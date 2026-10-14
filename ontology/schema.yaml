@@ -1,0 +1,820 @@
+id: https://w3id.org/kr-employment/
+name: employment
+title: 고용 분야 ontology
+description: 고용24가 다루는 고용 분야의 class와 property 정의다. class와 property는 표준의 이름을 그대로 쓰고, 각 이름은 표준 IRI에 대응한다.
+comments:
+  - 노트의 파일 이름은 RDF로 옮길 때 `skos:prefLabel`이 된다.
+  - "instance가 아니라 노트를 설명하는 property에는 `describes: note` annotation을 붙인다. RDF로 옮길 때 이런 property는 노트 문서(`foaf:Document`)에 붙이고, 노트 문서는 `foaf:primaryTopic`으로 instance를 가리킨다."
+  - 표준에 없는 개념이 필요하면 이 schema에 먼저 정의하고 이유를 comments에 적는다.
+prefixes:
+  linkml: https://w3id.org/linkml/
+  employment: https://w3id.org/kr-employment/
+  cpsv: http://purl.org/vocab/cpsv#
+  cv: http://data.europa.eu/m8g/
+  eli: http://data.europa.eu/eli/ontology#
+  skos: http://www.w3.org/2004/02/skos/core#
+  dcat: http://www.w3.org/ns/dcat#
+  foaf: http://xmlns.com/foaf/0.1/
+  prov: http://www.w3.org/ns/prov#
+  dmn: https://www.omg.org/spec/DMN/20191111/MODEL/
+  dct: http://purl.org/dc/terms/
+  org: http://www.w3.org/ns/org#
+  rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+  schema: http://schema.org/
+  sh: http://www.w3.org/ns/shacl#
+  spdx: http://spdx.org/rdf/terms#
+default_prefix: employment
+default_range: string
+imports:
+  - linkml:types
+
+enums:
+  CreativeWorkStatus:
+    description: 노트의 편집 상태
+    permissible_values:
+      draft:
+        description: LLM이 만들거나 고친 상태
+        meaning: employment:status-draft
+      verified:
+        description: 노트를 쓰지 않은 별도 agent가 원문과 대조한 상태
+        meaning: employment:status-verified
+      reviewed:
+        description: 사람이 승인한 상태
+        meaning: employment:status-reviewed
+  SubdivisionType:
+    description: 법령 하위 단위의 종류
+    permissible_values:
+      chapter:
+        description: 장
+      section:
+        description: 절
+      article:
+        description: 조
+      annex:
+        description: 별표
+      form:
+        description: 별지 서식
+      addendum:
+        description: 부칙
+  HitPolicy:
+    description: 결정표에서 여러 규칙이 맞을 때의 처리 방식(DMN hit policy)
+    permissible_values:
+      unique:
+        description: 맞는 규칙이 하나뿐이어야 함
+      first:
+        description: 맞는 규칙 중 첫 번째 규칙의 결과
+      any:
+        description: 맞는 규칙들의 결과가 모두 같아야 함
+
+classes:
+  NamedThing:
+    abstract: true
+    description: 모든 wiki 노트의 공통 property를 정의하는 추상 class
+    slots:
+      - type
+      - identifier
+      - aliases
+      - definition
+      - source
+      - validFrom
+      - validThrough
+      - status
+      - reviewedBy
+      - lastReviewed
+      - isReplacedBy
+
+  PublicService:
+    is_a: NamedThing
+    class_uri: cpsv:PublicService
+    description: 공공기관이 제공하는 서비스(급여와 신청 절차 포함)
+    annotations:
+      examples: 구직급여, 실업인정, 피보험자격 상실 신고
+    slots:
+      - hasCompetentAuthority
+      - audience
+      - follows
+      - hasChannel
+      - hasInputType
+      - hasLegalResource
+      - hasParticipation
+      - holdsRequirement
+      - isGroupedBy
+      - produces
+      - relatedService
+      - requires
+    slot_usage:
+      hasCompetentAuthority:
+        required: true
+
+  Event:
+    is_a: NamedThing
+    abstract: true
+    class_uri: cv:Event
+    description: 공공서비스가 필요해지는 사건
+    slots:
+      - eventType
+
+  LifeEvent:
+    is_a: Event
+    class_uri: cv:LifeEvent
+    description: 공공서비스가 필요해지는 개인의 사건
+    annotations:
+      examples: 이직, 재취업
+
+  BusinessEvent:
+    is_a: Event
+    class_uri: cv:BusinessEvent
+    description: 공공서비스가 필요해지는 사업장의 사건
+    annotations:
+      examples: 근로자 이직
+
+  Agent:
+    is_a: NamedThing
+    class_uri: foaf:Agent
+    description: 서비스에 참여하는 당사자
+    comments:
+      - 법령이 정한 당사자 유형도 instance로 둔다.
+    annotations:
+      examples: 사업주, 피보험자, 수급자격자
+
+  PublicOrganisation:
+    is_a: Agent
+    class_uri: cv:PublicOrganisation
+    description: 공공기관
+    annotations:
+      examples: 고용노동부, 직업안정기관, 근로복지공단
+    slots:
+      - subOrganizationOf
+
+  Participation:
+    is_a: NamedThing
+    class_uri: cv:Participation
+    description: 서비스에서 당사자가 맡는 역할
+    annotations:
+      examples: 피보험자격 상실 신고의 신고 의무자인 사업주
+    slots:
+      - hasParticipant
+      - role
+    slot_usage:
+      hasParticipant:
+        required: true
+      role:
+        required: true
+
+  Channel:
+    is_a: NamedThing
+    class_uri: cv:Channel
+    description: 서비스를 이용하는 경로
+    annotations:
+      examples: 고용24 누리집, 직업안정기관 출석
+    slots:
+      - ownedBy
+
+  Output:
+    is_a: NamedThing
+    class_uri: cv:Output
+    description: 서비스가 만들어 내는 결과
+    annotations:
+      examples: 수급자격 인정, 수급자격증
+
+  Rule:
+    is_a: NamedThing
+    class_uri: cpsv:Rule
+    description: 서비스가 따르는 산정·판단 규칙
+    comments:
+      - 식은 FEEL literal expression으로, 표는 DMN 결정표로 적는다.
+      - "`literalExpression`과 `decisionTable` 중 하나만 적는다."
+    annotations:
+      examples: 구직급여일액 산정, 소정급여일수 산정
+    slots:
+      - implements
+      - requiredInput
+      - variable
+      - literalExpression
+      - decisionTable
+    slot_usage:
+      implements:
+        required: true
+      variable:
+        required: true
+    exactly_one_of:
+      - slot_conditions:
+          literalExpression:
+            required: true
+      - slot_conditions:
+          decisionTable:
+            required: true
+
+  Requirement:
+    is_a: NamedThing
+    abstract: true
+    class_uri: cv:Requirement
+    description: Criterion과 Constraint의 상위 class
+    slots:
+      - hasConcept
+      - hasEvidenceTypeList
+      - hasRequirement
+      - isDerivedFrom
+
+  Criterion:
+    is_a: Requirement
+    class_uri: cv:Criterion
+    description: 서비스를 받으려면 충족해야 하는 조건
+    annotations:
+      examples: 기준기간 동안의 피보험 단위기간 180일 이상
+
+  Constraint:
+    is_a: Requirement
+    class_uri: cv:Constraint
+    description: 정보 값에 거는 기한·상한·하한 같은 제한
+    annotations:
+      examples: 기초일액 상한 11만3500원, 이직확인서 발급 기한 10일
+    slots:
+      - constrains
+      - value
+      - minInclusive
+      - minExclusive
+      - maxInclusive
+      - maxExclusive
+      - unitCode
+      - currency
+    slot_usage:
+      constrains:
+        required: true
+
+  InformationConcept:
+    is_a: NamedThing
+    class_uri: cv:InformationConcept
+    description: 조건과 규칙이 판단하는 정보 항목
+    annotations:
+      examples: 피보험 단위기간, 이직일, 기초일액
+
+  EvidenceType:
+    is_a: NamedThing
+    class_uri: cv:EvidenceType
+    description: 증빙 서류의 유형
+    annotations:
+      examples: 피보험자 이직확인서
+    slots:
+      - isDefinedBy
+
+  Work:
+    is_a: NamedThing
+    abstract: true
+    class_uri: eli:Work
+    description: 법령과 그 하위 단위의 공통 상위 class
+    slots:
+      - title
+      - idLocal
+      - basedOn
+      - cites
+    slot_usage:
+      title:
+        required: true
+      definition:
+        required: false
+
+  LegalResource:
+    is_a: Work
+    class_uri: eli:LegalResource
+    description: 시행일 버전과 무관한 법령
+    annotations:
+      examples: 고용보험법, 2026년 적용 최저임금 고시
+    comments:
+      - 법률, 시행령, 시행규칙, 고시를 포함한다.
+      - "identifier는 법령이면 law-<법령ID>, 행정규칙이면 admrul-<행정규칙ID>다."
+    slots:
+      - typeDocument
+    slot_usage:
+      typeDocument:
+        required: true
+
+  LegalResourceSubdivision:
+    is_a: Work
+    class_uri: eli:LegalResourceSubdivision
+    description: 시행일 버전과 무관한 법령의 하위 단위
+    annotations:
+      examples: 고용보험법 제40조, 고용보험법 별표 1, 고용보험법 시행규칙 별지 제6호서식
+    comments:
+      - 장, 절, 조, 별표, 별지 서식, 부칙을 포함한다.
+      - "identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-<번호>, 가지번호는 -art-10-2처럼 붙인다."
+      - "장은 -ch-<번호>, 절은 -ch-<번호>-sec-<번호>, 별표는 -annex-<번호>, 별지 서식은 -form-<번호>, 부칙은 -sup-<공포번호>다."
+    slots:
+      - isPartOf
+      - typeSubdivision
+      - number
+    slot_usage:
+      isPartOf:
+        required: true
+      typeSubdivision:
+        required: true
+      number:
+        required: true
+        description: 제40조, 별표 1 같은 하위 단위 번호
+
+  ConceptScheme:
+    is_a: NamedThing
+    class_uri: skos:ConceptScheme
+    description: 용어집과 코드 체계
+    annotations:
+      examples: 고용보험 상실사유 구분코드, 당사자 역할
+
+  Concept:
+    is_a: NamedThing
+    class_uri: skos:Concept
+    description: 용어, 코드 값, 역할, 대상자 유형
+    annotations:
+      examples: 상실사유 구분코드 23, 신고 의무자
+    slots:
+      - inScheme
+      - notation
+      - broader
+      - exactMatch
+      - related
+    slot_usage:
+      inScheme:
+        required: true
+
+  Dataset:
+    is_a: NamedThing
+    class_uri: dcat:Dataset
+    description: 통계와 데이터셋
+    annotations:
+      examples: 구직급여 수급 현황
+    slots:
+      - publisher
+    slot_usage:
+      publisher:
+        range: PublicOrganisation
+        required: true
+
+  DecisionTable:
+    class_uri: dmn:decisionTable
+    description: Rule의 결정표
+    comments:
+      - 행마다 입력 조건과 출력 값을 적는다.
+    slots:
+      - hitPolicy
+      - input
+      - output
+      - rule
+    slot_usage:
+      hitPolicy:
+        required: true
+      input:
+        required: true
+      output:
+        required: true
+      rule:
+        required: true
+
+  InputClause:
+    class_uri: dmn:input
+    description: 결정표의 입력 열
+    slots:
+      - hasConcept
+    slot_usage:
+      hasConcept:
+        required: true
+        multivalued: false
+        description: 입력 열의 정보 항목
+
+  OutputClause:
+    class_uri: dmn:output
+    description: 결정표의 출력 열
+    slots:
+      - hasConcept
+      - unitCode
+      - currency
+    slot_usage:
+      hasConcept:
+        required: true
+        multivalued: false
+        description: 출력 열의 정보 항목
+
+  DecisionRule:
+    class_uri: dmn:rule
+    description: 결정표의 한 행
+    slots:
+      - inputEntry
+      - outputEntry
+    slot_usage:
+      inputEntry:
+        required: true
+      outputEntry:
+        required: true
+
+  Entity:
+    class_uri: prov:Entity
+    description: "`raw/` 노트의 원문"
+    comments:
+      - 법령 원문 노트 하나는 시행일 버전 하나에 해당한다.
+    slots:
+      - title
+      - publisher
+      - url
+      - generatedAtTime
+      - sha256
+      - license
+      - modified
+      - idLocal
+      - number
+      - firstDateEntryInForce
+      - datePublication
+    slot_usage:
+      title:
+        required: true
+      publisher:
+        required: true
+      url:
+        required: true
+      generatedAtTime:
+        required: true
+      sha256:
+        required: true
+      license:
+        required: true
+      number:
+        description: 법령 원문 버전의 법령일련번호(MST)
+
+  Person:
+    class_uri: foaf:Person
+    description: 합성데이터의 개인
+    slots:
+      - type
+      - identifier
+      - synthetic
+    slot_usage:
+      synthetic:
+        required: true
+
+  Evidence:
+    class_uri: cv:Evidence
+    description: 합성데이터의 증빙 서류
+    slots:
+      - type
+      - identifier
+      - synthetic
+      - conformsTo
+    slot_usage:
+      synthetic:
+        required: true
+      conformsTo:
+        required: true
+
+slots:
+  type:
+    slot_uri: rdf:type
+    designates_type: true
+    required: true
+    description: Classes 표의 이름
+  identifier:
+    slot_uri: dct:identifier
+    identifier: true
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    description: 바뀌지 않는 kebab-case 식별자
+  aliases:
+    slot_uri: skos:altLabel
+    multivalued: true
+    description: 다른 이름 목록
+  definition:
+    slot_uri: skos:definition
+    required: true
+    description: 한 문장 정의
+  source:
+    slot_uri: dct:source
+    multivalued: true
+    required: true
+    range: uriorcurie
+    description: 원문 노트나 법령 노트의 wikilink 목록
+    annotations:
+      describes: note
+  validFrom:
+    slot_uri: schema:validFrom
+    range: date
+    description: 적용 시작일
+  validThrough:
+    slot_uri: schema:validThrough
+    range: date
+    description: 적용 종료일
+  status:
+    slot_uri: schema:creativeWorkStatus
+    range: CreativeWorkStatus
+    required: true
+    description: 노트의 편집 상태
+    annotations:
+      describes: note
+  reviewedBy:
+    slot_uri: schema:reviewedBy
+    description: 승인한 사람
+    annotations:
+      describes: note
+  lastReviewed:
+    slot_uri: schema:lastReviewed
+    range: date
+    description: 승인일
+    annotations:
+      describes: note
+  isReplacedBy:
+    slot_uri: dct:isReplacedBy
+    range: NamedThing
+    description: 폐지되거나 대체된 instance를 잇는 후속 instance
+
+  hasCompetentAuthority:
+    slot_uri: cv:hasCompetentAuthority
+    range: PublicOrganisation
+    multivalued: true
+    description: 서비스를 책임지는 공공기관
+  audience:
+    slot_uri: dct:audience
+    range: Concept
+    multivalued: true
+    description: 서비스의 대상자 유형
+  follows:
+    slot_uri: cpsv:follows
+    range: Rule
+    multivalued: true
+    description: 서비스가 따르는 규칙
+  hasChannel:
+    slot_uri: cv:hasChannel
+    range: Channel
+    multivalued: true
+    description: 서비스를 이용하는 경로
+  hasInputType:
+    slot_uri: cv:hasInputType
+    range: EvidenceType
+    multivalued: true
+    description: 서비스에 필요한 증빙 유형
+  hasLegalResource:
+    slot_uri: cv:hasLegalResource
+    range: Work
+    multivalued: true
+    description: 서비스의 근거 법령이나 그 하위 단위
+  hasParticipation:
+    slot_uri: cv:hasParticipation
+    range: Participation
+    multivalued: true
+    description: 서비스에서 당사자가 맡는 역할
+  holdsRequirement:
+    slot_uri: cv:holdsRequirement
+    range: Requirement
+    multivalued: true
+    description: 서비스의 조건이나 제한
+  isGroupedBy:
+    slot_uri: cv:isGroupedBy
+    range: Event
+    multivalued: true
+    description: 서비스를 필요로 하는 사건
+  produces:
+    slot_uri: cpsv:produces
+    range: Output
+    multivalued: true
+    description: 서비스의 결과
+  relatedService:
+    slot_uri: cv:relatedService
+    range: PublicService
+    multivalued: true
+    description: 관련 서비스
+  requires:
+    slot_uri: dct:requires
+    range: PublicService
+    multivalued: true
+    description: 먼저 거쳐야 하는 서비스
+  eventType:
+    slot_uri: dct:type
+    range: Concept
+    description: 사건의 유형 코드
+  subOrganizationOf:
+    slot_uri: org:subOrganizationOf
+    range: PublicOrganisation
+    multivalued: true
+    description: 상위 공공기관
+  hasParticipant:
+    slot_uri: cv:hasParticipant
+    range: Agent
+    description: 역할을 맡는 당사자
+  role:
+    slot_uri: cv:role
+    range: Concept
+    multivalued: true
+    description: 당사자가 맡는 역할
+  ownedBy:
+    slot_uri: cv:ownedBy
+    range: PublicOrganisation
+    multivalued: true
+    description: 경로를 운영하는 공공기관
+  implements:
+    slot_uri: cpsv:implements
+    range: Work
+    multivalued: true
+    description: 규칙의 근거 법령이나 그 하위 단위
+  requiredInput:
+    slot_uri: dmn:requiredInput
+    range: InformationConcept
+    multivalued: true
+    description: 규칙의 입력 정보 항목
+    comments:
+      - FEEL 식에서는 노트 이름을 변수 이름으로 쓴다.
+  variable:
+    slot_uri: dmn:variable
+    range: InformationConcept
+    description: 규칙이 산출하는 정보 항목
+  literalExpression:
+    slot_uri: dmn:literalExpression
+    description: 규칙의 FEEL 식
+  decisionTable:
+    slot_uri: dmn:decisionTable
+    range: DecisionTable
+    inlined: true
+    description: 규칙의 결정표
+  hasConcept:
+    slot_uri: cv:hasConcept
+    range: InformationConcept
+    multivalued: true
+    description: 판단하는 정보 항목
+  hasEvidenceTypeList:
+    slot_uri: cv:hasEvidenceTypeList
+    range: EvidenceType
+    multivalued: true
+    description: 조건을 증명하는 증빙 유형
+    comments:
+      - 적은 증빙 유형이 모두 필요하다. 서로 대신할 수 있는 조합이 있으면 조합마다 조건을 나눈다.
+      - "CCCEV의 증빙 유형 목록(`cv:EvidenceTypeList`)은 RDF로 옮길 때 만든다."
+  hasRequirement:
+    slot_uri: cv:hasRequirement
+    range: Requirement
+    multivalued: true
+    description: 하위 조건이나 제한
+    comments:
+      - 하위 조건이나 제한을 모두 충족할 때 상위 조건이나 제한이 적용된다.
+  isDerivedFrom:
+    slot_uri: cv:isDerivedFrom
+    range: Work
+    multivalued: true
+    description: 조건이나 제한의 근거 법령 단위
+  constrains:
+    slot_uri: cv:constrains
+    range: InformationConcept
+    description: 제한하는 정보 항목
+  value:
+    slot_uri: schema:value
+    range: decimal
+    description: 고정 값
+  minInclusive:
+    slot_uri: sh:minInclusive
+    range: decimal
+    description: 이상
+  minExclusive:
+    slot_uri: sh:minExclusive
+    range: decimal
+    description: 초과
+  maxInclusive:
+    slot_uri: sh:maxInclusive
+    range: decimal
+    description: 이하
+  maxExclusive:
+    slot_uri: sh:maxExclusive
+    range: decimal
+    description: 미만
+  unitCode:
+    slot_uri: schema:unitCode
+    description: UN/CEFACT 단위 코드
+    comments:
+      - 일은 DAY, 월은 MON, 년은 ANN, 시간은 HUR다.
+  currency:
+    slot_uri: schema:currency
+    description: ISO 4217 통화 코드
+  isDefinedBy:
+    slot_uri: rdfs:isDefinedBy
+    range: LegalResourceSubdivision
+    description: 증빙 유형을 정한 별지 서식
+  title:
+    slot_uri: dct:title
+    description: 제목
+  idLocal:
+    slot_uri: eli:id_local
+    description: 법제처 식별자
+    comments:
+      - 법령은 법령ID, 행정규칙은 행정규칙ID다.
+  basedOn:
+    slot_uri: eli:based_on
+    range: Work
+    multivalued: true
+    description: 위임한 상위 법령이나 그 하위 단위
+  cites:
+    slot_uri: eli:cites
+    range: Work
+    multivalued: true
+    description: 본문이 인용하는 법령이나 그 하위 단위
+  typeDocument:
+    slot_uri: eli:type_document
+    range: Concept
+    description: 법률, 대통령령, 부령, 고시 같은 법령 종류
+  isPartOf:
+    slot_uri: eli:is_part_of
+    range: Work
+    description: 속한 법령이나 상위 단위
+  typeSubdivision:
+    slot_uri: eli:type_subdivision
+    range: SubdivisionType
+    description: 하위 단위의 종류
+  number:
+    slot_uri: eli:number
+    description: 번호
+  inScheme:
+    slot_uri: skos:inScheme
+    range: ConceptScheme
+    description: 속한 용어집이나 코드 체계
+  notation:
+    slot_uri: skos:notation
+    description: 코드 값
+  broader:
+    slot_uri: skos:broader
+    range: Concept
+    multivalued: true
+    description: 상위 개념
+  exactMatch:
+    slot_uri: skos:exactMatch
+    range: uriorcurie
+    multivalued: true
+    description: 다른 체계의 같은 개념
+  related:
+    slot_uri: skos:related
+    range: Concept
+    multivalued: true
+    description: 관련 개념
+  publisher:
+    slot_uri: dct:publisher
+    description: 공개 기관
+  hitPolicy:
+    slot_uri: dmn:hitPolicy
+    range: HitPolicy
+    description: 여러 행이 맞을 때의 처리 방식
+  input:
+    slot_uri: dmn:input
+    range: InputClause
+    multivalued: true
+    inlined_as_list: true
+    description: 입력 열 목록
+  output:
+    slot_uri: dmn:output
+    range: OutputClause
+    multivalued: true
+    inlined_as_list: true
+    description: 출력 열 목록
+  rule:
+    slot_uri: dmn:rule
+    range: DecisionRule
+    multivalued: true
+    inlined_as_list: true
+    description: 행 목록
+  inputEntry:
+    slot_uri: dmn:inputEntry
+    multivalued: true
+    description: 입력 열 순서대로 적은 FEEL unary test
+    comments:
+      - "50세 미만은 `< 50`, 1년 이상 3년 미만은 `[1..3)`처럼 적는다."
+  outputEntry:
+    slot_uri: dmn:outputEntry
+    multivalued: true
+    description: 출력 열 순서대로 적은 FEEL 식
+  url:
+    slot_uri: schema:url
+    range: uri
+    description: 수집한 주소
+    comments:
+      - "인증값은 `${LAW_OC}`처럼 환경변수 이름으로 치환한다."
+  generatedAtTime:
+    slot_uri: prov:generatedAtTime
+    range: datetime
+    description: 수집 일시
+  sha256:
+    slot_uri: spdx:checksumValue
+    pattern: "^[0-9a-f]{64}$"
+    description: 정규화한 본문 텍스트의 SHA-256 hash
+  license:
+    slot_uri: dct:license
+    description: 이용 조건
+  modified:
+    slot_uri: dct:modified
+    range: date
+    description: 원문이 밝힌 최종 수정일
+  firstDateEntryInForce:
+    slot_uri: eli:first_date_entry_in_force
+    range: date
+    description: 법령 원문 버전의 시행일자
+  datePublication:
+    slot_uri: eli:date_publication
+    range: date
+    description: 법령 원문 버전의 공포일자
+  synthetic:
+    slot_uri: employment:synthetic
+    range: boolean
+    description: 합성데이터 표시
+    comments:
+      - 값은 항상 true다.
+  conformsTo:
+    slot_uri: dct:conformsTo
+    range: EvidenceType
+    description: 합성 증빙이 따르는 증빙 유형

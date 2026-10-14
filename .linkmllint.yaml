@@ -1,0 +1,7 @@
+extends: recommended
+rules:
+  standard_naming:
+    level: error
+    slot_pattern: "^[a-z][a-zA-Z0-9]*$"
+  canonical_prefixes:
+    level: disabled
