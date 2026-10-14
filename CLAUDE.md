@@ -2,6 +2,8 @@
 
 이 저장소는 고용24가 다루는 고용 도메인의 온톨로지를 Obsidian 위키로 관리한다. 첫 도메인은 퇴사와 실업급여다. 다른 서비스와 프로젝트는 이 온톨로지를 참조만 한다. 분량보다 정확성이 우선이다.
 
+모든 내용은 공식 출처로 추적할 수 있어야 하고, 수집은 스크립트로 다시 실행할 수 있어야 한다. 최종 승인은 사람이 한다.
+
 LLM-Wiki 방식을 따른다. 수정하지 않는 원문, LLM이 쓰고 관리하는 위키, 그리고 이 문서와 `ontology/schema.md`의 세 층으로 나눈다.
 
 ## 구조
@@ -19,7 +21,8 @@ LLM-Wiki 방식을 따른다. 수정하지 않는 원문, LLM이 쓰고 관리�
 ## 원문
 
 - 출처별로 폴더를 나눈다. `raw/law/`는 법제처, `raw/work24/`는 고용24 안내, `raw/stats/`는 EIS·KOSIS·공공데이터포털이다.
-- 원문은 Markdown 노트로 저장한다. frontmatter에 `sourceUrl`, `retrievedAt`, `sha256`을 적는다. `sha256`은 추출한 본문 텍스트의 해시다.
+- 원문은 Markdown 노트로 저장한다. frontmatter에 `sourceUrl`, `retrievedAt`, `sha256`, `license`를 적는다. `sha256`은 추출한 본문 텍스트의 해시다.
+- `license`에는 출처의 이용 조건을 적는다. 법령은 저작권법 제7조에 따라 보호받지 않는 저작물이다. 그 밖의 출처는 공공누리 유형이나 공공데이터포털의 이용허락범위를 적는다.
 - API 응답 원본은 같은 이름의 `.json`으로 옆에 둔다.
 - 법령은 `raw/law/<법령명>/<시행일자>.md`, 웹 페이지는 `raw/work24/<페이지 이름>/<수집일>.md`로 저장한다.
 - 다시 수집하면 덮어쓰지 않고 새 파일을 만든다. 직전 파일과 `sha256`이 같으면 저장하지 않는다.
@@ -62,9 +65,14 @@ status: draft
 
 ## 검토
 
-- LLM이 만들거나 고친 노트는 `status: draft`가 된다.
-- `status: reviewed`는 사람이 검토한 뒤에만 적는다. 이때 `reviewedBy`, `lastReviewed`를 함께 적는다. LLM은 노트를 `reviewed`로 바꾸지 않는다.
-- 근거 원문이 바뀐 노트는 `draft`로 되돌리고 `log.md`에 이유를 적는다.
+노트는 `draft`, `verified`, `reviewed` 순서로 올라간다.
+
+1. `draft`: LLM이 만들거나 고친 노트다.
+2. `verified`: 노트를 쓰지 않은 별도 에이전트가 새 맥락에서 검증한 노트다. 사실 문장마다 각주의 원문과 대조하고, 인용이 원문과 글자 그대로 같은지 확인하고, schema를 지켰는지 본다. 하나라도 어긋나면 `draft`로 두고 고칠 내용을 `log.md`에 적는다.
+3. `reviewed`: 사람이 승인한 노트다. 이때 `reviewedBy`, `lastReviewed`를 함께 적는다. LLM은 노트를 `reviewed`로 바꾸지 않는다.
+
+- 다른 프로젝트가 참조할 때는 `reviewed` 노트를 기준으로 한다.
+- 노트를 고치면 `draft`로 돌아간다. 근거 원문이 바뀐 노트도 `draft`로 되돌리고 `log.md`에 이유를 적는다.
 - 폐지되거나 대체된 개체는 지우지 않는다. `status: deprecated`로 바꾸고 `isReplacedBy`로 대체 노트를 잇는다.
 
 ## 작업
@@ -96,7 +104,7 @@ status: draft
 
 ## 작업 기록
 
-`log.md`에는 작업마다 아래 형식으로 추가한다.
+`log.md`에는 작업마다 아래 형식으로 추가한다. 작업 이름은 `ingest`, `verify`, `review`, `lint`, `schema` 중 하나다.
 
 ```markdown
 ## 2026-10-14 ingest | 고용보험법

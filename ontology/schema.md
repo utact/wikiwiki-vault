@@ -51,7 +51,7 @@
 | `aliases` | `skos:altLabel` | | 다른 이름 목록 |
 | `definition` | `skos:definition` | 예 | 한 문장 정의 |
 | `source` | `dct:source` | 예 | 원문 노트 또는 조문 노트 링크 |
-| `status` | `adms:status` | 예 | `draft`, `reviewed`, `deprecated` |
+| `status` | `adms:status` | 예 | `draft`, `verified`, `reviewed`, `deprecated` |
 | `validFrom` | `schema:validFrom` | | 적용 시작일 `YYYY-MM-DD` |
 | `validThrough` | `schema:validThrough` | | 적용 종료일 `YYYY-MM-DD` |
 | `reviewedBy` | `schema:reviewedBy` | | 검토자 |
