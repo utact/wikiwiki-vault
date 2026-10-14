@@ -4,39 +4,54 @@ This vault holds an ontology of the Korean employment domain served by 고용24,
 
 ## Structure
 
-The vault has three layers: raw sources that are never edited, the wiki that the LLM writes and maintains, and the schema that defines the wiki.
+The vault has three layers: raw sources that are never edited, the wiki that the LLM and scripts write, and the schema that defines the wiki.
 
 | Path | Layer | Content |
 | --- | --- | --- |
 | `raw/` | Raw | Collected sources |
 | `wiki/` | Wiki | Instance notes in one subfolder per class |
 | `CLAUDE.md` | Schema | Operating rules |
-| `ontology/schema.md` | Schema | Class and property definitions |
+| `ontology/schema.yaml` | Schema | Class and property definitions in LinkML |
+| `ontology/schema.md` | Schema | Document generated from `ontology/schema.yaml` |
+| `ontology/release.yaml` | Schema | Reference date of the wiki |
+| `ontology/verification.jsonl` | — | Verification ledger |
 | `synthetic/` | — | Synthetic data |
-| `scripts/` | — | Collection and validation scripts |
+| `scripts/` | — | Collection, generation and validation scripts |
 | `docs/` | — | Human-facing documents such as the roadmap |
 | `index.md` | — | Notes by class |
 | `log.md` | — | Operation log |
+
+## Reference date
+
+- `asOf` in `ontology/release.yaml` is the reference date (기준 시점) of the whole wiki.
+- The current version of a law is the version in force on that date.
+  - Decide it by comparing 시행일자 with the reference date, never by the API's 현행 or 연혁 label.
+- Changing the reference date is a `schema` operation.
+  - Regenerate the statute notes and lint the wiki afterwards.
 
 ## Raw sources
 
 - Collect sources with scripts in `scripts/`.
   - Read API keys from `.env`.
+  - Replace every `.env` value with its variable name, as in `${LAW_OC}`, before saving.
 - Use one folder per publisher.
   - `raw/law/`: 법제처
   - `raw/work24/`: 고용24 guides
   - `raw/stats/`: EIS, KOSIS and 공공데이터포털
-- Name files by source and date.
-  - Statutes: `raw/law/<법령명>/<시행일자>.md`
-  - Web pages: `raw/work24/<page name>/<retrieval date>.md`
-  - Original API responses: a `.json` file with the same name, next to the note
+- Save each statute version as `raw/law/<법령명>/<시행일자>-<MST>/<retrieval date>/<법령명>.md`.
+  - Keep the original API response next to it as `<법령명>.json`.
+  - Collect the current version and every scheduled version (시행예정).
+  - Re-collect scheduled versions after each new promulgation, because a later amendment can change them.
+- Keep 고용24 guide bodies local and out of Git.
+  - 고용24 content without a 공공누리 mark needs prior consultation before redistribution.
+  - Commit only `raw/work24/manifest.yaml`, which records the URL, retrieval time, `sha256` and license status of each capture.
 - Fill every property in the Raw source properties table of `ontology/schema.md`.
 - Record the terms of use in `license`.
   - Statutes: not protected works under 저작권법 제7조
   - Other sources: the 공공누리 type or the 공공데이터포털 terms of use
 - Never edit a saved source.
-  - On re-collection, write a new file.
-  - Skip the new file if its `sha256` equals that of the previous file.
+  - On re-collection, write a new retrieval-date folder.
+  - Skip it if its `sha256` equals that of the previous retrieval.
 
 ## Synthetic data
 
@@ -46,15 +61,34 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Never cite or link synthetic notes from `wiki/` notes.
   - Synthetic notes may link `wiki/` notes.
 
+## Statute notes
+
+- Generate `LegalResource` and `LegalResourceSubdivision` notes from raw sources with a script.
+  - The LLM never writes or edits statute text.
+  - Write one note per law, 장, 절, 조, 별표, 별지 서식 and 부칙.
+- Name statute notes with the law name and the unit.
+  - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
+- Give every quotable unit a block ID.
+  - Lead text before the items (각 호 외의 부분): `^lead`
+  - 항: `^p1`, `^p2`
+  - 호: `^p1-i1`, or `^i1` when the article has no 항
+  - 가지 호 such as 제3호의2: `^i3-2`
+  - 목: `^p1-i5-m1`, where 가 is 1 and 나 is 2
+  - Articles of a 부칙: `^a3`, and their 항: `^a3-p1`
+- Show the current version in the body.
+  - Put each scheduled version under its own heading, with block IDs prefixed by its 시행일자, as in `^v20280101-p1`.
+
 ## Note format
 
 - Name each file with its Korean preferred label (`skos:prefLabel`), unique in the vault.
-  - Prefix article notes with the statute name, as in `고용보험법 제40조`.
   - File names may change, but an `identifier` never does.
 - Write frontmatter with schema properties only.
   - Follow the order of the tables in `ontology/schema.md`.
   - Write each relation as an object property holding wikilinks.
+  - A wikilink may point to a block, as in `"[[고용보험법 제45조#^p5]]"`.
   - Write a relation only in the direction the schema defines, and read the inverse from backlinks.
+- Change classes and properties only in `ontology/schema.yaml`.
+  - Run `uv run python -X utf8 scripts/schema_doc.py` afterwards, and never edit `ontology/schema.md` by hand.
 - Write the body in Korean.
   - Open with a definition paragraph.
   - Split the explanation under `##` headings.
@@ -67,21 +101,23 @@ The frontmatter of `wiki/PublicService/구직급여.md` looks like this.
 type: PublicService
 identifier: job-seeking-benefit
 aliases: [실업급여]
-definition: 피보험자가 실업 상태에서 재취업활동을 하는 동안 지급하는 급여
+definition: 이직한 피보험자가 수급 요건을 갖추어 실업의 인정을 받은 날에 지급하는 급여
 hasCompetentAuthority: ["[[고용노동부]]"]
 hasLegalResource: ["[[고용보험법 제40조]]"]
-source: ["[[고용보험법 제40조]]"]
+source: ["[[고용보험법 제40조]]", "[[고용보험법 제44조]]"]
 status: draft
 ---
 ```
 
 ## Citations
 
-- Footnote every factual sentence with its source.
-  - Statutes: a paragraph of the article note, as in `[[고용보험법 제40조#제1항]]`
+- Footnote every factual sentence with the block it rests on.
+  - Statutes: a block of the statute note, labelled with the official citation, as in `[^1]: [[고용보험법 제40조#^p1-i1|고용보험법 제40조제1항제1호]]`
+  - 단서, 본문, 전단 and 후단: link the block, and name the part in the label
   - 고용24 guides: the raw note
 - Quote statutory text verbatim.
   - Keep source text and interpretation in separate sentences.
+- Every number, amount and date in a note must appear in, or be calculated from, the blocks it cites.
 - Rank sources in this order.
   1. 법률
   2. 시행령
@@ -89,32 +125,37 @@ status: draft
   4. 고시·행정규칙
   5. 고용24 official guides
   6. Statistics
-- When sources disagree, record both under a `> [!warning] 출처 충돌` callout.
-  - Never pick one yourself.
+- State a fact from the highest-ranked source.
+  - When a lower-ranked source says otherwise, add a `> [!warning] 출처 불일치` callout that quotes both.
+  - When sources of the same rank disagree, record both under a `> [!warning] 출처 충돌` callout and never pick one yourself.
 - Give amounts, periods and rates a reference date.
   - Give values that can change `validFrom` and `validThrough`.
+  - Model a transitional provision (경과조치) as a `Criterion` or `Constraint` on the date it depends on, such as 이직일, derived from the 부칙 block.
 - Never state unconfirmed content as fact.
   - Leave it as a question in a `> [!question]` callout.
 
 ## Review
 
-Notes move through three statuses in order.
+Notes written by the LLM move through three statuses in order.
 
 1. `draft`: created or edited by the LLM
-   - Any edit, or any change in the cited source, returns a note to `draft`.
+   - Any edit, or any change in a cited block, returns a note to `draft`.
    - Log the reason in `log.md`.
 2. `verified`: checked by a separate agent
    - The verifier did not write the note and works in a fresh context.
    - Run it as a subagent with model `opus` and effort `xhigh`.
-   - It compares every factual sentence with the cited source.
-   - It confirms that quotes match the source character for character.
+   - It compares every factual sentence with the cited block.
    - It checks schema conformance.
+   - Quotes and numbers are checked by script, not by the verifier.
    - On any mismatch, the note stays `draft` and the required fixes go to `log.md`.
+   - On success, append an entry to `ontology/verification.jsonl` with the note path, the hash of the note and the hashes of the cited blocks.
 3. `reviewed`: approved by the human owner
    - Record `reviewedBy` and `lastReviewed`.
    - The LLM never sets `reviewed`.
 
-Retired or superseded instances are never deleted. Set `status: deprecated` and link the successor with `isReplacedBy`.
+- Statute notes generated by script skip the verifier, because the script checks them against the raw source.
+- Retired or superseded instances are never deleted.
+  - Set `validThrough` and link the successor with `isReplacedBy`.
 
 ## Operations
 
@@ -123,10 +164,11 @@ Retired or superseded instances are never deleted. Set `status: deprecated` and 
 Ingest reflects a source in the wiki.
 
 1. Save the source to `raw/` with a script.
-2. Find related notes through `index.md`.
-3. Create or edit notes.
+2. Regenerate the statute notes when the source is a statute.
+3. Find related notes through `index.md`.
+4. Create or edit notes.
    - If a needed class or property is missing, update the schema first.
-4. Update `index.md` and `log.md`.
+5. Update `index.md` and `log.md`.
 
 ### Query
 
@@ -140,18 +182,23 @@ Query answers a question from the wiki.
 Lint checks the wiki for these problems.
 
 - Links
-  - Broken links
+  - Broken links and block references
   - Notes that nothing links to
 - Schema
-  - `type` values or properties missing from the schema
-  - Missing required properties
+  - Notes that fail LinkML validation against `ontology/schema.yaml`
+  - `ontology/schema.md` out of date with `ontology/schema.yaml`
 - Sources
   - Factual sentences without a source
-  - Changed `sha256` values in raw sources, and the notes they affect
+  - Quotes or numbers that do not match the cited block
+  - Cited blocks whose hash differs from the one in the verification ledger
+  - `verified` or `reviewed` notes without a matching ledger entry
+  - Scheduled versions that come into force on or before the reference date
+- Secrets
+  - `.env` values in tracked files
 - Synthetic data
   - Links from `wiki/` to `synthetic/`
 - Content
-  - Contradictions between notes
+  - Contradictions between notes, checked by the verifier
 
 ## Log
 
@@ -245,6 +292,12 @@ An entry for ingesting 고용보험법 looks like this.
   - Do not use bold or italic.
 - Checking
   - Check formatting with `npx markdownlint-cli2`, configured in `.markdownlint-cli2.jsonc`.
+
+### Scripts
+
+- Run Python with `uv run python -X utf8`.
+  - Without UTF-8 mode, Python on Windows reads Korean files as CP949.
+- Write files in UTF-8 with LF line endings.
 
 ### Commits
 

@@ -8,3 +8,6 @@
 
 .venv/
 __pycache__/
+
+raw/work24/*
+!raw/work24/manifest.yaml
