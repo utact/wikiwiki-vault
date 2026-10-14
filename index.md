@@ -1,3 +1,3 @@
 # Index
 
-클래스별 노트 목록이다. 클래스 정의는 [[schema]]에 있다.
+class별 노트 목록이다. class 정의는 [[schema]]에 있다.

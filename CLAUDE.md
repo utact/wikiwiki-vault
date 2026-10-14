@@ -1,38 +1,65 @@
-# 고용 도메인 온톨로지 위키
+# Employment domain ontology
 
-이 저장소는 고용24가 다루는 고용 도메인의 온톨로지를 Obsidian 위키로 관리한다. 첫 도메인은 퇴사와 실업급여다. 다른 서비스와 프로젝트는 이 온톨로지를 참조만 한다. 분량보다 정확성이 우선이다.
+This vault holds an ontology of the Korean employment domain served by 고용24, written as Markdown notes for Obsidian. The first domain is 이직 and 실업급여 under 고용보험법. Accuracy takes priority over coverage.
 
-모든 내용은 공식 출처로 추적할 수 있어야 하고, 수집은 스크립트로 다시 실행할 수 있어야 한다. 최종 승인은 사람이 한다.
+## Structure
 
-LLM-Wiki 방식을 따른다. 수정하지 않는 원문, LLM이 쓰고 관리하는 위키, 그리고 이 문서와 `ontology/schema.md`의 세 층으로 나눈다.
+The vault has three layers: raw sources that are never edited, the wiki that the LLM writes and maintains, and the schema that defines the wiki.
 
-## 구조
+| Path | Layer | Content |
+| --- | --- | --- |
+| `raw/` | Raw | Collected sources |
+| `wiki/` | Wiki | Instance notes in one subfolder per class |
+| `CLAUDE.md` | Schema | Operating rules |
+| `ontology/schema.md` | Schema | Class and property definitions |
+| `synthetic/` | — | Synthetic data |
+| `scripts/` | — | Collection and validation scripts |
+| `index.md` | — | Notes by class |
+| `log.md` | — | Operation log |
 
-| 경로 | 내용 | 규칙 |
-|---|---|---|
-| `raw/` | 수집한 원문 | 저장한 뒤 고치지 않는다 |
-| `wiki/` | 개체(instance) 노트 | 클래스 이름의 하위 폴더에 둔다. 예: `wiki/PublicService/` |
-| `ontology/schema.md` | 클래스와 속성 정의 | 새 클래스·속성은 여기에 먼저 정의한다 |
-| `synthetic/` | 합성데이터 | 공개 출처 노트와 섞지 않는다 |
-| `scripts/` | 수집·검증 스크립트 | 인증키는 `.env`에서 읽는다 |
-| `index.md` | 클래스별 노트 목록 | 노트를 만들거나 지우면 갱신한다 |
-| `log.md` | 작업 기록 | 끝에 추가만 한다 |
+## Raw sources
 
-## 원문
+- Collect sources with scripts in `scripts/`.
+  - Read API keys from `.env`.
+- Use one folder per publisher.
+  - `raw/law/`: 법제처
+  - `raw/work24/`: 고용24 guides
+  - `raw/stats/`: EIS, KOSIS and 공공데이터포털
+- Name files by source and date.
+  - Statutes: `raw/law/<법령명>/<시행일자>.md`
+  - Web pages: `raw/work24/<page name>/<retrieval date>.md`
+  - Original API responses: a `.json` file with the same name, next to the note
+- Fill every property in the Raw source properties table of `ontology/schema.md`.
+- Record the terms of use in `license`.
+  - Statutes: not protected works under 저작권법 제7조
+  - Other sources: the 공공누리 type or the 공공데이터포털 terms of use
+- Never edit a saved source.
+  - On re-collection, write a new file.
+  - Skip the new file if its `sha256` equals that of the previous file.
 
-- 출처별로 폴더를 나눈다. `raw/law/`는 법제처, `raw/work24/`는 고용24 안내, `raw/stats/`는 EIS·KOSIS·공공데이터포털이다.
-- 원문은 Markdown 노트로 저장한다. frontmatter에 `sourceUrl`, `retrievedAt`, `sha256`, `license`를 적는다. `sha256`은 추출한 본문 텍스트의 해시다.
-- `license`에는 출처의 이용 조건을 적는다. 법령은 저작권법 제7조에 따라 보호받지 않는 저작물이다. 그 밖의 출처는 공공누리 유형이나 공공데이터포털의 이용허락범위를 적는다.
-- API 응답 원본은 같은 이름의 `.json`으로 옆에 둔다.
-- 법령은 `raw/law/<법령명>/<시행일자>.md`, 웹 페이지는 `raw/work24/<페이지 이름>/<수집일>.md`로 저장한다.
-- 다시 수집하면 덮어쓰지 않고 새 파일을 만든다. 직전 파일과 `sha256`이 같으면 저장하지 않는다.
+## Synthetic data
 
-## 노트 형식
+- Keep synthetic data only in `synthetic/`.
+  - Synthetic data stands in for non-public information.
+  - Set `synthetic: true` in its frontmatter.
+- Never cite or link synthetic notes from `wiki/` notes.
+  - Synthetic notes may link `wiki/` notes.
 
-- 파일 이름은 한국어 대표 이름(`skos:prefLabel`)이다. 볼트 안에서 겹치지 않아야 한다. 조문은 `고용보험법 제40조`처럼 법령명을 붙인다.
-- frontmatter 키와 `type` 값은 `ontology/schema.md`에 정의된 영어 이름만 쓴다. 본문은 한국어로 쓴다.
-- 관계는 frontmatter 속성에 위키링크로 적는다. 관계마다 schema에 정한 한 방향으로만 적고, 반대 방향은 백링크로 본다.
-- `identifier`는 한 번 정하면 바꾸지 않는다. 파일 이름은 바꿔도 되지만 `identifier`는 그대로 둔다.
+## Note format
+
+- Name each file with its Korean preferred label (`skos:prefLabel`), unique in the vault.
+  - Prefix article notes with the statute name, as in `고용보험법 제40조`.
+  - File names may change, but an `identifier` never does.
+- Write frontmatter with schema properties only.
+  - Follow the order of the tables in `ontology/schema.md`.
+  - Write each relation as an object property holding wikilinks.
+  - Write a relation only in the direction the schema defines, and read the inverse from backlinks.
+- Write the body in Korean.
+  - Open with a definition paragraph.
+  - Split the explanation under `##` headings.
+  - Keep footnotes at the end.
+
+The frontmatter of `wiki/PublicService/구직급여.md` looks like this.
 
 ```yaml
 ---
@@ -47,67 +74,181 @@ status: draft
 ---
 ```
 
-본문은 정의, 설명, 관계 서술, 근거 순서로 쓴다.
+## Citations
 
-## 근거
+- Footnote every factual sentence with its source.
+  - Statutes: a paragraph of the article note, as in `[[고용보험법 제40조#제1항]]`
+  - 고용24 guides: the raw note
+- Quote statutory text verbatim.
+  - Keep source text and interpretation in separate sentences.
+- Rank sources in this order.
+  1. 법률
+  2. 시행령
+  3. 시행규칙
+  4. 고시·행정규칙
+  5. 고용24 official guides
+  6. Statistics
+- When sources disagree, record both under a `> [!warning] 출처 충돌` callout.
+  - Never pick one yourself.
+- Give amounts, periods and rates a reference date.
+  - Give values that can change `validFrom` and `validThrough`.
+- Never state unconfirmed content as fact.
+  - Leave it as a question in a `> [!question]` callout.
 
-- 사실을 적은 문장마다 각주로 출처를 단다. 법령은 조문 노트의 항으로 링크한다. 예: `[[고용보험법 제40조#제1항]]`. 고용24 안내는 원문 노트로 링크한다.
-- 법령 문구는 고치지 않고 인용한다. 원문과 해석을 문장 단위로 구분한다.
-- 출처 우선순위는 법률, 시행령, 시행규칙, 고시·행정규칙, 고용24 공식 안내, 통계 순이다.
-- 출처끼리 내용이 다르면 둘 다 적고 `> [!warning] 출처 충돌` callout으로 표시한다. 어느 쪽이 맞는지 임의로 정하지 않는다.
-- 금액, 기간, 비율에는 기준일을 적는다. 바뀔 수 있는 값은 `validFrom`, `validThrough`로 적용 기간을 적는다.
-- 출처로 확인하지 못한 내용은 사실로 쓰지 않는다. 확인할 질문은 `> [!question]` callout으로 남긴다.
+## Review
 
-## 합성데이터
+Notes move through three statuses in order.
 
-- 비공개 정보를 대신하는 합성데이터는 `synthetic/`에만 둔다. frontmatter에 `synthetic: true`를 적는다.
-- `wiki/` 노트는 합성데이터를 출처로 삼거나 링크하지 않는다. 합성데이터 노트는 `wiki/` 노트를 링크할 수 있다.
+1. `draft`: created or edited by the LLM
+   - Any edit, or any change in the cited source, returns a note to `draft`.
+   - Log the reason in `log.md`.
+2. `verified`: checked by a separate agent
+   - The verifier did not write the note and works in a fresh context.
+   - Run it as a subagent with model `opus` and effort `xhigh`.
+   - It compares every factual sentence with the cited source.
+   - It confirms that quotes match the source character for character.
+   - It checks schema conformance.
+   - On any mismatch, the note stays `draft` and the required fixes go to `log.md`.
+3. `reviewed`: approved by the human owner
+   - Record `reviewedBy` and `lastReviewed`.
+   - The LLM never sets `reviewed`.
 
-## 검토
+Retired or superseded instances are never deleted. Set `status: deprecated` and link the successor with `isReplacedBy`.
 
-노트는 `draft`, `verified`, `reviewed` 순서로 올라간다.
-
-1. `draft`: LLM이 만들거나 고친 노트다.
-2. `verified`: 노트를 쓰지 않은 별도 에이전트가 새 맥락에서 검증한 노트다. 사실 문장마다 각주의 원문과 대조하고, 인용이 원문과 글자 그대로 같은지 확인하고, schema를 지켰는지 본다. 하나라도 어긋나면 `draft`로 두고 고칠 내용을 `log.md`에 적는다.
-3. `reviewed`: 사람이 승인한 노트다. 이때 `reviewedBy`, `lastReviewed`를 함께 적는다. LLM은 노트를 `reviewed`로 바꾸지 않는다.
-
-- 다른 프로젝트가 참조할 때는 `reviewed` 노트를 기준으로 한다.
-- 노트를 고치면 `draft`로 돌아간다. 근거 원문이 바뀐 노트도 `draft`로 되돌리고 `log.md`에 이유를 적는다.
-- 폐지되거나 대체된 개체는 지우지 않는다. `status: deprecated`로 바꾸고 `isReplacedBy`로 대체 노트를 잇는다.
-
-## 작업
+## Operations
 
 ### Ingest
 
-원문을 위키에 반영하는 작업이다.
+Ingest reflects a source in the wiki.
 
-1. 스크립트로 원문을 `raw/`에 저장한다.
-2. `index.md`에서 관련 노트를 찾는다.
-3. 노트를 만들거나 고친다. 필요한 클래스·속성이 schema에 없으면 schema부터 고친다.
-4. `index.md`와 `log.md`를 갱신한다.
+1. Save the source to `raw/` with a script.
+2. Find related notes through `index.md`.
+3. Create or edit notes.
+   - If a needed class or property is missing, update the schema first.
+4. Update `index.md` and `log.md`.
 
 ### Query
 
-- 위키 노트를 근거로 답하고 해당 노트를 링크한다.
-- 위키에 없는 내용이면 없다고 답하고, 수집할 원문을 제안한다.
+Query answers a question from the wiki.
+
+- Link the notes that the answer rests on.
+- If the wiki lacks the answer, say so and propose sources to collect.
 
 ### Lint
 
-위키의 일관성을 점검하는 작업이다.
+Lint checks the wiki for these problems.
 
-- 깨진 링크, 아무 데서도 링크되지 않는 노트
-- schema에 없는 `type`·속성, 필수 속성 누락
-- 출처 없는 사실 문장
-- 원문의 `sha256` 변경과 그 영향을 받는 노트
-- `wiki/`에서 `synthetic/`으로 가는 링크
-- 노트끼리 모순되는 내용
+- Links
+  - Broken links
+  - Notes that nothing links to
+- Schema
+  - `type` values or properties missing from the schema
+  - Missing required properties
+- Sources
+  - Factual sentences without a source
+  - Changed `sha256` values in raw sources, and the notes they affect
+- Synthetic data
+  - Links from `wiki/` to `synthetic/`
+- Content
+  - Contradictions between notes
 
-## 작업 기록
+## Log
 
-`log.md`에는 작업마다 아래 형식으로 추가한다. 작업 이름은 `ingest`, `verify`, `review`, `lint`, `schema` 중 하나다.
+- Append one entry per operation to `log.md`.
+  - Never edit past entries.
+- Write each heading as `## <date> <time> <operation>`.
+  - Date and time are in KST.
+  - The operation is one of `ingest`, `verify`, `review`, `lint` and `schema`.
+- List the body fields in this order.
+  1. `대상`
+  2. `추가`, `수정`, `삭제`
+  3. `내용`
+
+An entry for ingesting 고용보험법 looks like this.
 
 ```markdown
-## 2026-10-14 ingest | 고용보험법
+## 2026-10-14 21:00 ingest
+
+- 대상: 고용보험법
 - 추가: [[고용보험법 제40조]]
 - 수정: [[구직급여]]
+- 내용: 현행 법령의 조문 반영
 ```
+
+## Conventions
+
+### Language
+
+- Choose the language by reader.
+  - `CLAUDE.md`: English
+  - `ontology/schema.md`, `index.md` and `log.md`: English headings, Korean prose
+  - `README.md` and vault notes in `wiki/`, `raw/` and `synthetic/`: Korean
+- In Korean prose, write technical terms whose original is English in English.
+  - Examples: ontology, schema, class, property, instance, wiki, vault, wikilink, backlink, frontmatter, callout, agent, context, hash
+- In Korean prose, write loanwords listed in the Korean dictionary in Korean.
+  - Examples: 파일, 폴더, 노트, 링크, 데이터, 스크립트
+- Use the terms of the issuing authority.
+  - Legal concepts: statutory terms, such as 이직 and 피보험자격
+  - 법제처 data: 법제처 terms, such as 현행 법령 and 시행일자
+- Coin no project-specific terms.
+  - If no standard term exists, define the term where it first appears.
+
+### Letter case
+
+- Use capitals only where they carry meaning.
+  - In English text, use sentence case for headings, list items and table cells.
+  - In Korean prose, keep English common nouns lowercase.
+  - Keep the spelling of proper nouns, such as Obsidian, Markdown and LLM Wiki, and of acronyms, such as API, IRI and RDF.
+- Case identifiers by kind.
+  - Classes: PascalCase
+  - Properties: camelCase
+  - Property values: lowercase
+  - `identifier` values: kebab-case
+
+### Korean prose
+
+- Write short declarative sentences ending in "-다".
+- Write one paragraph per line.
+  - Never break a line mid-sentence.
+
+### Markdown
+
+- Section order
+  - Put the overview first.
+  - Order the remaining sections by operation, or so that each term is defined before use.
+  - Put cross-cutting conventions last.
+- Headings
+  - Start a repository document with a single `#` heading.
+  - Give vault notes no `#` heading, because the file name is the title.
+  - Use one language for all headings of a document.
+  - Never skip a heading level.
+- Spacing
+  - Put one blank line between headings, paragraphs, lists, tables and code blocks.
+  - End every file with one newline.
+- Lists
+  - Number a list with `1.` only when order matters, and use `-` otherwise.
+  - Keep each item to one point, and move details, cases and examples into nested items.
+  - Make the items of one level all sentences or all phrases, and end only sentences with a period.
+- Tables
+  - Use a table only to compare items of one kind across attributes.
+  - Write tables in compact style, with one space inside each pipe and `| --- |` delimiters.
+  - Keep cells to phrases without periods, and put longer explanations in a paragraph below the table.
+  - State the row order rule above the table when it is not obvious.
+- Code
+  - Use inline code for paths, file names, properties and values.
+  - Put multi-line examples in fenced code blocks with a language, after a sentence that says what they show.
+- Links
+  - Link vault notes with wikilinks and external sources with `[name](URL)`.
+- Emphasis
+  - Use callouts for warnings and questions.
+  - Do not use bold or italic.
+- Checking
+  - Check formatting with `npx markdownlint-cli2`, configured in `.markdownlint-cli2.jsonc`.
+
+### Commits
+
+- Write the subject as `type(scope): 한국어 요약`.
+  - Type and scope are lowercase English.
+  - The scope is optional.
+- Write the body as a short `-` list after a blank line.
+- Commit each unit of work on `main`.
