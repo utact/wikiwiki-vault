@@ -14,6 +14,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 | `ontology/schema.md` | Schema | Class and property definitions |
 | `synthetic/` | — | Synthetic data |
 | `scripts/` | — | Collection and validation scripts |
+| `docs/` | — | Human-facing documents such as the roadmap |
 | `index.md` | — | Notes by class |
 | `log.md` | — | Operation log |
 
@@ -182,7 +183,7 @@ An entry for ingesting 고용보험법 looks like this.
 - Choose the language by reader.
   - `CLAUDE.md`: English
   - `ontology/schema.md`, `index.md` and `log.md`: English headings, Korean prose
-  - `README.md` and vault notes in `wiki/`, `raw/` and `synthetic/`: Korean
+  - `README.md`, `docs/` and vault notes in `wiki/`, `raw/` and `synthetic/`: Korean
 - In Korean prose, write technical terms whose original is English in English.
   - Examples: ontology, schema, class, property, instance, wiki, vault, wikilink, backlink, frontmatter, callout, agent, context, hash
 - In Korean prose, write loanwords listed in the Korean dictionary in Korean.
