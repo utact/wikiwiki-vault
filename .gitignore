@@ -5,3 +5,6 @@
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .trash/
+
+.venv/
+__pycache__/
