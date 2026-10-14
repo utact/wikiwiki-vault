@@ -36,7 +36,8 @@
 - 작업
   - 법제처 `eflaw`로 현행과 시행예정 버전 전부 수집
   - 행정규칙(고시) 수집
-  - 고용24 안내의 본문 영역과 수정일 수집
+  - 고용24 안내의 본문 영역과 수정일 수집, `raw/work24/manifest.yaml` 기록
+  - 커밋 전 비밀값 검사(Git pre-commit hook)
   - 별표와 별지 서식 추출
 - 완료 조건
   - 응답 시행일자와 요청 시행일자 일치
@@ -54,7 +55,8 @@
   - frontmatter를 RDF로 변환하고 SHACL로 검사
   - lint
   - 인용 문자열과 숫자를 원문과 대조
-  - 검증 원장
+  - 검증 원장(`ontology/verification.jsonl`)
+  - vault 노트용 markdownlint 설정
   - `reviewed` 보호 hook
 - 완료 조건
   - 결함을 심은 시험 노트에서 결함 100% 검출, 오탐 0건
@@ -95,6 +97,7 @@
 ## 8. 배포와 유지
 
 - 작업
+  - base IRI 확정
   - 기준 시점 tag, RDF export, 이용 조건 고지
   - 시행일 전환과 새 공포에 따른 재수집
 - 완료 조건
