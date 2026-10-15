@@ -101,10 +101,18 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 
 ## Statute notes
 
-- Generate `LegalResource` and `LegalResourceSubdivision` notes from raw sources with a script.
+- Generate `LegalResource` and `LegalResourceSubdivision` notes from raw sources with `uv run python -X utf8 scripts/statutes.py`.
   - The LLM never writes or edits statute text.
   - Write one note per law, 장, 절, 조, 별표, 별지 서식 and 부칙.
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
+  - It prints dates that fail the check below as `REVIEW` lines. Record them in `log.md`.
+  - `--check` lists the notes that differ from a fresh generation, and changes nothing.
+- List laws that the wiki cites only for a definition, such as 정부조직법 for 고용노동부, under `references` in `scripts/sources.yaml`.
+  - Collect their current and scheduled versions only.
+- Give statute notes these identifiers.
+  - Law: `law-<법령ID>`, and for a series of 고시 under one 행정규칙ID: `admrul-<행정규칙ID>`
+  - Units: the law's identifier followed by `-art-40`, `-art-10-2`, `-ch-4`, `-ch-5-2`, `-ch-4-sec-2`, `-annex-1-2`, `-form-6` or `-sup-<공포일자>-<공포번호>`
+- Write a series of 고시 such as the 적용 최저임금 고시 as one `LegalResource` named after the current 고시, with each year's 고시 as a version and its text as the block `^v20260101-t`.
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
   - When two 부칙 of a law share a 공포번호, add the 공포일자 in parentheses, as in `고용보험법 시행규칙 부칙 제263호 (2019. 9. 30.)` and `고용보험법 시행규칙 부칙 제263호 (2019. 10. 15.)`.
@@ -125,8 +133,14 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - 비고 of a 별표: `^v20260918-remarks`
   - Articles of a 부칙 and their parts: `^v20260317-a3`, `^v20260317-a3-p1`
   - 별지 서식: only the whole text, `^v20260918-t`, with its parts cited by quotation
+- Show image files in place of the `<img>` elements of statute text, as embeds of the attachments of the raw note.
 - Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".
   - Resolve 법, 영 and 규칙 against the law family, 같은 조 against the current article, and short names defined in the text, such as 고용산재보험료징수법.
+  - A reference after 부터, 까지, ㆍ, 및, 또는 or a comma belongs to the law of the reference before it, as 제132조 in "「형법」 제129조부터 제132조까지".
+  - Read references in 별표 and 별지 서식 with their wrapped lines joined, because a law name can wrap, as "「고용보" and "험법 시행규칙」".
+  - Skip the 부칙 articles titled 다른 법률의 개정 or 다른 법령의 개정, because their references belong to another law.
+  - Count a reference as a delegation only when the cited provision delegates to the citing kind of law, as "대통령령으로 정하는" for a 시행령 and "고용노동부령으로 정하는" for a 시행규칙, and the reference is followed by 에 따라, 에 따른 or 에서.
+  - Link only units that have statute notes, and a block only when the cited version declares it.
 
 ## Note format
 
@@ -291,7 +305,7 @@ Ingest reflects a source in the wiki.
 3. Find related notes through `index.md`.
 4. Create or edit notes.
    - If a needed class or property is missing, update the schema first.
-5. Update `index.md` and `log.md`.
+5. Update `index.md` with `uv run python -X utf8 scripts/index.py`, and append to `log.md`.
 
 ### Query
 
@@ -425,7 +439,9 @@ An entry for ingesting 고용보험법 looks like this.
   - Use callouts for warnings and questions.
   - Do not use bold or italic.
 - Checking
-  - Check formatting with `npx markdownlint-cli2`, configured in `.markdownlint-cli2.jsonc`.
+  - Check formatting with `npx markdownlint-cli2 "**/*.md"`, configured in `.markdownlint.jsonc` with ignored paths in `.markdownlint-cli2.jsonc`.
+  - `wiki/.markdownlint.jsonc` turns off MD041, because vault notes have no `#` heading.
+  - The statute note folders also turn off MD029, MD030 and MD052, which statute text trips with its 호 numbers and bracketed notes.
 
 ### Scripts
 
