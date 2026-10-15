@@ -51,8 +51,10 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Every scheduled version (시행예정)
   - Every earlier version that a 경과조치 still applies to, such as the text before 2026-01-01 of 고용보험법 시행령 제68조
 - Find those earlier versions from 부칙 articles titled 경과조치 or 적용례 that name a unit.
-  - Look back `transitionalWindowYears` years from the reference date, as set in `ontology/release.yaml`.
-  - The longest 수급기간 under 고용보험법 제48조제2항 is 4 years, and the window adds one year of margin.
+  - Look back over `transitionalWindow` in `ontology/release.yaml` from the reference date.
+  - The window is the longest time a person can still receive 구직급여 after 이직: 4 years (고용보험법 제48조제2항) plus 2 years of 훈련연장급여 (시행령 제72조), 60 days of 개별연장급여 (법 제52조제2항) and 60 days of 특별연장급여 (법 제53조제1항), which are paid one after another (법 제55조).
+  - Recompute the window when any of those provisions changes.
+  - List 경과조치 and 적용례 articles that name no unit for review in `log.md`.
 - Walk back the version list as far as needed to date the text of each generated unit, as described in Statute notes.
   - Commit only the versions that the wiki cites or that are current or scheduled.
   - Keep the others in the local cache `.cache/law/`, which Git ignores.
@@ -88,7 +90,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
 - Give a unit a new version only when its canonical text changes.
-  - Date the version by the 시행일자 of the earliest law version that has this text of the unit.
+  - Date the version by the 시행일자 of the earliest law version in the latest unbroken run of versions that have this text of the unit. This is the version's `firstDateEntryInForce`.
+  - Check the date against the text: the law version found must carry the 공포번호 of the latest amendment tag of the unit, such as `<개정 2021.1.5>`.
   - A 부칙 has one version, dated by the earliest law version that contains it.
 - Put the current, scheduled and cited versions of the unit in the body, each under its own heading, and mark the current one.
   - Never remove a version that a note cites.
