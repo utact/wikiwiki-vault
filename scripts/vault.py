@@ -23,6 +23,7 @@ SCHEMA = VAULT / "ontology" / "schema.yaml"
 PREFIX = "employment"
 NOTE_SLOTS = ("source", "status", "reviewedBy", "lastReviewed")
 WIKILINK = re.compile(r"^\[\[([^\]|#]+)(?:#\^([a-z0-9-]+))?(?:\|[^\]]*)?\]\]$")
+IDENTIFIER = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 class StringLoader(yaml.SafeLoader):
@@ -69,8 +70,11 @@ class Vault:
     def resolve(self, value, where, curie=False):
         """Return the identifier a wikilink points to, as a CURIE for uriorcurie slots."""
         wrap = self.curie if curie else (lambda identifier: identifier)
-        if where.startswith("raw/") and isinstance(value, str) and value in self.ids.values():
-            return wrap(value)
+        if where.startswith("raw/") and isinstance(value, str) and IDENTIFIER.match(value):
+            if value in self.ids.values():
+                return wrap(value)
+            self.errors.append(f"{where}: unknown identifier: {value}")
+            return None
         match = WIKILINK.match(value.strip()) if isinstance(value, str) else None
         if not match:
             self.errors.append(f"{where}: not a wikilink: {value!r}")
