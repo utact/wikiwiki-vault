@@ -59,7 +59,7 @@ class를 정의하는 표준은 class가 처음 나오는 순서로, property만
 - `LegalResourceSubdivision`: 장, 절, 조, 별표, 별지 서식, 부칙은 노트로 두고, 항, 호, 목은 노트의 block으로 둔다.
 - `LegalResourceSubdivision`: identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-40, 가지번호는 -art-10-2, 장은 -ch-4, 장의2는 -ch-5-2, 절은 -ch-4-sec-2다.
 - `LegalResourceSubdivision`: 별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포번호>다.
-- `LegalResourceSubdivision`: block은 소속 노트의 identifier 뒤에 block ID를 붙인다. 고용보험법 제45조 제5항은 law-001761-art-45-p5다.
+- `LegalResourceSubdivision`: 버전과 무관한 block은 소속 노트의 identifier 뒤에 날짜를 뺀 block ID를 붙인다. 고용보험법 제45조제5항은 law-001761-art-45-p5다.
 
 아래 추상 class는 instance의 class로 쓰지 않고, 공통 property를 묶는 데만 쓴다.
 
@@ -83,7 +83,7 @@ class를 정의하는 표준은 class가 처음 나오는 순서로, property만
 | `validThrough` | `sdo:validThrough` | 아니요 | 달력상 적용 종료일 (date) |
 | `isReplacedBy` | `dct:isReplacedBy` | 아니요 | 폐지되거나 대체된 instance를 잇는 후속 instance (`NamedThing`) |
 
-- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `identifier`: instance의 IRI는 base IRI 뒤에 identifier를 붙여 만든다.
 - `validThrough`: 이직일 같은 사실의 날짜에 따라 달라지는 경과조치는 이 property가 아니라 Criterion으로 적는다.
 
 ## Object properties
@@ -274,7 +274,7 @@ instance가 아니라 wiki 노트 자체를 설명하는 property다.
 | `reviewedBy` | `sdo:reviewedBy` | 아니요 | 승인한 사람의 IRI (uri) |
 | `lastReviewed` | `sdo:lastReviewed` | 아니요 | 승인일 (date) |
 
-- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `identifier`: instance의 IRI는 base IRI 뒤에 identifier를 붙여 만든다.
 
 ## Statute versions
 
@@ -283,13 +283,14 @@ instance가 아니라 wiki 노트 자체를 설명하는 property다.
 `LegalExpression`(`eli:LegalExpression`): 법령이나 그 하위 단위의 시행일 버전 하나
 
 - 같은 시행일자에 법령일련번호(MST)가 여럿이면 공포일자가, 그다음 공포번호가 늦은 버전을 쓴다.
-- identifier는 실현하는 Work의 identifier 뒤에 -v<시행일자>를 붙인다. block 버전은 그 뒤에 block ID를 붙인다.
+- identifier는 실현하는 Work의 identifier 뒤에 -v<시행일자>를 붙인다. block 버전은 노트의 block ID를 그대로 붙여 law-001761-art-45-v20260918-p5처럼 쓰고, law-001761-art-45-p5를 실현한다.
+- 시행일자는 그 단위가 이 본문을 처음 가진 법령 버전의 시행일자다.
+- 버전 사이의 포함 관계는 실현하는 Work의 `isPartOf`로 나타낸다. ELI 1.4의 eli:is_part_of는 Work에만 쓴다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
 | `identifier` | `dct:identifier` | 예 | 버전의 kebab-case 식별자 |
 | `realizes` | `eli:realizes` | 예 | 이 버전이 실현하는 법령이나 하위 단위 (`Work`) |
-| `isPartOf` | `eli:is_part_of` | 아니요 | 상위 단위의 같은 버전 (`LegalExpression`) |
 | `firstDateEntryInForce` | `eli:first_date_entry_in_force` | 예 | 버전의 시행일자 (date) |
 | `dateNoLongerInForce` | `eli:date_no_longer_in_force` | 아니요 | 버전이 시행되는 마지막 날 (date) |
 | `datePublication` | `eli:date_publication` | 아니요 | 공포일자나 발령일자 (date) |
@@ -298,7 +299,7 @@ instance가 아니라 wiki 노트 자체를 설명하는 property다.
 | `text` | `sdo:text` | 아니요 | 정규화한 block 본문 |
 | `wasDerivedFrom` | `prov:wasDerivedFrom` | 아니요 | 이 버전을 만든 원문 (`Entity`) |
 
-- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `identifier`: instance의 IRI는 base IRI 뒤에 identifier를 붙여 만든다.
 - `idLocal`: 법령은 법령ID, 행정규칙은 행정규칙ID, 버전은 법령일련번호(MST)나 행정규칙일련번호다.
 
 ## Inline structures
@@ -406,7 +407,7 @@ instance가 아니라 wiki 노트 자체를 설명하는 property다.
 | `modified` | `dct:modified` | 아니요 | 원문이 밝힌 최종 수정일 (date) |
 | `hasPart` | `dct:hasPart` | 아니요 | Git에 남기는 짧은 인용 (`Quotation`) |
 
-- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `identifier`: instance의 IRI는 base IRI 뒤에 identifier를 붙여 만든다.
 - `url`: 인증값 parameter는 지우고 저장한다.
 
 ### Quotation
@@ -421,4 +422,4 @@ instance가 아니라 wiki 노트 자체를 설명하는 property다.
 | `text` | `sdo:text` | 예 | 본문 |
 | `sha256` | `spdx:checksumValue` | 예 | 정규화한 본문의 SHA-256 hash |
 
-- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `identifier`: instance의 IRI는 base IRI 뒤에 identifier를 붙여 만든다.

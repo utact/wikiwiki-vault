@@ -66,9 +66,11 @@ class Vault:
     def curie(self, identifier):
         return f"{PREFIX}:{identifier}"
 
-    def resolve(self, value, where):
+    def resolve(self, value, where, curie=False):
+        """Return the identifier a wikilink points to, as a CURIE for uriorcurie slots."""
+        wrap = self.curie if curie else (lambda identifier: identifier)
         if where.startswith("raw/") and isinstance(value, str) and value in self.ids.values():
-            return self.curie(value)
+            return wrap(value)
         match = WIKILINK.match(value.strip()) if isinstance(value, str) else None
         if not match:
             self.errors.append(f"{where}: not a wikilink: {value!r}")
@@ -80,7 +82,7 @@ class Vault:
         identifier = self.ids[stem]
         if match.group(2):
             identifier = f"{identifier}-{match.group(2)}"
-        return self.curie(identifier)
+        return wrap(identifier)
 
     def is_link_slot(self, slot):
         rng = slot.range
@@ -100,7 +102,7 @@ class Vault:
             if key == "type":
                 out[key] = self.view.get_uri(value, expand=False)
             elif key == "identifier":
-                out[key] = self.curie(value)
+                out[key] = value
             elif key == "decisionTable":
                 out[key] = self.decision_table(value, where)
             elif key == "hasEvidenceTypeList":
@@ -110,7 +112,7 @@ class Vault:
                 ]
             elif self.is_link_slot(slot):
                 values = value if isinstance(value, list) else [value]
-                resolved = [self.resolve(v, where) for v in values]
+                resolved = [self.resolve(v, where, curie=slot.range == "uriorcurie") for v in values]
                 out[key] = resolved if slot.multivalued else resolved[0]
             elif slot.range in self.view.all_classes():
                 rng = slot.range
@@ -118,7 +120,7 @@ class Vault:
                 converted = [self.convert(rng, item, where) for item in items]
                 if key == "isRealizedBy":
                     for item in converted:
-                        item.setdefault("realizes", out.get("identifier") or self.curie(data["identifier"]))
+                        item.setdefault("realizes", data["identifier"])
                 out[key] = converted if slot.multivalued else converted[0]
             else:
                 out[key] = value
@@ -161,7 +163,7 @@ class Vault:
             things.append(thing)
             note = {k: v for k, v in meta.items() if k in NOTE_SLOTS}
             note = self.convert("NoteDocument", note, where)
-            note["identifier"] = self.curie(f"{meta.get('identifier')}-note")
+            note["identifier"] = f"{meta.get('identifier')}-note"
             note["primaryTopic"] = thing.get("identifier")
             documents.append(note)
         return {"things": things, "documents": documents, "sources": sources}
@@ -200,9 +202,12 @@ class RdfWriter:
             self.graph.bind(prefix, Namespace(iri))
         self.class_by_uri = {view.get_uri(c, expand=False): c for c in view.all_classes()}
 
-    def iri(self, curie):
-        prefix, local = curie.split(":", 1)
-        return URIRef(self.prefixes[prefix] + local)
+    def iri(self, value):
+        """Expand a CURIE, or a bare identifier against the default prefix."""
+        prefix, _, local = value.rpartition(":")
+        if prefix in self.prefixes:
+            return URIRef(self.prefixes[prefix] + local)
+        return URIRef(self.prefixes[PREFIX] + value)
 
     def literal(self, value, slot):
         rng = slot.range
@@ -223,6 +228,9 @@ class RdfWriter:
                 continue
             slot = self.view.induced_slot(key, cls)
             predicate = self.iri(slot.slot_uri)
+            if key == "identifier":
+                self.graph.add((subject, predicate, Literal(value)))
+                continue
             for item in value if isinstance(value, list) else [value]:
                 if isinstance(item, dict):
                     self.graph.add((subject, predicate, self.node(item, slot.range)))

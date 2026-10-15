@@ -355,7 +355,7 @@ classes:
       - 장, 절, 조, 별표, 별지 서식, 부칙은 노트로 두고, 항, 호, 목은 노트의 block으로 둔다.
       - "identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-40, 가지번호는 -art-10-2, 장은 -ch-4, 장의2는 -ch-5-2, 절은 -ch-4-sec-2다."
       - "별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포번호>다."
-      - "block은 소속 노트의 identifier 뒤에 block ID를 붙인다. 고용보험법 제45조 제5항은 law-001761-art-45-p5다."
+      - "버전과 무관한 block은 소속 노트의 identifier 뒤에 날짜를 뺀 block ID를 붙인다. 고용보험법 제45조제5항은 law-001761-art-45-p5다."
     slots:
       - isPartOf
       - typeSubdivision
@@ -374,11 +374,12 @@ classes:
     description: 법령이나 그 하위 단위의 시행일 버전 하나
     comments:
       - 같은 시행일자에 법령일련번호(MST)가 여럿이면 공포일자가, 그다음 공포번호가 늦은 버전을 쓴다.
-      - "identifier는 실현하는 Work의 identifier 뒤에 -v<시행일자>를 붙인다. block 버전은 그 뒤에 block ID를 붙인다."
+      - "identifier는 실현하는 Work의 identifier 뒤에 -v<시행일자>를 붙인다. block 버전은 노트의 block ID를 그대로 붙여 law-001761-art-45-v20260918-p5처럼 쓰고, law-001761-art-45-p5를 실현한다."
+      - 시행일자는 그 단위가 이 본문을 처음 가진 법령 버전의 시행일자다.
+      - 버전 사이의 포함 관계는 실현하는 Work의 `isPartOf`로 나타낸다. ELI 1.4의 eli:is_part_of는 Work에만 쓴다.
     slots:
       - identifier
       - realizes
-      - isPartOf
       - firstDateEntryInForce
       - dateNoLongerInForce
       - datePublication
@@ -391,9 +392,6 @@ classes:
         description: 버전의 kebab-case 식별자
       realizes:
         required: true
-      isPartOf:
-        range: LegalExpression
-        description: 상위 단위의 같은 버전
       firstDateEntryInForce:
         required: true
       idLocal:
@@ -594,10 +592,10 @@ slots:
   identifier:
     slot_uri: dct:identifier
     identifier: true
-    pattern: "^employment:[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
     description: 바뀌지 않는 kebab-case 식별자
     comments:
-      - "frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다."
+      - instance의 IRI는 base IRI 뒤에 identifier를 붙여 만든다.
   prefLabel:
     slot_uri: skos:prefLabel
     required: true
