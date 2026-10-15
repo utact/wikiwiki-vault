@@ -11,3 +11,5 @@ __pycache__/
 
 raw/work24/**/*.html
 .cache/
+
+tests/fixtures/vault/.obsidian/
