@@ -39,7 +39,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Strip credential parameters such as `OC` from every stored URL and response.
   - Check the result with `uv run python -X utf8 scripts/check_raw.py` before committing.
   - It needs the local cache that `scripts/collect.py` writes, because it compares every version in the transitional window.
-  - It explains each changed unit by an amendment tag dated as a promulgation of that version, by 조문변경여부, or as the new 부칙 of that version, and each removed unit by 조문이동이전 or an earlier deletion.
+  - It explains each changed unit by an amendment tag dated as a promulgation of that version, by 조문변경여부, or as the new 부칙 of that version.
+  - It explains each removed unit by 조문이동이전, or by an earlier version in which the whole unit was a deletion, such as `제22조 삭제 <2006.12.28>`.
   - It works per unit: one matching tag explains every change in the unit.
 - Use one folder per publisher.
   - `raw/law/`: 법제처, for both 법령 and 행정규칙
@@ -64,7 +65,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - For such cases, cite the 경과조치 and leave the earlier text as a question until a competency question needs it.
 - List the 부칙 articles that govern the window with `uv run python -X utf8 scripts/transitional.py`.
   - It reads the 부칙 of the current and scheduled versions, whose titles contain 경과조치, 적용례, 특례 or 유효기간, of every promulgation with a 시행일자 on or after the first day of the window.
-  - It shows the units each article names: articles, 항, 호, 별표, 별지 서식 and 같은 조.
+  - It shows the units each article names: articles, 항, 호, 별표, 별지 서식 and 같은 조, but not the articles of the 부칙 itself, such as "부칙 제4조부터 제7조까지".
   - List those that name no unit for review in `log.md`.
 - Walk back the version list as far as needed to date the text of each generated unit, as described in Statute notes.
   - Commit only the versions that the wiki cites or that are current or scheduled.
@@ -76,9 +77,10 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Commit the raw note next to it, with the short quotations the wiki cites in `hasPart`, quoted under 저작권법 제28조.
   - Number the quotation blocks `^q1`, `^q2` in the order of `hasPart`, and cite them as `[[<raw note>#^q1]]`.
 - Fill every required property in the Raw sources section of `ontology/schema.md`, and the optional ones that apply.
-- Set `sha256` to the SHA-256 of the stored response file.
-  - For a 고용24 guide, whose page stays out of Git, use the text of its body area without whitespace.
-  - The hash never depends on how scripts read the text, so a change in the reading rules leaves raw notes as they are.
+- Set `sha256` to the SHA-256 of the stored response file followed by its attachments in the order of the response.
+  - This hash does not depend on how scripts read the text, so a change in the reading rules leaves raw notes as they are.
+  - Any change in a response makes a new raw note, even in a field outside the text, such as a contact number.
+  - For a 고용24 guide, whose page stays out of Git, use the text of its body area without whitespace, section by section. This hash changes when the reading of the page changes.
 - Record the terms of use in `license`.
   - Statutes: not protected works under 저작권법 제7조
   - Other sources: the 공공누리 type or the 공공데이터포털 terms of use
@@ -223,7 +225,9 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
 - Read the text in cell order before any comparison.
   - Count display columns with ASCII 1 wide and every other character 2 wide, and a "?" between two wide characters 2 wide, because it stands for a lost glyph such as an arrow.
   - Split each line at box-drawing characters (U+2500 to U+257F), and leave out runs of spaces.
-  - Runs on adjacent lines that share at least 2 columns, or 1 when a run is narrower than 2, belong to one cell, so a cell keeps its wrapped lines whatever the widths of the other columns.
+  - Runs on adjacent lines belong to one cell when they start within 2 columns of each other and share at least 2 columns, or 1 when a run is narrower than 2.
+  - A cell then keeps its wrapped lines whatever the widths of the other columns, and text that runs past a border does not join the next column.
+  - Lines with box-drawing characters and lines without them never join.
   - Put cells in the order of their first line, then of their column.
   - Inside `<img>` elements, whose table text comes without line breaks, break the line where a line end meets a line start, such as `││`.
   - Text without box-drawing characters stays one cell per paragraph.
@@ -231,8 +235,10 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
   - Wrapped lines of 별표 and spaces inserted by PDF extraction then stop mattering.
   - Table text inside `<img>` elements stays without the tags, because some tables exist only there, such as 고용보험법 시행규칙 제105조.
   - "ㆍ" (U+318D) and "·" (U+00B7) stay different.
-- Compare numbers as whole tokens of the text in cell order, keeping whitespace and the breaks between cells.
+- Compare numbers as whole tokens of the text in cell order, with a break between cells.
   - Then 100분의 30 does not match inside 100분의 300, and the cells 100분의 100 and 100분의 150 stay two numbers.
+  - Join the wrapped lines of a table cell, and every line of 별표, 별지 서식 and PDF text, without a break, because they wrap in the middle of words, as `210` and `만원` in 고용보험법 시행규칙 별지 제52호서식.
+  - Keep the lines of 조문 fields apart, because each is a 항, 호 or 목.
 - Read numbers in these forms.
   - Digits with or without commas, such as 113,500
   - Korean units, such as 11만3500원 and 3천만원
@@ -241,7 +247,9 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
 - Decide versions and hashes of units on the version text: the comparison text without `<img>` elements and the text inside them.
   - Some versions of a 법제처 response leave out the text inside `<img>` elements that other versions carry, such as 고용보험법 시행규칙 제105조 in the version of 2024-07-01.
   - An amendment of such a table shows in the amendment tag of its unit, as the table of 제105조제1항 did in `<개정 2020.8.28, 2026.7.1>`.
-  - `scripts/check_raw.py` fails when the text inside images differs from the last version that carried it while the version text does not.
+  - `scripts/check_raw.py` fails when the text inside images differs from the last version that carried it while the version text does not, whatever 조문변경여부 says.
+  - It fails when image files change while the version text does not and no image text shows the same content.
+  - It fails when the lines restored from an image lack a frame at either end or differ in width by more than 2 columns.
   - It lists current units with images that carry no text, such as the formulas of 고용산재보험료징수법 시행령 제18조의2, for review.
 - The hash of a block is the SHA-256 of its version text.
 
