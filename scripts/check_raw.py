@@ -192,12 +192,22 @@ def check_law(name, problems, notes):
 
 
 def attachments(note, response):
-    """Stored attachments of a raw note as (content, file name) pairs in the order of the response, or None if any is missing."""
+    """Stored attachments of a raw note as (content, name) pairs, named as in the response where it names them."""
     names = L.as_list(response.get("AdmRulService", {}).get("첨부파일", {}).get("첨부파일명"))
-    stored = [note.parent / f"{note.stem}-{index}{Path(name).suffix}" for index, name in enumerate(names, start=1)]
-    if not all(path.exists() for path in stored):
-        return None
-    return [(path.read_bytes(), name) for path, name in zip(stored, names)]
+    stored = L.stored_attachments(note.parent, note.stem)
+    return [(path.read_bytes(), names[index] if index < len(names) else path.name) for index, path in enumerate(stored)]
+
+
+def latest_retrievals():
+    """The latest raw note of each source version, by retrieval time."""
+    latest = {}
+    for note in L.RAW.rglob("*.md"):
+        match = NOTE.match(note.stem)
+        if match:
+            key = (note.parent, match["name"], match["date"], match["serial"])
+            if key not in latest or note.stem > latest[key].stem:
+                latest[key] = note
+    return set(latest.values())
 
 
 def check_notices(problems, notes):
@@ -211,8 +221,6 @@ def check_notices(problems, notes):
         if service["행정규칙기본정보"]["시행일자"] != match["date"]:
             problems.append(f"{note.name}: response says {service['행정규칙기본정보']['시행일자']}")
         stored = attachments(note, load(payload))
-        if stored is None:
-            continue
         try:
             text = L.notice_text(service, stored)
         except PyPdfError as error:
@@ -232,7 +240,11 @@ def check_notices(problems, notes):
 
 
 def check_notes(problems):
-    """Required properties of every raw note, and its sha256 against the stored file."""
+    """Required properties of every raw note, its sha256 against the stored files, and complete attachments in the latest retrieval.
+
+    An earlier retrieval keeps the files it stored, such as a 법령 response stored before its images were collected.
+    """
+    latest = latest_retrievals()
     for note in sorted(L.RAW.rglob("*.md")):
         meta = L.frontmatter(note)
         missing = [k for k in REQUIRED if not meta.get(k)]
@@ -242,9 +254,8 @@ def check_notes(problems):
         if payload.exists():
             text = payload.read_text(encoding="utf-8")
             stored = attachments(note, json.loads(text))
-            if stored is None:
+            if note in latest and len(stored) != L.attachment_count(json.loads(text)):
                 problems.append(f"{note.relative_to(L.VAULT)}: attachments missing")
-                continue
             digest = L.files_hash(text, [data for data, _ in stored])
         elif page.exists():
             sections, _ = collect.page_sections(page.read_text(encoding="utf-8"), meta["title"])

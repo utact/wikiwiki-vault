@@ -27,6 +27,27 @@ def latest(folder, pattern):
     return found[-1] if found else None
 
 
+def images(text):
+    """The image files a response links to, as (content, extension) pairs in order of first appearance."""
+    files = []
+    for link in L.image_links(json.loads(text)):
+        data = L.get(link)
+        files.append((data, L.extension(data)))
+    return files
+
+
+def cached_images(path):
+    """Whether a cached response has every attachment and image file stored next to it."""
+    response = json.loads(path.read_text(encoding="utf-8"))
+    return len(L.stored_attachments(path.parent, path.stem)) == L.attachment_count(response)
+
+
+def write_attachments(folder, basename, files):
+    """Write attachments as <basename>-1, <basename>-2 and so on, with their own extensions."""
+    for index, (data, suffix) in enumerate(files, start=1):
+        (folder / f"{basename}-{index}{suffix}").write_bytes(data)
+
+
 def unchanged(folder, basename, digest):
     """Whether the latest retrieval of the same source has the same sha256."""
     stem = basename.rsplit(" ", 1)[0]
@@ -79,11 +100,13 @@ def collect_laws(as_of, window_start, stamp, generated, report):
         for effective in (d for d in chosen if d >= current):
             mst = chosen[effective]["법령일련번호"]
             text, url = fetch_law(mst, effective)
+            files = images(text)
             basename = f"{name} {effective}-{mst} {stamp}"
-            digest = L.sha256(L.json_payload(text))
+            digest = L.files_hash(L.json_payload(text), [data for data, _ in files])
             if unchanged(folder, basename, digest):
                 continue
             L.write_json(folder / f"{basename}.json", text)
+            write_attachments(folder, basename, files)
             meta = {
                 "identifier": f"raw-law-{law_id}-{effective}-{mst}-{stamp.lower()}",
                 "title": name,
@@ -93,7 +116,7 @@ def collect_laws(as_of, window_start, stamp, generated, report):
                 "sha256": digest,
                 "license": L.LICENSES["law"],
             }
-            body = f"{name}의 {effective} 시행 버전 원문 노트다. 원문 응답은 같은 이름의 JSON 파일이다."
+            body = f"{name}의 {effective} 시행 버전 원문 노트다. 원문 응답은 같은 이름의 JSON 파일이고, 응답이 링크하는 이미지는 같은 이름 뒤에 나오는 순서대로 번호를 붙여 둔다."
             L.write_note(folder / f"{basename}.md", meta, body)
             entry["written"].append(f"{basename}.md")
         cache = L.CACHE / "law" / law_id
@@ -138,7 +161,8 @@ def fetch_notice(row):
         raise ValueError(f"{row['행정규칙명']}: listed for {row['시행일자']}, response says {effective}")
     links = L.as_list(service.get("첨부파일", {}).get("첨부파일링크"))
     names = L.as_list(service.get("첨부파일", {}).get("첨부파일명"))
-    return text, url, [(L.get(link), name) for link, name in zip(links, names)]
+    attached = [(L.get(link), Path(name).suffix) for link, name in zip(links, names)]
+    return text, url, attached + images(text)
 
 
 def collect_admrul(as_of, window_start, stamp, generated, report):
@@ -154,22 +178,20 @@ def collect_admrul(as_of, window_start, stamp, generated, report):
             if effective < current:
                 cache = L.CACHE / "admrul" / source["id"]
                 path = cache / f"{serial}-{effective}.json"
-                if not path.exists():
-                    text, _, attachments = fetch_notice(row)
+                if not path.exists() or not cached_images(path):
+                    text, _, files = fetch_notice(row)
                     L.write_json(path, text)
-                    for index, (data, file_name) in enumerate(attachments, start=1):
-                        (cache / f"{serial}-{effective}-{index}{Path(file_name).suffix}").write_bytes(data)
+                    write_attachments(cache, path.stem, files)
                 report["admrul"].append({"name": name, "effective": effective, "cached": path.name})
                 continue
-            text, url, attachments = fetch_notice(row)
+            text, url, files = fetch_notice(row)
             folder = L.RAW / "law" / name
             basename = f"{name} {effective}-{serial} {stamp}"
-            digest = L.files_hash(L.json_payload(text), [data for data, _ in attachments])
+            digest = L.files_hash(L.json_payload(text), [data for data, _ in files])
             written = not unchanged(folder, basename, digest)
             if written:
                 L.write_json(folder / f"{basename}.json", text)
-                for index, (data, file_name) in enumerate(attachments, start=1):
-                    (folder / f"{basename}-{index}{Path(file_name).suffix}").write_bytes(data)
+                write_attachments(folder, basename, files)
                 meta = {
                     "identifier": f"raw-admrul-{source['id']}-{effective}-{serial}-{stamp.lower()}",
                     "title": name,

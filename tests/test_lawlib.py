@@ -186,3 +186,15 @@ def test_number_text_joins_wrapped_lines():
     paragraph = "  14. 정년연장형 840만원(분기 210  \n  만원, 월 70만원)"
     assert "분기 210만원" in L.number_text(paragraph, wrapped=True)
     assert "분기 210만원" not in L.number_text(paragraph)
+
+
+def test_image_links_in_order_of_first_appearance():
+    response = {"법령": {"조문": [
+        {"항내용": '1. 제1항제1호의 경우:<img src="http://www.law.go.kr/flDownload.do?flSeq=102803859"  alt="img102803859" >┌┐</img>'},
+        {"조문내용": '1. 최저임금액<img id="44188166"></img> <img src="http://www.law.go.kr/flDownload.do?flSeq=102803859" >'},
+    ]}}
+    assert L.image_links(response) == [
+        "http://www.law.go.kr/flDownload.do?flSeq=102803859",
+        "http://www.law.go.kr/flDownload.do?flSeq=44188166",
+    ]
+    assert [L.extension(data) for data in (b"GIF89a", b"BM6", b"\x89PNG\r\n")] == [".gif", ".bmp", ".png"]

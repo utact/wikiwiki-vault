@@ -1,5 +1,6 @@
 """Shared helpers for collecting and checking raw sources."""
 
+import glob
 import hashlib
 import io
 import json
@@ -222,6 +223,56 @@ def version_text(text):
 
 def sha256(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+IMAGE_REFERENCE = re.compile(r'<img\b[^>]*?(?:src="([^"]+)"|id="(\d+)")[^>]*>')
+FILE_URL = "http://www.law.go.kr/flDownload.do?flSeq={}"
+SIGNATURES = {b"GIF8": ".gif", b"\x89PNG": ".png", b"\xff\xd8\xff": ".jpg", b"BM": ".bmp"}
+
+
+def strings(value):
+    """Every string of a parsed JSON value, in document order."""
+    if isinstance(value, dict):
+        for item in value.values():
+            yield from strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from strings(item)
+    elif isinstance(value, str):
+        yield value
+
+
+def image_links(response):
+    """URLs of the image files a 법제처 response links to, in order of first appearance.
+
+    An image appears as <img src="..."> or, in some 고시, as <img id="..."> with the file number only.
+    """
+    links = []
+    for text in strings(response):
+        for match in IMAGE_REFERENCE.finditer(text):
+            link = match.group(1) or FILE_URL.format(match.group(2))
+            if link not in links:
+                links.append(link)
+    return links
+
+
+def attachment_count(response):
+    """Number of files a raw note of this response stores: the attachments of a 고시, then the linked images."""
+    names = as_list(response.get("AdmRulService", {}).get("첨부파일", {}).get("첨부파일명"))
+    return len(names) + len(image_links(response))
+
+
+def stored_attachments(folder, stem):
+    """Attachment files stored next to a raw note as <stem>-1, <stem>-2 and so on, up to the first gap."""
+    found = []
+    while matches := sorted(folder.glob(f"{glob.escape(stem)}-{len(found) + 1}.*")):
+        found.append(matches[0])
+    return found
+
+
+def extension(data):
+    """File extension of an image from its first bytes."""
+    return next((suffix for signature, suffix in SIGNATURES.items() if data.startswith(signature)), ".bin")
 
 
 def files_hash(payload, attachments=()):

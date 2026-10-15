@@ -282,3 +282,25 @@ def test_same_table_in_a_new_image_file_and_layout_passes():
     versions["20200101"]["조문"]["조문단위"][0]["조문내용"] += '<img src="a" >│거짓이나 그 │3회 ││밖의 방법   │    │</img>'
     versions["20210101"]["조문"]["조문단위"][0]["조문내용"] += '<img src="b" >│거짓이나 그 밖의 │3회 ││방법             │    │</img>'
     assert run(versions) == []
+
+
+def test_only_the_latest_retrieval_needs_every_image(tmp_path, monkeypatch):
+    """The retrievals of 2026-10-15 13:37 came before image files were collected."""
+    import json
+
+    import lawlib as L
+
+    monkeypatch.setattr(L, "VAULT", tmp_path)
+    monkeypatch.setattr(L, "RAW", tmp_path / "raw")
+    folder = tmp_path / "raw" / "law" / "시험법"
+    folder.mkdir(parents=True)
+    payload = L.json_payload(json.dumps({"법령": {"조문내용": '<img src="http://x/flDownload.do?flSeq=1" >'}}))
+    for stamp in ("20261015T1337", "20261015T1940"):
+        stem = f"시험법 20260918-1 {stamp}"
+        (folder / f"{stem}.json").write_text(payload, encoding="utf-8", newline="\n")
+        meta = {"identifier": f"raw-law-1-20260918-1-{stamp.lower()}", "title": "시험법", "publisher": "ministry-of-government-legislation",
+                "url": "http://x", "generatedAtTime": "2026-10-15T13:37:00+09:00", "sha256": L.files_hash(payload), "license": "저작권법 제7조"}
+        L.write_note(folder / f"{stem}.md", meta, "시험용 원문 노트다.")
+    problems = []
+    C.check_notes(problems)
+    assert [p for p in problems if "attachments missing" in p] == [f"{(folder / '시험법 20260918-1 20261015T1940.md').relative_to(tmp_path)}: attachments missing"]
