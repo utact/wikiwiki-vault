@@ -17,3 +17,15 @@
 - 대상: ontology schema
 - 수정: [[schema]]
 - 내용: datatype property와 원문 property 정의, `rdf`·`prov`·`spdx` 이름공간 추가, 표의 순서 기준 적용
+
+## 2026-10-15 08:38 schema
+
+- 대상: ontology schema
+- 수정: [[schema]]
+- 내용: LinkML schema 원본으로 전환하고 schema 문서를 생성
+
+## 2026-10-15 09:27 schema
+
+- 대상: ontology schema
+- 수정: [[schema]]
+- 내용: 노트 문서 class, 법령 시행일 버전, FEEL 조건식, 결정표 위치 번호, 증빙 유형 목록, 원문 인용 추가
