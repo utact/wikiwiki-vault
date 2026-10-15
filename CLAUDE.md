@@ -122,7 +122,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - 호: `^v20260918-p1-i1`, or `^v20260918-i1` when the unit has no 항
   - 가지 호 such as 제3호의2: `^v20260918-i3-2`
   - 목: `^v20260918-p1-i5-m1`, where 가 is 1 and 나 is 2
-  - 비고 of a 별표: `^v20260918-note`
+  - 비고 of a 별표: `^v20260918-remarks`
   - Articles of a 부칙 and their parts: `^v20260317-a3`, `^v20260317-a3-p1`
   - 별지 서식: only the whole text, `^v20260918-t`, with its parts cited by quotation
 - Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".

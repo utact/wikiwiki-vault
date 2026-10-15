@@ -59,9 +59,15 @@ enums:
       subpoint:
         description: 목
         meaning: employment:subdivision-subpoint
+      lead:
+        description: 각 호 외의 부분
+        meaning: employment:subdivision-lead
       annex:
         description: 별표
         meaning: employment:subdivision-annex
+      remarks:
+        description: 별표의 비고
+        meaning: employment:subdivision-remarks
       form:
         description: 별지 서식
         meaning: employment:subdivision-form
@@ -354,7 +360,7 @@ classes:
     comments:
       - 장, 절, 조, 별표, 별지 서식, 부칙은 노트로 두고, 항, 호, 목은 노트의 block으로 둔다.
       - "identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-40, 가지번호는 -art-10-2, 장은 -ch-4, 장의2는 -ch-5-2, 절은 -ch-4-sec-2다."
-      - "별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포번호>다."
+      - "별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포일자>-<공포번호>다. 공포번호가 같은 부칙이 있어 공포일자를 붙인다."
       - "버전과 무관한 block은 소속 노트의 identifier 뒤에 날짜를 뺀 block ID를 붙인다. 고용보험법 제45조제5항은 law-001761-art-45-p5다."
     slots:
       - isPartOf

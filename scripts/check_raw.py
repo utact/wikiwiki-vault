@@ -19,7 +19,7 @@ from pypdf.errors import PyPdfError
 import collect
 import lawlib as L
 
-NOTE = re.compile(r"^(?P<name>.+) (?P<date>\d{8})-(?P<serial>\d+) (?P<stamp>\d{8}T\d{4})$")
+NOTE = L.RAW_NOTE
 REQUIRED = ("identifier", "title", "publisher", "url", "generatedAtTime", "sha256", "license")
 DELETED = re.compile(r"(?:제\d+(?:조|장|절|편|관)(?:의\d+)?|■[가-힣]+)?삭제")
 
@@ -34,21 +34,6 @@ def deleted(text):
 
 def load(path):
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-def law_versions(name):
-    """Every stored version of a law, from raw notes and the cache, keyed by 시행일자, with the version list."""
-    versions = {}
-    folder = L.RAW / "law" / name
-    for note in sorted(folder.glob(f"{name} *-* *.md")):
-        match = NOTE.match(note.stem)
-        if match:
-            versions[match["date"]] = load(note.with_suffix(".json"))["법령"]
-    listing = load(sorted(folder.glob(f"{name} versions *.json"))[-1])
-    rows = [r for p in listing["pages"] for r in L.as_list(p.get("law")) if r.get("법령명한글") == name]
-    for path in sorted((L.CACHE / "law" / rows[0]["법령ID"]).glob("*.json")):
-        versions.setdefault(path.stem.split("-")[1], load(path)["법령"])
-    return dict(sorted(versions.items())), rows, listing
 
 
 def changed_flags(law):
@@ -110,6 +95,7 @@ def check_versions(name, versions, rows, listing, window_start, as_of):
     if seen != listing["totalCnt"]:
         problems.append(f"{name}: list pages hold {seen} rows, totalCnt is {listing['totalCnt']}")
     chosen = L.choose_versions(rows)
+    versions = {d: law for d, law in versions.items() if d >= L.in_force(chosen, window_start)}
     missing = sorted(d for d in chosen if d >= L.in_force(chosen, window_start) and d not in versions)
     if missing:
         problems.append(f"{name}: versions in the list but not collected {missing}")
@@ -184,18 +170,14 @@ def check_law(name, problems, notes):
     if not (L.CACHE / "law").exists():
         problems.append(f"{name}: no local cache; run scripts/collect.py laws first")
         return
-    versions, rows, listing = law_versions(name)
+    versions, rows, listing, _ = L.stored_versions(name)
     as_of, window_start = L.release()
     found, remarks = check_versions(name, versions, rows, listing, window_start, as_of)
     problems += found
     notes += remarks
 
 
-def attachments(note, response):
-    """Stored attachments of a raw note as (content, name) pairs, named as in the response where it names them."""
-    names = L.as_list(response.get("AdmRulService", {}).get("첨부파일", {}).get("첨부파일명"))
-    stored = L.stored_attachments(note.parent, note.stem)
-    return [(path.read_bytes(), names[index] if index < len(names) else path.name) for index, path in enumerate(stored)]
+attachments = L.note_attachments
 
 
 def latest_retrievals():
@@ -208,6 +190,21 @@ def latest_retrievals():
             if key not in latest or note.stem > latest[key].stem:
                 latest[key] = note
     return set(latest.values())
+
+
+def check_reference(name, problems):
+    """A reference law: its list pages, and its current and scheduled versions with the 시행일자 asked for."""
+    versions, rows, listing, raw = L.stored_versions(name)
+    seen = sum(len(L.as_list(p.get("law"))) for p in listing["pages"])
+    if seen != listing["totalCnt"]:
+        problems.append(f"{name}: list pages hold {seen} rows, totalCnt is {listing['totalCnt']}")
+    chosen = L.choose_versions(rows)
+    expected = {d for d in chosen if d >= L.in_force(chosen, L.release()[0])}
+    if expected - set(raw):
+        problems.append(f"{name}: current or scheduled versions not collected {sorted(expected - set(raw))}")
+    for effective in raw:
+        if versions[effective]["기본정보"]["시행일자"] != effective:
+            problems.append(f"{name} {effective}: response says {versions[effective]['기본정보']['시행일자']}")
 
 
 def check_notices(problems, notes):
@@ -285,6 +282,8 @@ def main():
     problems, notes = [], []
     for name in sources["laws"]:
         check_law(name, problems, notes)
+    for name in sources.get("references", []):
+        check_reference(name, problems)
     check_notices(problems, notes)
     check_notes(problems)
     check_secrets(problems, notes)

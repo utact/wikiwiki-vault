@@ -216,9 +216,15 @@ def canonical(text):
     return re.sub(r"\s+", "", cell_order(text))
 
 
+TABLE_HEADER = re.compile(r"■[^\[\n]*?(?=\[(?:별표|별지))")
+
+
 def version_text(text):
-    """Version text for hashes and version changes: comparison text without image elements."""
-    return canonical(without_images(text))
+    """Version text for hashes and version changes: comparison text without image elements.
+
+    It also leaves out the "■ 고용보험법 시행규칙" header that 법제처 added before [별표 1의2] and other tables in 2019, a display format.
+    """
+    return canonical(TABLE_HEADER.sub("", without_images(text)))
 
 
 def sha256(text):
@@ -268,6 +274,13 @@ def stored_attachments(folder, stem):
     while matches := sorted(folder.glob(f"{glob.escape(stem)}-{len(found) + 1}.*")):
         found.append(matches[0])
     return found
+
+
+def note_attachments(note, response):
+    """Stored attachments of a raw note as (content, name) pairs, named as in the response where it names them."""
+    names = as_list(response.get("AdmRulService", {}).get("첨부파일", {}).get("첨부파일명"))
+    stored = stored_attachments(note.parent, note.stem)
+    return [(path.read_bytes(), names[index] if index < len(names) else path.name) for index, path in enumerate(stored)]
 
 
 def extension(data):
@@ -471,6 +484,28 @@ def choose_versions(rows):
         if key not in chosen or rank > chosen[key][0]:
             chosen[key] = (rank, row)
     return {d: r for d, (_, r) in sorted(chosen.items())}
+
+
+RAW_NOTE = re.compile(r"^(?P<name>.+) (?P<date>\d{8})-(?P<serial>\d+) (?P<stamp>\d{8}T\d{4})$")
+
+
+def stored_versions(name):
+    """Every stored version of a law, keyed by 시행일자, from raw notes and the cache.
+
+    Returns the versions, the rows of the latest version list, that list, and the latest raw note of each committed version.
+    """
+    versions, notes = {}, {}
+    folder = RAW / "law" / name
+    for note in sorted(folder.glob(f"{glob.escape(name)} *-* *.md")):
+        match = RAW_NOTE.match(note.stem)
+        if match:
+            versions[match["date"]] = json.loads(note.with_suffix(".json").read_text(encoding="utf-8"))["법령"]
+            notes[match["date"]] = note
+    listing = json.loads(sorted(folder.glob(f"{glob.escape(name)} versions *.json"))[-1].read_text(encoding="utf-8"))
+    rows = [r for p in listing["pages"] for r in as_list(p.get("law")) if r.get("법령명한글") == name]
+    for path in sorted((CACHE / "law" / rows[0]["법령ID"]).glob("*.json")):
+        versions.setdefault(path.stem.split("-")[1], json.loads(path.read_text(encoding="utf-8"))["법령"])
+    return dict(sorted(versions.items())), rows, listing, notes
 
 
 def in_force(dates, day):

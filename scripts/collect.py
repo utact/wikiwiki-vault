@@ -79,7 +79,8 @@ def fetch_law(mst, effective):
 
 
 def collect_laws(as_of, window_start, stamp, generated, report):
-    for name in SOURCES["laws"]:
+    """Laws in scope with their earlier versions in the window, and reference laws with their current and scheduled versions only."""
+    for name in SOURCES["laws"] + SOURCES.get("references", []):
         folder = L.RAW / "law" / name
         rows, pages, seen, total = version_list(name)
         listing = {"query": name, "totalCnt": total, "pages": pages}
@@ -120,7 +121,8 @@ def collect_laws(as_of, window_start, stamp, generated, report):
             L.write_note(folder / f"{basename}.md", meta, body)
             entry["written"].append(f"{basename}.md")
         cache = L.CACHE / "law" / law_id
-        for effective in (d for d in chosen if L.in_force(chosen, window_start) <= d < current):
+        earlier = [d for d in chosen if L.in_force(chosen, window_start) <= d < current] if name in SOURCES["laws"] else []
+        for effective in earlier:
             mst = chosen[effective]["법령일련번호"]
             path = cache / f"{mst}-{effective}.json"
             if not path.exists():

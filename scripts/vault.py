@@ -36,12 +36,34 @@ StringLoader.yaml_implicit_resolvers = {
 }
 
 
+BLOCK = re.compile(r"\^(v(\d{8})-([a-z0-9-]+)|q\d+)\s*$", re.M)
+STATUTE_TYPES = ("LegalResource", "LegalResourceSubdivision")
+BLOCK_TYPES = {"p": "paragraph", "i": "point", "m": "subpoint", "a": "article", "lead": "lead", "remarks": "remarks"}
+
+
 def read_note(path):
+    """Frontmatter and body of a note."""
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         raise ValueError(f"{path}: no frontmatter")
     end = text.index("\n---\n", 4)
-    return yaml.load(text[4:end], Loader=StringLoader) or {}
+    return yaml.load(text[4:end], Loader=StringLoader) or {}, text[end + 5:]
+
+
+def block_label(suffix):
+    """Official citation of a block suffix, such as p1-i5-m1 for 제1항제5호가목."""
+    words = {"lead": "각 호 외의 부분", "remarks": "비고"}
+    if suffix in words:
+        return " " + words[suffix]
+    label = ""
+    for part in suffix.split("-"):
+        if part[0].isdigit():
+            label += f"의{part}"
+        elif part[0] == "m":
+            label += "가나다라마바사아자차카타파하"[int(part[1:]) - 1] + "목"
+        else:
+            label += {"p": "제{}항", "i": "제{}호", "a": " 제{}조"}[part[0]].format(part[1:])
+    return label
 
 
 class Vault:
@@ -49,12 +71,14 @@ class Vault:
         self.root = Path(root)
         self.view = SchemaView(str(SCHEMA))
         self.errors = []
-        self.notes = {}
+        self.notes, self.blocks = {}, {}
         for folder in ("wiki", "raw"):
             for path in sorted((self.root / folder).rglob("*.md")):
                 if path.stem in self.notes:
                     self.errors.append(f"duplicate note name: {path.stem}")
-                self.notes[path.stem] = (path, folder, read_note(path))
+                meta, body = read_note(path)
+                self.notes[path.stem] = (path, folder, meta)
+                self.blocks[path.stem] = [m.group(1) for m in BLOCK.finditer(body)]
         self.ids = {}
         for stem, (path, _, meta) in self.notes.items():
             identifier = meta.get("identifier")
@@ -84,8 +108,12 @@ class Vault:
             self.errors.append(f"{where}: broken link: {value}")
             return None
         identifier = self.ids[stem]
-        if match.group(2):
-            identifier = f"{identifier}-{match.group(2)}"
+        block = match.group(2)
+        if block:
+            if block not in self.blocks.get(stem, []):
+                self.errors.append(f"{where}: undeclared block: {value}")
+                return None
+            identifier = f"{identifier}-{block.removesuffix('-t')}"
         return wrap(identifier)
 
     def is_link_slot(self, slot):
@@ -150,6 +178,39 @@ class Vault:
             "rule": rules,
         }
 
+    def block_things(self, thing, stem, where):
+        """Version-independent blocks of a statute note, such as law-001761-art-45-p5, each with its versions.
+
+        A block ID such as v20260918-p5 names the version of block p5 that comes into force on 2026-09-18.
+        The whole text block t is the version of the note's own unit.
+        """
+        expressions = {e["identifier"]: e for e in thing.get("isRealizedBy", [])}
+        works = {}
+        for block in self.blocks.get(stem, []):
+            match = re.fullmatch(r"v(\d{8})-([a-z0-9-]+)", block)
+            if not match or match.group(2) == "t":
+                continue
+            date, suffix = match.groups()
+            version = expressions.get(f"{thing['identifier']}-v{date}")
+            if version is None:
+                self.errors.append(f"{where}: block {block} has no version dated {date} in isRealizedBy")
+                continue
+            parts = re.findall(r"[a-z]+\d*(?:-\d+)?", suffix)
+            identifier = f"{thing['identifier']}-{suffix}"
+            parent = f"{thing['identifier']}-{'-'.join(parts[:-1])}" if len(parts) > 1 else thing["identifier"]
+            kind = parts[-1] if parts[-1] in BLOCK_TYPES else parts[-1][0]
+            work = works.setdefault(identifier, {
+                "type": self.view.get_uri("LegalResourceSubdivision", expand=False),
+                "identifier": identifier,
+                "prefLabel": stem + block_label(suffix),
+                "isPartOf": parent,
+                "typeSubdivision": BLOCK_TYPES[kind],
+                "isRealizedBy": [],
+            })
+            expression = {k: v for k, v in version.items() if k not in ("identifier", "realizes")}
+            work["isRealizedBy"].append({"identifier": f"{thing['identifier']}-{block}", "realizes": identifier, **expression})
+        return list(works.values())
+
     def container(self):
         things, documents, sources = [], [], []
         for stem, (path, folder, meta) in self.notes.items():
@@ -165,6 +226,8 @@ class Vault:
             thing = self.convert(cls, body, where)
             thing["prefLabel"] = stem
             things.append(thing)
+            if cls in STATUTE_TYPES:
+                things += self.block_things(thing, stem, where)
             note = {k: v for k, v in meta.items() if k in NOTE_SLOTS}
             note = self.convert("NoteDocument", note, where)
             note["identifier"] = f"{meta.get('identifier')}-note"

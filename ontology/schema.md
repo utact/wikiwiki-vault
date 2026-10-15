@@ -58,7 +58,7 @@ class를 정의하는 표준은 class가 처음 나오는 순서로, property만
 - `LegalResource`: identifier는 법령이면 law-<법령ID>, 행정규칙이면 admrul-<행정규칙ID>다.
 - `LegalResourceSubdivision`: 장, 절, 조, 별표, 별지 서식, 부칙은 노트로 두고, 항, 호, 목은 노트의 block으로 둔다.
 - `LegalResourceSubdivision`: identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-40, 가지번호는 -art-10-2, 장은 -ch-4, 장의2는 -ch-5-2, 절은 -ch-4-sec-2다.
-- `LegalResourceSubdivision`: 별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포번호>다.
+- `LegalResourceSubdivision`: 별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포일자>-<공포번호>다. 공포번호가 같은 부칙이 있어 공포일자를 붙인다.
 - `LegalResourceSubdivision`: 버전과 무관한 block은 소속 노트의 identifier 뒤에 날짜를 뺀 block ID를 붙인다. 고용보험법 제45조제5항은 law-001761-art-45-p5다.
 
 아래 추상 class는 instance의 class로 쓰지 않고, 공통 property를 묶는 데만 쓴다.
@@ -247,7 +247,7 @@ class를 정의하는 표준은 class가 처음 나오는 순서로, property만
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `typeSubdivision` | `eli:type_subdivision` | 예 | 하위 단위의 종류: `chapter`(장), `section`(절), `article`(조), `paragraph`(항), `point`(호), `subpoint`(목), `annex`(별표), `form`(별지 서식), `addendum`(부칙) |
+| `typeSubdivision` | `eli:type_subdivision` | 예 | 하위 단위의 종류: `chapter`(장), `section`(절), `article`(조), `paragraph`(항), `point`(호), `subpoint`(목), `lead`(각 호 외의 부분), `annex`(별표), `remarks`(별표의 비고), `form`(별지 서식), `addendum`(부칙) |
 | `number` | `eli:number` | 아니요 | 제40조, 제1항, 별표 1 같은 하위 단위 번호 |
 
 ### Concept
