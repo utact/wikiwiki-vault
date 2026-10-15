@@ -18,6 +18,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 | `synthetic/` | — | Synthetic data |
 | `scripts/` | — | Collection, generation and validation scripts |
 | `tests/` | — | Fixture notes and tests for the scripts |
+| `.cache/` | — | Local cache of uncited raw versions, ignored by Git |
 | `docs/` | — | Human-facing documents such as the roadmap |
 | `index.md` | — | Notes by class |
 | `log.md` | — | Operation log |
@@ -48,17 +49,25 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Collect these versions of every law in scope.
   - The current version
   - Every scheduled version (시행예정)
-  - Every earlier version that a 경과조치 still applies to someone who left before the change, such as 이직 before 2026-01-01 for 고용보험법 시행령 제68조
+  - Every earlier version that a 경과조치 still applies to, such as the text before 2026-01-01 of 고용보험법 시행령 제68조
+- Find those earlier versions from 부칙 articles titled 경과조치 or 적용례 that name a unit.
+  - Look back `transitionalWindowYears` years from the reference date, as set in `ontology/release.yaml`.
+  - The longest 수급기간 under 고용보험법 제48조제2항 is 4 years, and the window adds one year of margin.
+- Walk back the version list as far as needed to date the text of each generated unit, as described in Statute notes.
+  - Commit only the versions that the wiki cites or that are current or scheduled.
+  - Keep the others in the local cache `.cache/law/`, which Git ignores.
 - Re-collect scheduled versions after each new promulgation, because a later amendment can change them.
 - Keep 고용24 guide bodies local and out of Git.
   - 고용24 content without a 공공누리 mark needs prior consultation before redistribution.
   - Store the captured page as `raw/work24/<page name>/<page name> <YYYYMMDDTHHMM>.html`, which Git ignores.
   - Commit the raw note next to it, with the short quotations the wiki cites in `hasPart`, quoted under 저작권법 제28조.
+  - Number the quotation blocks `^q1`, `^q2` in the order of `hasPart`, and cite them as `[[<raw note>#^q1]]`.
 - Fill every required property in the Raw sources section of `ontology/schema.md`, and the optional ones that apply.
 - Record the terms of use in `license`.
   - Statutes: not protected works under 저작권법 제7조
   - Other sources: the 공공누리 type or the 공공데이터포털 terms of use
 - Never edit a saved source.
+  - The only allowed edit is appending a quotation to `hasPart` of a 고용24 raw note.
   - On re-collection, write a new note with the new retrieval time.
   - Skip it if its `sha256` equals that of the previous retrieval.
 
@@ -75,11 +84,15 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Generate `LegalResource` and `LegalResourceSubdivision` notes from raw sources with a script.
   - The LLM never writes or edits statute text.
   - Write one note per law, 장, 절, 조, 별표, 별지 서식 and 부칙.
-  - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite.
+  - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
-- Put every collected version in the body under its own heading, and mark the current version in that heading.
-- Prefix every block ID with the 시행일자 of its version, so that a block ID never changes meaning.
+- Give a unit a new version only when its canonical text changes.
+  - Date the version by the 시행일자 of the earliest law version that has this text of the unit.
+  - A 부칙 has one version, dated by the earliest law version that contains it.
+- Put the current, scheduled and cited versions of the unit in the body, each under its own heading, and mark the current one.
+  - Never remove a version that a note cites.
+- Prefix every block ID with the date of its version, so that a block ID never changes meaning.
   - Whole text of a unit without 항 or 호: `^v20260918-t`
   - Lead text before the items (각 호 외의 부분): `^v20260918-lead`
   - 항: `^v20260918-p1`
@@ -88,6 +101,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - 목: `^v20260918-p1-i5-m1`, where 가 is 1 and 나 is 2
   - 비고 of a 별표: `^v20260918-note`
   - Articles of a 부칙 and their parts: `^v20260317-a3`, `^v20260317-a3-p1`
+  - 별지 서식: only the whole text, `^v20260918-t`, with its parts cited by quotation
 - Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".
   - Resolve 법, 영 and 규칙 against the law family, 같은 조 against the current article, and short names defined in the text, such as 고용산재보험료징수법.
 
@@ -154,9 +168,12 @@ decisionTable:
   - Statutes: a block of the statute note, labelled with the official citation, as in `[^1]: [[고용보험법 제40조#^v20260918-p1-i1|고용보험법 제40조제1항제1호]]`
   - 단서, 본문, 전단 and 후단: link the block, and name the part in the label
   - 고용24 guides: a quotation block of the raw note
-- Quote statutory text verbatim inside double quotes, followed directly by its footnote.
+- Quote statutory text verbatim inside “ ” (U+201C and U+201D), followed directly by its footnote.
+  - Statute text itself uses ASCII double quotes, as in `[이하 "기초일액(基礎日額)"이라 한다]`.
   - Keep source text and interpretation in separate sentences.
-- Every number, amount and date in a footnoted sentence must appear in a cited block, or come from a `Rule` that the sentence cites.
+- Every number, amount and date in a footnoted sentence must appear in a cited block.
+  - Numbers inside citations, such as 제45조제5항, 별표 1 and 부칙 제21473호, are exempt.
+  - Give a calculated number a footnote that links its `Rule` and states the calculation in inline code, such as `113500 * 60 / 100`; the checker evaluates it.
 - Rank sources in this order.
   1. 법률
   2. 시행령
@@ -177,17 +194,23 @@ decisionTable:
 
 Scripts check quotes, numbers and hashes against this canonical text.
 
-- The text of a statute block joins the 조문내용, 항내용, 호내용 and 목내용 of the block and all its children with newlines.
-  - Keep amendment tags such as `<개정 2019.1.15>`.
+- Take the canonical text of each kind of source from these fields.
+  - 조문 block: 조문내용, 항내용, 호내용 and 목내용 of the block and all its children, joined with newlines
+  - 별표 and 별지 서식: 별표내용
+  - 부칙: 부칙내용
+  - 고시 whose 조문내용 is empty: the text extracted from its PDF attachment
+  - 고용24 guide: the text of the body area
+- Keep amendment tags such as `<개정 2019.1.15>`, and box-drawing characters of 별표.
 - Compare texts after removing all whitespace, and change no other character.
+  - Wrapped lines of 별표 and spaces inserted by PDF extraction then stop mattering.
   - "ㆍ" (U+318D) and "·" (U+00B7) stay different.
 - Read numbers in these forms.
   - Digits with or without commas, such as 113,500
   - Korean units, such as 11만3500원 and 3천만원
   - Fractions and percentages, such as 100분의 60 and 70퍼센트
   - Dates, such as 2026-01-01, 2026.1.1. and 2026년 1월 1일
-- The hash of a block is the SHA-256 of its canonical text.
-- The `sha256` of a raw source is the SHA-256 of the canonical text of everything it contains, without metadata such as 조문이동이전.
+- The hash of a block is the SHA-256 of its canonical text with all whitespace removed.
+- The `sha256` of a raw source is computed the same way over the fields listed above, and over no other field.
 
 ## Review
 
@@ -239,20 +262,31 @@ Query answers a question from the wiki.
 Lint checks the wiki for these problems.
 
 - Links
-  - Broken links and block references
+  - Broken links, and links to blocks or quotations that the target note does not declare
   - Notes that nothing links to, except generated statute notes
+  - `source` values that point to anything other than a raw note, a statute block or a quotation
 - Schema
   - Notes that fail `uv run python -X utf8 scripts/vault.py check`, which validates them against LinkML and SHACL
   - `ontology/schema.md` out of date with `ontology/schema.yaml`
   - Duplicate file names, identifiers or aliases
+- Rules
+  - `unaryTests` and FEEL expressions that do not parse
+  - Tests or expressions whose types do not match the `typeRef` of their concepts
+  - FEEL names that are not in `requiredInput`
+  - Decision table inputs missing from `requiredInput`, and outputs other than `variable`
+  - `UNIQUE` decision tables with overlapping rows
 - Sources
   - Factual sentences without a source
   - Quotes or numbers that do not match the cited block
+  - Current facts that cite a superseded version without `appliesWhen`
   - Cited blocks whose hash differs from the one in the verification ledger
   - `verified` or `reviewed` notes without a matching ledger entry
+  - `reviewed` notes without `reviewedBy` and `lastReviewed`
+  - Versions of one unit with the same date, or whose dates overlap
   - Scheduled versions that come into force on or before the reference date
 - Secrets
   - `.env` values in tracked files
+  - Credential parameters in raw URLs
 - Synthetic data
   - Links from `wiki/` to `synthetic/`
 
