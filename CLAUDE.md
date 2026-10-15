@@ -50,7 +50,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - 법령: `raw/law/<법령명>/<법령명> <시행일자>-<MST> <YYYYMMDDTHHMM>.md`
   - 행정규칙: `raw/law/<행정규칙명>/<행정규칙명> <시행일자>-<행정규칙일련번호> <YYYYMMDDTHHMM>.md`
   - Keep the original response next to the note with the same basename and `.json`.
-  - Keep attachments with the same basename followed by `-1`, `-2` in the order of the response, and their own extension.
+  - Keep attachments with the same basename followed by `-1`, `-2` and so on, with their own extension: first the 첨부파일 of a 고시 in the order of the response, then the image files the response links to as `<img src>` or `<img id>`, in order of first appearance.
+  - Store the image files because some text exists only in them, such as the formulas of 고용산재보험료징수법 시행령 제18조의2 and the amount in `2020년 적용 최저임금 고시`.
   - Keep version lists as `<법령명> versions <YYYYMMDDTHHMM>.json`.
 - Collect these versions of every 법령 and 행정규칙 in scope.
   - The current version
@@ -77,7 +78,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Commit the raw note next to it, with the short quotations the wiki cites in `hasPart`, quoted under 저작권법 제28조.
   - Number the quotation blocks `^q1`, `^q2` in the order of `hasPart`, and cite them as `[[<raw note>#^q1]]`.
 - Fill every required property in the Raw sources section of `ontology/schema.md`, and the optional ones that apply.
-- Set `sha256` to the SHA-256 of the stored response file followed by its attachments in the order of the response.
+- Set `sha256` to the SHA-256 of the stored response file followed by its attachments in their order.
+  - The latest retrieval of each version stores every attachment. An earlier retrieval keeps the files it stored, such as the 법령 retrievals of 2026-10-15 13:37 made before image files were collected.
   - This hash does not depend on how scripts read the text, so a change in the reading rules leaves raw notes as they are.
   - Any change in a response makes a new raw note, even in a field outside the text, such as a contact number.
   - For a 고용24 guide, whose page stays out of Git, use the text of its body area without whitespace, section by section. This hash changes when the reading of the page changes.
