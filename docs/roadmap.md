@@ -75,7 +75,7 @@
   - CPSV-AP 3.2.0·CCCEV 2.1.0 공식 SHACL shape 검사, PublicService의 `dct:title`·`dct:description` 출력, 상태 값과 하위 단위 종류의 ConceptScheme 선언
   - lint
   - 인용 문자열과 숫자를 원문과 대조하고, 계산식을 평가
-    - 숫자는 칸 경계와 공백을 남긴 텍스트에서 token 단위로 대조
+    - 숫자는 칸 경계를 남기고, 표 칸과 별표·서식·PDF 텍스트의 줄바꿈은 이어 붙인 텍스트에서 token 단위로 대조
   - 선언되지 않은 block·인용 링크, FEEL 구문과 자료형, 결정표 일관성 검사
   - 검증 원장(`ontology/verification.jsonl`)
   - vault 노트용 markdownlint 설정
