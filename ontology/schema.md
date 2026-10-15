@@ -1,99 +1,94 @@
 # Ontology schema
 
-고용24가 다루는 고용 분야의 class와 property 정의다. class와 property는 표준의 이름을 그대로 쓰고, 각 이름은 표준 IRI에 대응한다.
+고용24가 다루는 고용 분야의 RDF 모델이다. class와 property는 표준의 이름을 그대로 쓰고, 각 이름은 표준 IRI에 대응한다.
 
 이 문서는 `ontology/schema.yaml`에서 `scripts/schema_doc.py`로 생성한다. 이 문서를 직접 고치지 않는다.
 
-- 노트의 파일 이름은 RDF로 옮길 때 `skos:prefLabel`이 된다.
-- instance가 아니라 노트를 설명하는 property에는 `describes: note` annotation을 붙인다. RDF로 옮길 때 이런 property는 노트 문서(`foaf:Document`)에 붙이고, 노트 문서는 `foaf:primaryTopic`으로 instance를 가리킨다.
-- 표준에 없는 개념이 필요하면 이 schema에 먼저 정의하고 이유를 comments에 적는다.
+- 노트의 frontmatter는 작성용 형식이다. `scripts/vault.py`가 frontmatter를 이 모델의 instance와 노트 문서로 옮긴다.
+- 표준에 없는 개념은 `employment:` 이름공간에 정의하고, 이유를 해당 class나 property의 comments에 적는다.
 
 ## Standards
 
-class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표준은 접두어의 알파벳순으로 둔다.
+class를 정의하는 표준은 class가 처음 나오는 순서로, property만 쓰는 표준은 접두어의 알파벳순으로 둔다.
 
 | 접두어 | 표준 | 이름공간 |
 | --- | --- | --- |
+| `employment` | 이 ontology | `https://w3id.org/kr-employment/` |
+| `foaf` | FOAF (Friend of a Friend) | `http://xmlns.com/foaf/0.1/` |
 | `cpsv` | CPSV-AP 3.2.0 (Core Public Service Vocabulary Application Profile) | `http://purl.org/vocab/cpsv#` |
 | `cv` | CPSV-AP 3.2.0, CCCEV 2.1.0 (Core Criterion and Core Evidence Vocabulary) | `http://data.europa.eu/m8g/` |
-| `foaf` | FOAF (Friend of a Friend) | `http://xmlns.com/foaf/0.1/` |
 | `eli` | ELI 1.4 (European Legislation Identifier) | `http://data.europa.eu/eli/ontology#` |
 | `skos` | SKOS (Simple Knowledge Organization System) | `http://www.w3.org/2004/02/skos/core#` |
-| `dcat` | DCAT (Data Catalog Vocabulary) | `http://www.w3.org/ns/dcat#` |
-| `dmn` | DMN 1.3 (Decision Model and Notation) | `https://www.omg.org/spec/DMN/20191111/MODEL/` |
 | `prov` | PROV-O (PROV Ontology) | `http://www.w3.org/ns/prov#` |
+| `sdo` | Schema.org | `https://schema.org/` |
 | `dct` | DCMI Metadata Terms | `http://purl.org/dc/terms/` |
-| `employment` | 이 ontology | `https://w3id.org/kr-employment/` |
 | `org` | W3C Organization Ontology | `http://www.w3.org/ns/org#` |
 | `rdf` | RDF | `http://www.w3.org/1999/02/22-rdf-syntax-ns#` |
 | `rdfs` | RDF Schema | `http://www.w3.org/2000/01/rdf-schema#` |
-| `schema` | Schema.org | `http://schema.org/` |
-| `sh` | SHACL (Shapes Constraint Language) | `http://www.w3.org/ns/shacl#` |
 | `spdx` | SPDX | `http://spdx.org/rdf/terms#` |
 
 ## Classes
 
-`wiki/` 노트의 `type`에 쓰는 class다. CPSV-AP, CCCEV, ELI, SKOS, DCAT 순서로 묶는다.
+`wiki/` 노트가 설명하는 instance의 class다. CPSV-AP, CCCEV, ELI, SKOS 순서로 묶는다.
 
 | 이름 | 표준 | 뜻 | 예 |
 | --- | --- | --- | --- |
-| `PublicService` | `cpsv:PublicService` | 공공기관이 제공하는 서비스(급여와 신청 절차 포함) | 구직급여, 실업인정, 피보험자격 상실 신고 |
+| `PublicService` | `cpsv:PublicService` | 공공기관이 제공하는 서비스(급여와 신청 절차 포함) | 실업급여, 구직급여, 실업의 신고, 피보험자격 상실 신고 |
 | `LifeEvent` | `cv:LifeEvent` | 공공서비스가 필요해지는 개인의 사건 | 이직, 재취업 |
-| `BusinessEvent` | `cv:BusinessEvent` | 공공서비스가 필요해지는 사업장의 사건 | 근로자 이직 |
-| `Agent` | `foaf:Agent` | 서비스에 참여하는 당사자 | 사업주, 피보험자, 수급자격자 |
-| `PublicOrganisation` | `cv:PublicOrganisation` | 공공기관 | 고용노동부, 직업안정기관, 근로복지공단 |
-| `Participation` | `cv:Participation` | 서비스에서 당사자가 맡는 역할 | 피보험자격 상실 신고의 신고 의무자인 사업주 |
+| `BusinessEvent` | `cv:BusinessEvent` | 공공서비스가 필요해지는 사업장의 사건 | 근로자의 이직 |
+| `PublicOrganisation` | `cv:PublicOrganisation` | 공공기관 | 고용노동부, 근로복지공단 |
+| `Participation` | `cv:Participation` | 서비스에서 당사자가 맡는 역할과 그 역할의 의무 | 피보험자격 상실 신고에서 사업주가 맡는 신고 의무 |
 | `Channel` | `cv:Channel` | 서비스를 이용하는 경로 | 고용24 누리집, 직업안정기관 출석 |
 | `Output` | `cv:Output` | 서비스가 만들어 내는 결과 | 수급자격 인정, 수급자격증 |
 | `Rule` | `cpsv:Rule` | 서비스가 따르는 산정·판단 규칙 | 구직급여일액 산정, 소정급여일수 산정 |
-| `Criterion` | `cv:Criterion` | 서비스를 받으려면 충족해야 하는 조건 | 기준기간 동안의 피보험 단위기간 180일 이상 |
+| `Criterion` | `cv:Criterion` | 서비스를 받으려면 충족해야 하는 조건 | 기준기간 동안의 피보험 단위기간 180일 이상, 2026-01-01 이후 이직 |
 | `Constraint` | `cv:Constraint` | 정보 값에 거는 기한·상한·하한 같은 제한 | 기초일액 상한 11만3500원, 이직확인서 발급 기한 10일 |
-| `InformationConcept` | `cv:InformationConcept` | 조건과 규칙이 판단하는 정보 항목 | 피보험 단위기간, 이직일, 기초일액 |
+| `InformationConcept` | `cv:InformationConcept` | 조건과 규칙이 판단하는 정보 항목 | 피보험 단위기간, 이직일, 기초일액, 이직사유 |
 | `EvidenceType` | `cv:EvidenceType` | 증빙 서류의 유형 | 피보험자 이직확인서 |
 | `LegalResource` | `eli:LegalResource` | 시행일 버전과 무관한 법령 | 고용보험법, 2026년 적용 최저임금 고시 |
 | `LegalResourceSubdivision` | `eli:LegalResourceSubdivision` | 시행일 버전과 무관한 법령의 하위 단위 | 고용보험법 제40조, 고용보험법 별표 1, 고용보험법 시행규칙 별지 제6호서식 |
-| `ConceptScheme` | `skos:ConceptScheme` | 용어집과 코드 체계 | 고용보험 상실사유 구분코드, 당사자 역할 |
-| `Concept` | `skos:Concept` | 용어, 코드 값, 역할, 대상자 유형 | 상실사유 구분코드 23, 신고 의무자 |
-| `Dataset` | `dcat:Dataset` | 통계와 데이터셋 | 구직급여 수급 현황 |
+| `ConceptScheme` | `skos:ConceptScheme` | 용어집과 코드 체계 | 피보험자격 상실사유 구분코드, 고용보험 당사자 유형, 정당한 이직 사유 |
+| `Concept` | `skos:Concept` | 용어, 코드 값, 당사자 유형, 사유 목록의 항목 | 상실사유 구분코드 23, 사업주 |
 
-- `Agent`: 법령이 정한 당사자 유형도 instance로 둔다.
-- `Rule`: 식은 FEEL literal expression으로, 표는 DMN 결정표로 적는다.
-- `Rule`: `literalExpression`과 `decisionTable` 중 하나만 적는다.
+- `Participation`: 사업주, 피보험자 같은 당사자 유형은 `role`의 Concept로 적고 `hasParticipant`는 비워 둔다. CPSV-AP는 `hasParticipant`를 필수로 두지만, 법령이 정한 당사자 유형은 특정 Agent가 아니다.
+- `Participation`: 역할에 딸린 기한 같은 의무는 `holdsRequirement`로 적는다. CPSV-AP는 이 property를 PublicService에만 두므로 Participation에 쓰는 것은 확장이다.
+- `Rule`: 식은 FEEL literal expression으로, 표는 결정표로 적는다. 둘 중 하나만 적는다.
+- `Rule`: 경과조치처럼 규칙이 일부 경우에만 적용되면 그 조건을 `appliesWhen`으로 잇는다.
 - `LegalResource`: 법률, 시행령, 시행규칙, 고시를 포함한다.
 - `LegalResource`: identifier는 법령이면 law-<법령ID>, 행정규칙이면 admrul-<행정규칙ID>다.
-- `LegalResourceSubdivision`: 장, 절, 조, 별표, 별지 서식, 부칙을 포함한다.
-- `LegalResourceSubdivision`: identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-<번호>, 가지번호는 -art-10-2처럼 붙인다.
-- `LegalResourceSubdivision`: 장은 -ch-<번호>, 절은 -ch-<번호>-sec-<번호>, 별표는 -annex-<번호>, 별지 서식은 -form-<번호>, 부칙은 -sup-<공포번호>다.
+- `LegalResourceSubdivision`: 장, 절, 조, 별표, 별지 서식, 부칙은 노트로 두고, 항, 호, 목은 노트의 block으로 둔다.
+- `LegalResourceSubdivision`: identifier는 소속 법령의 identifier 뒤에 단위를 붙인다. 조는 -art-40, 가지번호는 -art-10-2, 장은 -ch-4, 장의2는 -ch-5-2, 절은 -ch-4-sec-2다.
+- `LegalResourceSubdivision`: 별표는 -annex-1, 별표 1의2는 -annex-1-2, 별지 서식은 -form-6, 부칙은 -sup-<공포번호>다.
+- `LegalResourceSubdivision`: block은 소속 노트의 identifier 뒤에 block ID를 붙인다. 고용보험법 제45조 제5항은 law-001761-art-45-p5다.
 
-아래 추상 class는 `type`에 쓰지 않고, 공통 property를 묶는 데만 쓴다.
+아래 추상 class는 instance의 class로 쓰지 않고, 공통 property를 묶는 데만 쓴다.
 
 - `Event`(`cv:Event`): 공공서비스가 필요해지는 사건
+- `Agent`(`foaf:Agent`): 서비스에 참여하는 당사자
 - `Requirement`(`cv:Requirement`): Criterion과 Constraint의 상위 class
 - `Work`(`eli:Work`): 법령과 그 하위 단위의 공통 상위 class
 
 ## Common properties
 
-모든 `wiki/` 노트에 쓰는 property다. 내용, 근거, 적용 기간, 편집 상태의 순서로 둔다. frontmatter에도 이 순서로 적고, class별 property는 `definition`과 `source` 사이에 둔다.
+모든 instance의 공통 property다. 내용, 적용 기간, 대체 관계의 순서로 둔다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
 | `type` | `rdf:type` | 예 | Classes 표의 이름 |
 | `identifier` | `dct:identifier` | 예 | 바뀌지 않는 kebab-case 식별자 |
+| `prefLabel` | `skos:prefLabel` | 예 | 노트의 파일 이름 |
 | `aliases` | `skos:altLabel` | 아니요 | 다른 이름 목록 |
 | `definition` | `skos:definition` | 예 | 한 문장 정의 |
-| `source` | `dct:source` | 예 | 원문 노트나 법령 노트의 wikilink 목록 |
-| `validFrom` | `schema:validFrom` | 아니요 | 적용 시작일 (date) |
-| `validThrough` | `schema:validThrough` | 아니요 | 적용 종료일 (date) |
-| `status` | `schema:creativeWorkStatus` | 예 | 노트의 편집 상태: `draft`(LLM이 만들거나 고친 상태), `verified`(노트를 쓰지 않은 별도 agent가 원문과 대조한 상태), `reviewed`(사람이 승인한 상태) |
-| `reviewedBy` | `schema:reviewedBy` | 아니요 | 승인한 사람 |
-| `lastReviewed` | `schema:lastReviewed` | 아니요 | 승인일 (date) |
+| `validFrom` | `sdo:validFrom` | 아니요 | 달력상 적용 시작일 (date) |
+| `validThrough` | `sdo:validThrough` | 아니요 | 달력상 적용 종료일 (date) |
 | `isReplacedBy` | `dct:isReplacedBy` | 아니요 | 폐지되거나 대체된 instance를 잇는 후속 instance (`NamedThing`) |
 
-`source`, `status`, `reviewedBy`, `lastReviewed`는 instance가 아니라 노트를 설명한다.
+- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `validThrough`: 이직일 같은 사실의 날짜에 따라 달라지는 경과조치는 이 property가 아니라 Criterion으로 적는다.
 
 ## Object properties
 
-다른 노트를 wikilink로 가리키는 class별 property다. 관계마다 이 표의 방향으로만 적는다. 표 안에서는 필수 property를 먼저, 나머지를 알파벳순으로 둔다.
+다른 instance를 가리키는 class별 property다. 관계마다 이 표의 방향으로만 적는다. 표 안에서는 필수 property를 먼저, 나머지를 알파벳순으로 둔다.
 
 ### PublicService
 
@@ -105,20 +100,13 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 | `hasChannel` | `cv:hasChannel` | 아니요 | 서비스를 이용하는 경로 (`Channel`) |
 | `hasInputType` | `cv:hasInputType` | 아니요 | 서비스에 필요한 증빙 유형 (`EvidenceType`) |
 | `hasLegalResource` | `cv:hasLegalResource` | 아니요 | 서비스의 근거 법령이나 그 하위 단위 (`Work`) |
+| `hasPart` | `dct:hasPart` | 아니요 | 하위 서비스 (`PublicService`) |
 | `hasParticipation` | `cv:hasParticipation` | 아니요 | 서비스에서 당사자가 맡는 역할 (`Participation`) |
-| `holdsRequirement` | `cv:holdsRequirement` | 아니요 | 서비스의 조건이나 제한 (`Requirement`) |
+| `holdsRequirement` | `cv:holdsRequirement` | 아니요 | 조건이나 제한 (`Requirement`) |
 | `isGroupedBy` | `cv:isGroupedBy` | 아니요 | 서비스를 필요로 하는 사건 (`Event`) |
 | `produces` | `cpsv:produces` | 아니요 | 서비스의 결과 (`Output`) |
 | `relatedService` | `cv:relatedService` | 아니요 | 관련 서비스 (`PublicService`) |
 | `requires` | `dct:requires` | 아니요 | 먼저 거쳐야 하는 서비스 (`PublicService`) |
-
-### Event
-
-`LifeEvent`, `BusinessEvent`에 쓴다.
-
-| 이름 | 표준 | 필수 | 대상 |
-| --- | --- | --- | --- |
-| `eventType` | `dct:type` | 아니요 | 사건의 유형 코드 (`Concept`) |
 
 ### PublicOrganisation
 
@@ -130,8 +118,9 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 
 | 이름 | 표준 | 필수 | 대상 |
 | --- | --- | --- | --- |
-| `hasParticipant` | `cv:hasParticipant` | 예 | 역할을 맡는 당사자 (`Agent`) |
-| `role` | `cv:role` | 예 | 당사자가 맡는 역할 (`Concept`) |
+| `role` | `cv:role` | 예 | 당사자가 맡는 역할이나 당사자 유형 (`Concept`) |
+| `hasParticipant` | `cv:hasParticipant` | 아니요 | 역할을 맡는 특정 당사자 (`Agent`) |
+| `holdsRequirement` | `cv:holdsRequirement` | 아니요 | 조건이나 제한 (`Requirement`) |
 
 ### Channel
 
@@ -144,10 +133,13 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 | 이름 | 표준 | 필수 | 대상 |
 | --- | --- | --- | --- |
 | `implements` | `cpsv:implements` | 예 | 규칙의 근거 법령이나 그 하위 단위 (`Work`) |
-| `variable` | `dmn:variable` | 예 | 규칙이 산출하는 정보 항목 (`InformationConcept`) |
-| `requiredInput` | `dmn:requiredInput` | 아니요 | 규칙의 입력 정보 항목 (`InformationConcept`) |
+| `variable` | `employment:variable` | 예 | 규칙이 산출하는 정보 항목 (`InformationConcept`) |
+| `appliesWhen` | `employment:appliesWhen` | 아니요 | 규칙이나 조건이 적용되는 조건 (`Requirement`) |
+| `requiredInput` | `employment:requiredInput` | 아니요 | 규칙의 입력 정보 항목 (`InformationConcept`) |
 
-- `requiredInput`: FEEL 식에서는 노트 이름을 변수 이름으로 쓴다.
+- `variable`: DMN 1.3 decision의 variable에 대응한다.
+- `appliesWhen`: cpsv:Rule과 cv:Requirement에는 적용 조건을 나타내는 property가 없어서 정의한다. 조건을 모두 충족할 때 적용된다.
+- `requiredInput`: DMN 1.3의 requiredInput에 대응한다. FEEL 식에서는 정보 항목 노트의 이름을 변수 이름으로 쓴다.
 
 ### Requirement
 
@@ -155,14 +147,13 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 
 | 이름 | 표준 | 필수 | 대상 |
 | --- | --- | --- | --- |
+| `appliesWhen` | `employment:appliesWhen` | 아니요 | 규칙이나 조건이 적용되는 조건 (`Requirement`) |
 | `hasConcept` | `cv:hasConcept` | 아니요 | 판단하는 정보 항목 (`InformationConcept`) |
-| `hasEvidenceTypeList` | `cv:hasEvidenceTypeList` | 아니요 | 조건을 증명하는 증빙 유형 (`EvidenceType`) |
 | `hasRequirement` | `cv:hasRequirement` | 아니요 | 하위 조건이나 제한 (`Requirement`) |
-| `isDerivedFrom` | `cv:isDerivedFrom` | 아니요 | 조건이나 제한의 근거 법령 단위 (`Work`) |
 
-- `hasEvidenceTypeList`: 적은 증빙 유형이 모두 필요하다. 서로 대신할 수 있는 조합이 있으면 조합마다 조건을 나눈다.
-- `hasEvidenceTypeList`: CCCEV의 증빙 유형 목록(`cv:EvidenceTypeList`)은 RDF로 옮길 때 만든다.
-- `hasRequirement`: 하위 조건이나 제한을 모두 충족할 때 상위 조건이나 제한이 적용된다.
+- `appliesWhen`: cpsv:Rule과 cv:Requirement에는 적용 조건을 나타내는 property가 없어서 정의한다. 조건을 모두 충족할 때 적용된다.
+- `hasRequirement`: 하위 조건이나 제한을 모두 충족할 때 상위 조건이나 제한이 충족된다.
+- `hasRequirement`: 하위 사유 중 어느 하나만 충족하면 되는 경우는 사유를 ConceptScheme으로 두고, 정보 항목의 `conformsTo`와 `unaryTests`로 적는다.
 
 ### Constraint
 
@@ -170,20 +161,17 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 | --- | --- | --- | --- |
 | `constrains` | `cv:constrains` | 예 | 제한하는 정보 항목 (`InformationConcept`) |
 
+### InformationConcept
+
+| 이름 | 표준 | 필수 | 대상 |
+| --- | --- | --- | --- |
+| `conformsTo` | `dct:conformsTo` | 아니요 | 값으로 쓸 수 있는 코드 체계 (`ConceptScheme`) |
+
 ### EvidenceType
 
 | 이름 | 표준 | 필수 | 대상 |
 | --- | --- | --- | --- |
-| `isDefinedBy` | `rdfs:isDefinedBy` | 아니요 | 증빙 유형을 정한 별지 서식 (`LegalResourceSubdivision`) |
-
-### Work
-
-`LegalResource`, `LegalResourceSubdivision`에 쓴다.
-
-| 이름 | 표준 | 필수 | 대상 |
-| --- | --- | --- | --- |
-| `basedOn` | `eli:based_on` | 아니요 | 위임한 상위 법령이나 그 하위 단위 (`Work`) |
-| `cites` | `eli:cites` | 아니요 | 본문이 인용하는 법령이나 그 하위 단위 (`Work`) |
+| `isDefinedBy` | `rdfs:isDefinedBy` | 아니요 | 증빙 유형을 정한 별지 서식 (`Work`) |
 
 ### LegalResource
 
@@ -195,7 +183,7 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 
 | 이름 | 표준 | 필수 | 대상 |
 | --- | --- | --- | --- |
-| `isPartOf` | `eli:is_part_of` | 예 | 속한 법령이나 상위 단위 (`Work`) |
+| `isPartOf` | `eli:is_part_of` | 예 | 속한 상위 단위 (`Work`) |
 
 ### Concept
 
@@ -205,36 +193,41 @@ class를 정의하는 표준은 Classes 표의 순서로, property만 쓰는 표
 | `broader` | `skos:broader` | 아니요 | 상위 개념 (`Concept`) |
 | `related` | `skos:related` | 아니요 | 관련 개념 (`Concept`) |
 
-### Dataset
-
-| 이름 | 표준 | 필수 | 대상 |
-| --- | --- | --- | --- |
-| `publisher` | `dct:publisher` | 예 | 공개 기관 (`PublicOrganisation`) |
-
 ## Datatype properties
 
-wikilink가 아닌 값을 담는 class별 property다. 배치 기준은 Object properties와 같다.
+값이나 block IRI를 담는 class별 property다. 배치 기준은 Object properties와 같다.
 
 ### Rule
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `decisionTable` | `dmn:decisionTable` | 아니요 | 규칙의 결정표 (`DecisionTable`) |
-| `literalExpression` | `dmn:literalExpression` | 아니요 | 규칙의 FEEL 식 |
+| `decisionTable` | `employment:decisionTable` | 아니요 | 규칙의 결정표 (`DecisionTable`) |
+| `literalExpression` | `employment:literalExpression` | 아니요 | 규칙의 FEEL 식 |
 
-### Constraint
+### Requirement
+
+`Criterion`, `Constraint`에 쓴다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `currency` | `schema:currency` | 아니요 | ISO 4217 통화 코드 |
-| `maxExclusive` | `sh:maxExclusive` | 아니요 | 미만 (decimal) |
-| `maxInclusive` | `sh:maxInclusive` | 아니요 | 이하 (decimal) |
-| `minExclusive` | `sh:minExclusive` | 아니요 | 초과 (decimal) |
-| `minInclusive` | `sh:minInclusive` | 아니요 | 이상 (decimal) |
-| `unitCode` | `schema:unitCode` | 아니요 | UN/CEFACT 단위 코드 |
-| `value` | `schema:value` | 아니요 | 고정 값 (decimal) |
+| `hasEvidenceTypeList` | `cv:hasEvidenceTypeList` | 아니요 | 조건을 증명하는 증빙 유형 목록 (`EvidenceTypeList`) |
+| `isDerivedFrom` | `cv:isDerivedFrom` | 아니요 | 조건이나 제한의 근거가 된 block |
+| `unaryTests` | `employment:unaryTests` | 아니요 | 정보 항목의 값이 충족해야 하는 FEEL unary tests |
 
-- `unitCode`: 일은 DAY, 월은 MON, 년은 ANN, 시간은 HUR다.
+- `hasEvidenceTypeList`: 목록이 여럿이면 그중 하나를 충족하면 된다.
+- `unaryTests`: CCCEV에는 값의 조건을 적는 property가 없어서 정의한다. `>= 180`, `<= 113500`, `>= date("2026-01-01")`처럼 적는다.
+- `unaryTests`: 여러 정보 항목에 걸친 조건은 정보 항목마다 하위 조건으로 나눈다.
+
+### InformationConcept
+
+| 이름 | 표준 | 필수 | 값 |
+| --- | --- | --- | --- |
+| `typeRef` | `employment:typeRef` | 예 | FEEL 자료형 |
+| `currency` | `sdo:currency` | 아니요 | ISO 4217 통화 코드 |
+| `unitCode` | `sdo:unitCode` | 아니요 | UN/CEFACT 단위 코드 |
+
+- `typeRef`: DMN 1.3의 typeRef에 대응한다.
+- `unitCode`: 일은 DAY, 주는 WEE, 월은 MON, 년은 ANN, 시간은 HUR다.
 
 ### Work
 
@@ -242,17 +235,20 @@ wikilink가 아닌 값을 담는 class별 property다. 배치 기준은 Object p
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `title` | `dct:title` | 예 | 제목 |
+| `basedOn` | `eli:based_on` | 아니요 | 위임한 상위 법령이나 그 block |
+| `cites` | `eli:cites` | 아니요 | 본문이 인용하는 법령이나 그 block |
 | `idLocal` | `eli:id_local` | 아니요 | 법제처 식별자 |
+| `isRealizedBy` | `eli:is_realized_by` | 아니요 | 시행일 버전 목록 (`LegalExpression`) |
+| `title` | `dct:title` | 아니요 | 법령명이나 조문 제목 |
 
-- `idLocal`: 법령은 법령ID, 행정규칙은 행정규칙ID다.
+- `idLocal`: 법령은 법령ID, 행정규칙은 행정규칙ID, 버전은 법령일련번호(MST)나 행정규칙일련번호다.
 
 ### LegalResourceSubdivision
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `number` | `eli:number` | 예 | 제40조, 별표 1 같은 하위 단위 번호 |
-| `typeSubdivision` | `eli:type_subdivision` | 예 | 하위 단위의 종류: `chapter`(장), `section`(절), `article`(조), `annex`(별표), `form`(별지 서식), `addendum`(부칙) |
+| `typeSubdivision` | `eli:type_subdivision` | 예 | 하위 단위의 종류: `chapter`(장), `section`(절), `article`(조), `paragraph`(항), `point`(호), `subpoint`(목), `annex`(별표), `form`(별지 서식), `addendum`(부칙) |
+| `number` | `eli:number` | 아니요 | 제40조, 제1항, 별표 1 같은 하위 단위 번호 |
 
 ### Concept
 
@@ -261,104 +257,168 @@ wikilink가 아닌 값을 담는 class별 property다. 배치 기준은 Object p
 | `exactMatch` | `skos:exactMatch` | 아니요 | 다른 체계의 같은 개념 |
 | `notation` | `skos:notation` | 아니요 | 코드 값 |
 
-## Decision tables
+## Note documents
 
-Rule의 `decisionTable` 안에 inline으로 적는 DMN 결정표 구조다. 배치 기준은 Object properties와 같다.
+instance가 아니라 wiki 노트 자체를 설명하는 property다.
+
+`NoteDocument`(`foaf:Document`): wiki 노트 자체
+
+- 노트 하나는 instance 하나를 설명하고, 출처와 편집 상태는 노트에 붙는다.
+
+| 이름 | 표준 | 필수 | 값 |
+| --- | --- | --- | --- |
+| `identifier` | `dct:identifier` | 예 | instance의 identifier 뒤에 -note를 붙인 식별자 |
+| `primaryTopic` | `foaf:primaryTopic` | 예 | 노트가 설명하는 instance (`NamedThing`) |
+| `source` | `dct:source` | 예 | 노트가 근거로 삼은 block, 원문, 인용 |
+| `status` | `sdo:creativeWorkStatus` | 예 | 노트의 편집 상태: `draft`(LLM이 만들거나 고친 상태), `verified`(별도 agent나 생성 스크립트가 원문과 대조한 상태), `reviewed`(사람이 승인한 상태) |
+| `reviewedBy` | `sdo:reviewedBy` | 아니요 | 승인한 사람의 IRI (uri) |
+| `lastReviewed` | `sdo:lastReviewed` | 아니요 | 승인일 (date) |
+
+- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+
+## Statute versions
+
+법령 노트의 시행일 버전이다. 법령 노트의 `isRealizedBy` 안에 적는다.
+
+`LegalExpression`(`eli:LegalExpression`): 법령이나 그 하위 단위의 시행일 버전 하나
+
+- 같은 시행일자에 법령일련번호(MST)가 여럿이면 공포일자가, 그다음 공포번호가 늦은 버전을 쓴다.
+- identifier는 실현하는 Work의 identifier 뒤에 -v<시행일자>를 붙인다. block 버전은 그 뒤에 block ID를 붙인다.
+
+| 이름 | 표준 | 필수 | 값 |
+| --- | --- | --- | --- |
+| `identifier` | `dct:identifier` | 예 | 버전의 kebab-case 식별자 |
+| `realizes` | `eli:realizes` | 예 | 이 버전이 실현하는 법령이나 하위 단위 (`Work`) |
+| `isPartOf` | `eli:is_part_of` | 아니요 | 상위 단위의 같은 버전 (`LegalExpression`) |
+| `firstDateEntryInForce` | `eli:first_date_entry_in_force` | 예 | 버전의 시행일자 (date) |
+| `dateNoLongerInForce` | `eli:date_no_longer_in_force` | 아니요 | 버전이 시행되는 마지막 날 (date) |
+| `datePublication` | `eli:date_publication` | 아니요 | 공포일자나 발령일자 (date) |
+| `idLocal` | `eli:id_local` | 아니요 | 법령일련번호(MST)나 행정규칙일련번호 |
+| `number` | `eli:number` | 아니요 | 공포번호나 발령번호 |
+| `text` | `sdo:text` | 아니요 | 정규화한 block 본문 |
+| `wasDerivedFrom` | `prov:wasDerivedFrom` | 아니요 | 이 버전을 만든 원문 (`Entity`) |
+
+- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `idLocal`: 법령은 법령ID, 행정규칙은 행정규칙ID, 버전은 법령일련번호(MST)나 행정규칙일련번호다.
+
+## Inline structures
+
+다른 instance의 property 안에 inline으로 적는 구조다. 배치 기준은 Object properties와 같다.
+
+### EvidenceTypeList
+
+`EvidenceTypeList`(`cv:EvidenceTypeList`): 함께 내야 하는 증빙 유형의 목록
+
+| 이름 | 표준 | 필수 | 값 |
+| --- | --- | --- | --- |
+| `specifiesEvidenceType` | `cv:specifiesEvidenceType` | 예 | 목록에 든 증빙 유형 (`EvidenceType`) |
+
+- `specifiesEvidenceType`: 목록에 든 증빙 유형이 모두 필요하다.
 
 ### DecisionTable
 
-`DecisionTable`(`dmn:decisionTable`): Rule의 결정표
+`DecisionTable`(`employment:DecisionTable`): Rule의 결정표
 
-- 행마다 입력 조건과 출력 값을 적는다.
+- DMN 1.3의 tDecisionTable에 대응한다. DMN은 XML schema만 공개하고 RDF 어휘가 없어서 `employment:` 이름공간에 둔다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `hitPolicy` | `dmn:hitPolicy` | 예 | 여러 행이 맞을 때의 처리 방식: `unique`(맞는 규칙이 하나뿐이어야 함), `first`(맞는 규칙 중 첫 번째 규칙의 결과), `any`(맞는 규칙들의 결과가 모두 같아야 함) |
-| `input` | `dmn:input` | 예 | 입력 열 목록 (`InputClause`) |
-| `output` | `dmn:output` | 예 | 출력 열 목록 (`OutputClause`) |
-| `rule` | `dmn:rule` | 예 | 행 목록 (`DecisionRule`) |
+| `hitPolicy` | `employment:hitPolicy` | 예 | 여러 행이 맞을 때의 처리 방식: `UNIQUE`(맞는 행이 하나뿐이어야 함), `FIRST`(맞는 행 중 첫 번째 행의 결과), `ANY`(맞는 행들의 결과가 모두 같아야 함) |
+| `input` | `employment:input` | 예 | 입력 열 목록 (`InputClause`) |
+| `output` | `employment:output` | 예 | 출력 열 목록 (`OutputClause`) |
+| `rule` | `employment:rule` | 예 | 행 목록 (`DecisionRule`) |
 
 ### InputClause
 
-`InputClause`(`dmn:input`): 결정표의 입력 열
+`InputClause`(`employment:InputClause`): 결정표의 입력 열
+
+- DMN 1.3의 tInputClause에 대응한다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `hasConcept` | `cv:hasConcept` | 예 | 입력 열의 정보 항목 (`InformationConcept`) |
+| `inputExpression` | `employment:inputExpression` | 예 | 입력 열의 정보 항목 (`InformationConcept`) |
+| `position` | `sdo:position` | 예 | 1부터 세는 순서 (integer) |
 
 ### OutputClause
 
-`OutputClause`(`dmn:output`): 결정표의 출력 열
+`OutputClause`(`employment:OutputClause`): 결정표의 출력 열
+
+- DMN 1.3의 tOutputClause에 대응한다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `hasConcept` | `cv:hasConcept` | 예 | 출력 열의 정보 항목 (`InformationConcept`) |
-| `currency` | `schema:currency` | 아니요 | ISO 4217 통화 코드 |
-| `unitCode` | `schema:unitCode` | 아니요 | UN/CEFACT 단위 코드 |
-
-- `unitCode`: 일은 DAY, 월은 MON, 년은 ANN, 시간은 HUR다.
+| `name` | `employment:name` | 예 | 출력 열의 정보 항목 (`InformationConcept`) |
+| `position` | `sdo:position` | 예 | 1부터 세는 순서 (integer) |
 
 ### DecisionRule
 
-`DecisionRule`(`dmn:rule`): 결정표의 한 행
+`DecisionRule`(`employment:DecisionRule`): 결정표의 한 행
+
+- DMN 1.3의 tDecisionRule에 대응한다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `inputEntry` | `dmn:inputEntry` | 예 | 입력 열 순서대로 적은 FEEL unary test |
-| `outputEntry` | `dmn:outputEntry` | 예 | 출력 열 순서대로 적은 FEEL 식 |
+| `inputEntry` | `employment:inputEntry` | 예 | 입력 칸 목록 (`UnaryTests`) |
+| `outputEntry` | `employment:outputEntry` | 예 | 출력 칸 목록 (`LiteralExpression`) |
+| `position` | `sdo:position` | 예 | 1부터 세는 순서 (integer) |
 
-- `inputEntry`: 50세 미만은 `< 50`, 1년 이상 3년 미만은 `[1..3)`처럼 적는다.
+### UnaryTests
 
-## Raw source properties
+`UnaryTests`(`employment:UnaryTests`): 결정표 한 칸의 입력 조건
 
-`raw/` 노트의 frontmatter에 이 표의 순서로 적는 property다. 원문은 wiki보다 먼저 존재하므로 wikilink를 쓰지 않는다.
-
-`Entity`(`prov:Entity`): `raw/` 노트의 원문
-
-- 법령 원문 노트 하나는 시행일 버전 하나에 해당한다.
+- DMN 1.3의 tUnaryTests에 대응한다. `position`은 같은 위치의 입력 열을 가리킨다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `title` | `dct:title` | 예 | 제목 |
-| `publisher` | `dct:publisher` | 예 | 공개 기관 |
-| `url` | `schema:url` | 예 | 수집한 주소 (uri) |
+| `position` | `sdo:position` | 예 | 1부터 세는 순서 (integer) |
+| `text` | `sdo:text` | 예 | FEEL unary tests |
+
+### LiteralExpression
+
+`LiteralExpression`(`employment:LiteralExpression`): 결정표 한 칸의 출력 값
+
+- DMN 1.3의 tLiteralExpression에 대응한다. `position`은 같은 위치의 출력 열을 가리킨다.
+
+| 이름 | 표준 | 필수 | 값 |
+| --- | --- | --- | --- |
+| `position` | `sdo:position` | 예 | 1부터 세는 순서 (integer) |
+| `text` | `sdo:text` | 예 | FEEL 식 |
+
+## Raw sources
+
+`raw/` 노트와 그 인용의 property다. 원문은 wiki보다 먼저 존재하므로 wikilink 대신 identifier를 쓴다.
+
+### Entity
+
+`Entity`(`prov:Entity`): `raw/` 노트의 원문 한 건
+
+- identifier는 raw-<출처>-<원문 식별자>-<수집 일시>다. 법령은 raw-law-001761-20260918-284449-20261015t1030처럼 쓴다.
+
+| 이름 | 표준 | 필수 | 값 |
+| --- | --- | --- | --- |
+| `identifier` | `dct:identifier` | 예 | 바뀌지 않는 kebab-case 식별자 |
+| `title` | `dct:title` | 예 | 법령명이나 조문 제목 |
+| `publisher` | `dct:publisher` | 예 | 원문을 공개한 기관 (`PublicOrganisation`) |
+| `url` | `sdo:url` | 예 | 수집한 주소 (uri) |
 | `generatedAtTime` | `prov:generatedAtTime` | 예 | 수집 일시 (datetime) |
-| `sha256` | `spdx:checksumValue` | 예 | 정규화한 본문 텍스트의 SHA-256 hash |
+| `sha256` | `spdx:checksumValue` | 예 | 정규화한 본문의 SHA-256 hash |
 | `license` | `dct:license` | 예 | 이용 조건 |
 | `modified` | `dct:modified` | 아니요 | 원문이 밝힌 최종 수정일 (date) |
-| `idLocal` | `eli:id_local` | 아니요 | 법제처 식별자 |
-| `number` | `eli:number` | 아니요 | 법령 원문 버전의 법령일련번호(MST) |
-| `firstDateEntryInForce` | `eli:first_date_entry_in_force` | 아니요 | 법령 원문 버전의 시행일자 (date) |
-| `datePublication` | `eli:date_publication` | 아니요 | 법령 원문 버전의 공포일자 (date) |
+| `hasPart` | `dct:hasPart` | 아니요 | Git에 남기는 짧은 인용 (`Quotation`) |
 
-- `url`: 인증값은 `${LAW_OC}`처럼 환경변수 이름으로 치환한다.
-- `idLocal`: 법령은 법령ID, 행정규칙은 행정규칙ID다.
+- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
+- `url`: 인증값 parameter는 지우고 저장한다.
 
-## Synthetic data
+### Quotation
 
-`synthetic/` 노트에만 쓰는 class와 property다. frontmatter에 이 표의 순서로 적는다.
+`Quotation`(`sdo:Quotation`): 원문을 Git에 두지 않는 출처에서 인용한 짧은 문장
 
-### Person
-
-`Person`(`foaf:Person`): 합성데이터의 개인
+- 저작권법 제28조의 범위에서 출처를 밝혀 인용한다.
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `type` | `rdf:type` | 예 | Classes 표의 이름 |
 | `identifier` | `dct:identifier` | 예 | 바뀌지 않는 kebab-case 식별자 |
-| `synthetic` | `employment:synthetic` | 예 | 합성데이터 표시 (boolean) |
+| `text` | `sdo:text` | 예 | 본문 |
+| `sha256` | `spdx:checksumValue` | 예 | 정규화한 본문의 SHA-256 hash |
 
-- `synthetic`: 값은 항상 true다.
-
-### Evidence
-
-`Evidence`(`cv:Evidence`): 합성데이터의 증빙 서류
-
-| 이름 | 표준 | 필수 | 값 |
-| --- | --- | --- | --- |
-| `type` | `rdf:type` | 예 | Classes 표의 이름 |
-| `identifier` | `dct:identifier` | 예 | 바뀌지 않는 kebab-case 식별자 |
-| `synthetic` | `employment:synthetic` | 예 | 합성데이터 표시 (boolean) |
-| `conformsTo` | `dct:conformsTo` | 예 | 합성 증빙이 따르는 증빙 유형 (`EvidenceType`) |
-
-- `synthetic`: 값은 항상 true다.
+- `identifier`: frontmatter에는 접두어 없이 적고, `scripts/vault.py`가 `employment:` 접두어를 붙인다.
