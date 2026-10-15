@@ -1,0 +1,2 @@
+#!/bin/sh
+exec uv run python -X utf8 scripts/secret_scan.py
