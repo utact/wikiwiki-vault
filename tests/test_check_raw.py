@@ -274,3 +274,11 @@ def test_secret_in_a_raw_file_fails(tmp_path, monkeypatch):
     problems = []
     C.check_secrets(problems, [])
     assert any("contains a secret value" in p for p in problems)
+
+
+def test_same_table_in_a_new_image_file_and_layout_passes():
+    """고용보험법 시행규칙 제105조 carries one table in two layouts across versions."""
+    versions = clean()
+    versions["20200101"]["조문"]["조문단위"][0]["조문내용"] += '<img src="a" >│거짓이나 그 │3회 ││밖의 방법   │    │</img>'
+    versions["20210101"]["조문"]["조문단위"][0]["조문내용"] += '<img src="b" >│거짓이나 그 밖의 │3회 ││방법             │    │</img>'
+    assert run(versions) == []

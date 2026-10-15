@@ -76,8 +76,7 @@ def image_text(text):
 
 def images(text):
     """Image files of a unit with the comparison text each carries, empty when the response leaves it out."""
-    return [(source, L.canonical(L.IMAGE_TAG.sub("", element)))
-            for element, source in ((m.group(0), m.group(1)) for m in IMAGE_FILE.finditer(text))]
+    return [(m.group(1), L.canonical(m.group(0))) for m in IMAGE_FILE.finditer(text)]
 
 
 def replaced_without_text(before, after):
