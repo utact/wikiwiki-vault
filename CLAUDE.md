@@ -34,9 +34,10 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 
 ## Raw sources
 
-- Collect sources with scripts in `scripts/`.
+- Collect sources with `uv run python -X utf8 scripts/collect.py`, which reads the source list in `scripts/sources.yaml`.
   - Read API keys from `.env`.
   - Strip credential parameters such as `OC` from every stored URL and response.
+  - Check the result with `uv run python -X utf8 scripts/check_raw.py` before committing.
 - Use one folder per publisher.
   - `raw/law/`: 법제처, for both 법령 and 행정규칙
   - `raw/work24/`: 고용24 guides
@@ -49,12 +50,13 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Collect these versions of every law in scope.
   - The current version
   - Every scheduled version (시행예정)
-  - Every earlier version that a 경과조치 still applies to, such as the text before 2026-01-01 of 고용보험법 시행령 제68조
-- Find those earlier versions from 부칙 articles titled 경과조치 or 적용례 that name a unit.
-  - Look back over `transitionalWindow` in `ontology/release.yaml` from the reference date.
-  - The window is the longest time a person can still receive 구직급여 after 이직: 4 years (고용보험법 제48조제2항) plus 2 years of 훈련연장급여 (시행령 제72조), 60 days of 개별연장급여 (법 제52조제2항) and 60 days of 특별연장급여 (법 제53조제1항), which are paid one after another (법 제55조).
-  - Recompute the window when any of those provisions changes.
-  - List 경과조치 and 적용례 articles that name no unit for review in `log.md`.
+  - Every earlier version in force during the transitional window, so that text kept by a 경과조치 is at hand, such as 고용보험법 시행령 제68조 before 2026-01-01
+- The transitional window is `transitionalWindow` in `ontology/release.yaml`, counted back from the reference date.
+  - It starts with the version in force on its first day.
+  - It is the longest time a person can still receive 구직급여 after 이직: 4 years (고용보험법 제48조제2항) plus 2 years of 훈련연장급여 (시행령 제72조), 60 days of 개별연장급여 (법 제52조제2항) and 60 days of 특별연장급여 (법 제53조제1항), which are paid one after another (법 제55조).
+  - Recompute it when any of those provisions changes.
+- The collection report `.cache/collect-laws.json` lists the 부칙 articles titled 경과조치 or 적용례 promulgated within the window, with the units they name.
+  - List those that name no unit for review in `log.md`.
 - Walk back the version list as far as needed to date the text of each generated unit, as described in Statute notes.
   - Commit only the versions that the wiki cites or that are current or scheduled.
   - Keep the others in the local cache `.cache/law/`, which Git ignores.
@@ -89,7 +91,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
-- Give a unit a new version only when its canonical text changes.
+- Give a unit a new version only when its version text, defined in Text checks, changes.
   - Date the version by the 시행일자 of the earliest law version in the latest unbroken run of versions that have this text of the unit. This is the version's `firstDateEntryInForce`.
   - Check the date against the text: the law version found must carry the 공포번호 of the latest amendment tag of the unit, such as `<개정 2021.1.5>`.
   - A 부칙 has one version, dated by the earliest law version that contains it.
@@ -195,24 +197,30 @@ decisionTable:
 
 ## Text checks
 
-Scripts check quotes, numbers and hashes against this canonical text.
+Scripts check quotes, numbers and hashes against texts derived from the canonical text of a source.
 
 - Take the canonical text of each kind of source from these fields.
-  - 조문 block: 조문내용, 항내용, 호내용 and 목내용 of the block and all its children, joined with newlines
+  - 조문 block: 조문내용, 항내용, 호내용 and 목내용 of the block and all its children, then 조문참고자료 such as `[본조신설 2020.6.9]`, joined with newlines
   - 별표 and 별지 서식: 별표내용
   - 부칙: 부칙내용
   - 고시 whose 조문내용 is empty: the text extracted from its PDF attachment
   - 고용24 guide: the text of the body area
-- Keep amendment tags such as `<개정 2019.1.15>`, and box-drawing characters of 별표.
-- Compare texts after removing all whitespace, and change no other character.
+- Keep amendment tags such as `<개정 2019.1.15>`.
+- Compare quotes and numbers against the comparison text: the canonical text without whitespace and without box-drawing characters (U+2500 to U+257F).
+  - Read tables drawn with box-drawing characters cell by cell, row by row, then column by column within a row.
   - Wrapped lines of 별표 and spaces inserted by PDF extraction then stop mattering.
+  - Table text inside `<img>` elements stays without the tags, because some tables exist only there, such as 고용보험법 시행규칙 제105조.
   - "ㆍ" (U+318D) and "·" (U+00B7) stay different.
+- Decide versions and hashes on the version text: the comparison text without `<img>` elements and the text inside them.
+  - Some versions of a 법제처 response leave out the text inside `<img>` elements that other versions carry, such as 고용보험법 시행규칙 제105조 in the version of 2024-07-01.
+  - An amendment of such a table shows in the amendment tag of its unit, as the table of 제105조제1항 did in `<개정 2020.8.28, 2026.7.1>`.
+  - `scripts/check_raw.py` fails when the text inside images changes while the version text does not.
 - Read numbers in these forms.
   - Digits with or without commas, such as 113,500
   - Korean units, such as 11만3500원 and 3천만원
   - Fractions and percentages, such as 100분의 60 and 70퍼센트
   - Dates, such as 2026-01-01, 2026.1.1. and 2026년 1월 1일
-- The hash of a block is the SHA-256 of its canonical text with all whitespace removed.
+- The hash of a block is the SHA-256 of its version text.
 - The `sha256` of a raw source is computed the same way over the fields listed above, and over no other field.
 
 ## Review
@@ -393,6 +401,9 @@ An entry for ingesting 고용보험법 looks like this.
   - Without UTF-8 mode, Python on Windows reads Korean files as CP949.
 - Write files in UTF-8 with LF line endings.
 - Keep every script check reproducible with the fixture notes in `tests/fixtures/`.
+  - Run the tests with `uv run python -X utf8 -m pytest`.
+- Enable the pre-commit hook with `git config core.hooksPath .githooks` in every clone.
+  - It runs `scripts/secret_scan.py`, which rejects staged files that contain `.env` values.
 
 ### Commits
 
