@@ -1,17 +1,35 @@
 """Tests for the text rules in scripts/lawlib.py, with excerpts of 법제처 responses."""
 
+from datetime import date
+
 import lawlib as L
 
 # 고용보험 및 산업재해보상보험의 보험료징수 등에 관한 법률 시행령 별표 2, one row in two layouts
-NARROW = """├────┼────┤
+NARROW = """├─────────────────┼─────┤
 │바. 법 제45조제1항(제48조의2제8   │법 제50조 │
 │항제4호에 따라 준용되는 경우를    │제1항제4호│
 │포함한다)                         │          │
-└────┴────┘"""
-WIDE = """├────────┼────┤
+└─────────────────┴─────┘"""
+WIDE = """├──────────────────────────────────┼─────┤
 │바. 법 제45조제1항(제48조의2제8항제4호에 따라 준용되는 경우를 포함한다) │법 제50조 │
 │                                                                    │제1항제4호│
-└────────┴────┘"""
+└──────────────────────────────────┴─────┘"""
+
+# 고용보험법 시행령 별표 2, a merged cell beside rows split by partial borders inside a heavy frame
+MERGED = """┠──────────────┬───────┼──────┨
+┃거짓이나 그 밖의 부정한 방  │300만원 미만  │3개월       ┃
+┃법으로 지급받거나 받으려고  ├───────┼──────┨
+┃한 금액                     │300만원 이상  │6개월       ┃
+┃                            │  500만원 미만│            ┃
+┃                            ├───────┼──────┨"""
+
+# 고용보험법 시행규칙 별지 제1호서식, a form without an outer frame whose first column is blank on a line
+FORM = """────┬──────────────────────────────────────────────────────────────
+  사업장│사업장관리번호는 상시 4명 이하의 근로자를 사용하는 법인이 아닌 농업·임업 및 어업 사업장이 고용보험에 가입
+        │하면서 근로복지공단으로부터 부여받은 관리번호를 적습니다.
+────┼──────────────────────────────────────────────────────────────
+  신청  │1. 성명 및 주민등록번호는 주민등록표 상의 성명 및 주민등록번호를 적습니다.
+  근로자│2. 채용일은 최초 근로계약 개시일을 적습니다.                                                                                """
 
 # 고용보험법 시행규칙 제105조제1항, a table that exists only inside an image, without line breaks
 IMAGE = (
@@ -28,11 +46,31 @@ def test_table_layouts_read_the_same():
     assert L.canonical(NARROW) == L.canonical(WIDE) == expected
 
 
+def test_merged_cell_stays_together():
+    cells = [" ".join(c.split()) for c in L.cells(MERGED)]
+    assert "거짓이나 그 밖의 부정한 방 법으로 지급받거나 받으려고 한 금액" in cells
+    assert cells.index("300만원 미만") < cells.index("3개월") < cells.index("300만원 이상 500만원 미만")
+
+
+def test_form_sentence_stays_together():
+    quote = "사업장관리번호는 상시 4명 이하의 근로자를 사용하는 법인이 아닌 농업·임업 및 어업 사업장이 고용보험에 가입하면서 근로복지공단으로부터 부여받은 관리번호를 적습니다."
+    assert L.canonical(quote) in L.canonical(FORM)
+
+
+def test_lines_of_spaces_do_not_change_the_reading():
+    spaced = FORM.replace("\n  신청", "\n" + " " * 40 + "\n  신청")
+    assert L.canonical(spaced) == L.canonical(FORM)
+
+
 def test_image_table_is_read_by_cell():
     assert L.canonical(IMAGE) == (
         "다음표의구분에따른비율을곱한금액으로한다."
         "구분비율거짓이나그밖의부정한방법으로3회미만100분의100<개정2020.8.28,2026.7.1>"
     )
+
+
+def test_cells_keep_numbers_apart():
+    assert "100분의 100" in [c.strip() for c in L.cells(IMAGE)]
 
 
 def test_version_text_leaves_out_images():
@@ -51,7 +89,59 @@ def test_middle_dots_stay_different():
 def test_amendment_dates():
     assert L.amendment_dates("<개정 2019. 1. 15., 2021.1.5>") == ["20190115", "20210105"]
     assert L.amendment_dates("[본조신설 2020.6.9]") == ["20200609"]
+    assert L.amendment_dates("제18조 삭제 <2024.12.24>") == ["20241224"]
     assert L.amendment_dates("제40조(구직급여의 수급 요건) ① 2020.6.9 이후") == []
+
+
+def law(articles=(), annexes=(), supplements=()):
+    return {
+        "조문": {"조문단위": [{"조문여부": kind, "조문번호": number, "조문가지번호": "", "조문키": key, "조문내용": text}
+                          for kind, number, key, text in articles]},
+        "별표": {"별표단위": list(annexes)},
+        "부칙": {"부칙단위": [{"부칙공포일자": d, "부칙공포번호": n, "부칙내용": t} for d, n, t in supplements]},
+    }
+
+
+def test_headings_are_keyed_by_place():
+    units = L.law_units(law([
+        ("전문", "37", "0037000", "제4장 실업급여"),
+        ("전문", "37", "0037000", "제1절 통칙"),
+        ("조문", "37", "0037001", "제37조(실업급여의 종류)"),
+        ("전문", "40", "0040000", "제2절 구직급여"),
+    ]))
+    assert list(units) == ["heading-ch4", "heading-ch4-sec1", "art-37", "heading-ch4-sec2"]
+
+
+def test_supplements_with_one_number_stay_apart():
+    units = L.law_units(law(supplements=[("20190930", "00263", "부칙 <제263호,2019.9.30>"), ("20191015", "00263", "부칙 <제263호,2019.10.15>")]))
+    assert list(units) == ["sup-20190930-263", "sup-20191015-263"]
+
+
+def test_transitional_articles():
+    text = "\n".join([
+        "부칙 <제17429호,2020.6.9>",
+        "제1조(시행일) 이 법은 공포 후 6개월이 경과한 날부터 시행한다.",
+        "제2조(예술인의 피보험자격 취득일에 관한 적용례) 제77조의2의 개정규정은 부칙 제1조에 따른 시행일 이후 체결하는 계약부터 적용한다.",
+        "제3조(서식에 관한 경과조치) 별지 제32호서식 및 제34호서식은 같은 조 제3항에 따라 별표 1과 함께 쓴다.",
+    ])
+    old = ("20190827", "16557", "부칙 <제16557호,2019.8.27>\n제1조(시행일) 생략\n제9조(추가 징수에 관한 경과조치) 제62조제2항에 따른다.")
+    stale = ("20150101", "13000", "부칙\n제1조(시행일) 생략\n제2조(경과조치) 제1조에 따른다.")
+    rows = [
+        {"공포일자": "20200609", "공포번호": "17429", "시행일자": "20201210"},
+        {"공포일자": "20190827", "공포번호": "16557", "시행일자": "20200828"},
+        {"공포일자": "20150101", "공포번호": "13000", "시행일자": "20150701"},
+    ]
+    found = L.transitional([law(supplements=[("20200609", "17429", text), old, stale])], rows, date(2020, 6, 16))
+    assert [(f["promulgation"], f["article"], f["units"]) for f in found] == [
+        ("20200609-17429", "제2조", ["제77조의2"]),
+        ("20200609-17429", "제3조", ["별지 제32호서식", "제34호서식", "같은 조 제3항", "별표 1"]),
+        ("20190827-16557", "제9조", ["제62조제2항"]),
+    ]
+
+
+def test_window_start():
+    assert L.window_start(date(2026, 10, 14), "P6Y120D") == date(2020, 6, 16)
+    assert L.window_start(date(2028, 2, 29), "P6Y0D") == date(2022, 2, 28)
 
 
 def test_scrub_removes_the_oc_parameter(monkeypatch):

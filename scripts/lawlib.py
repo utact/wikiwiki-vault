@@ -1,15 +1,18 @@
 """Shared helpers for collecting and checking raw sources."""
 
 import hashlib
+import io
 import json
 import re
 import time
 import urllib.parse
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from itertools import accumulate
 from pathlib import Path
 
 import yaml
+from pypdf import PdfReader
 
 VAULT = Path(__file__).resolve().parents[1]
 RAW = VAULT / "raw"
@@ -28,15 +31,23 @@ TAG = re.compile(
     r"|\[(?:본조신설|전문개정|제목개정|본조제목개정|종전)[^\]]*\]"
 )
 TAG_DATE = re.compile(r"(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})")
-IMAGE = re.compile(r"<img\b[^>]*>.*?</img>", re.S)
+IMAGE = re.compile(r"<img\b[^>]*>(?:(?!<img\b).)*?</img>", re.S)
 IMAGE_TAG = re.compile(r"</?img\b[^>]*>")
 BOX = re.compile(r"[─-╿]")
-LINE_BREAK = re.compile(r"(?<=[│┤┐┘])(?=[│├└┌])")
+LINE_END = "│┃┤┨┫┐┓┘┛"
+LINE_START = "│┃├┠┣┌┏└┗"
+LINE_BREAK = re.compile(f"(?<=[{LINE_END}])(?=[{LINE_START}])")
+WIDE = re.compile(r"[^\x00-\x7f]")
+LOST_GLYPH = re.compile(r"(?<=[^\x00-\x7f])\?(?=[^\x00-\x7f])")
 
 
 def env():
+    """Values in .env, or none in a clone without it."""
     values = {}
-    for line in (VAULT / ".env").read_text(encoding="utf-8").splitlines():
+    path = VAULT / ".env"
+    if not path.exists():
+        return values
+    for line in path.read_text(encoding="utf-8").splitlines():
         if "=" in line and not line.lstrip().startswith("#"):
             key, value = line.split("=", 1)
             values[key.strip()] = value.strip()
@@ -53,21 +64,23 @@ def secrets():
 
 
 def release():
+    """The reference date and the first day of the transitional window, from ontology/release.yaml."""
     data = yaml.safe_load((VAULT / "ontology" / "release.yaml").read_text(encoding="utf-8"))
     as_of = data["asOf"] if isinstance(data["asOf"], date) else date.fromisoformat(str(data["asOf"]))
-    match = re.fullmatch(r"P(\d+)Y(\d+)D", data["transitionalWindow"])
+    return as_of, window_start(as_of, data["transitionalWindow"])
+
+
+def window_start(as_of, period):
+    """The day a period such as P6Y120D before a date, counting 29 February as 28 February in other years."""
+    match = re.fullmatch(r"P(\d+)Y(\d+)D", period)
     years, days = int(match.group(1)), int(match.group(2))
-    start = as_of.replace(year=as_of.year - years) - timedelta(days=days)
-    return as_of, start
+    day = 28 if (as_of.month, as_of.day) == (2, 29) else as_of.day
+    return as_of.replace(year=as_of.year - years, day=day) - timedelta(days=days)
 
 
 def now():
     stamp = datetime.now(KST).replace(second=0, microsecond=0)
     return stamp, stamp.strftime("%Y%m%dT%H%M")
-
-
-def ymd(text):
-    return date(int(text[:4]), int(text[4:6]), int(text[6:8]))
 
 
 def as_list(value):
@@ -89,31 +102,97 @@ def without_images(text):
     return IMAGE_TAG.sub("", IMAGE.sub("", text))
 
 
-def cell_order(text):
-    """Text with box-drawing tables read cell by cell: row by row, then column by column within a row.
+def columns(line):
+    """Display column of each index of a line, and of its end: ASCII is 1 wide and the rest 2.
 
-    Table text inside images comes without line breaks; there a line end followed by a line start,
-    such as "││", marks a break, because the table has no empty cell without spaces.
+    A "?" between two wide characters stands for a lost wide glyph, such as an arrow, and is 2 wide.
     """
-    text = IMAGE.sub(lambda m: "\n" + LINE_BREAK.sub("\n", IMAGE_TAG.sub("", m.group(0))) + "\n", text)
-    lines, row = [], []
-    for line in text.splitlines():
-        if "│" in line:
-            cells = line.strip().removeprefix("│").removesuffix("│").split("│")
-            row += [[] for _ in range(len(cells) - len(row))]
-            for column, cell in enumerate(cells):
-                row[column].append(cell)
+    widths = [1 if ch < "\x80" else 2 for ch in line]
+    if "?" in line:
+        for match in LOST_GLYPH.finditer(line):
+            widths[match.start()] = 2
+    return [0, *accumulate(widths)]
+
+
+def width(line):
+    """Display width of a line, counted as in columns()."""
+    return len(line) + len(WIDE.findall(line)) + (len(LOST_GLYPH.findall(line)) if "?" in line else 0)
+
+
+def image_lines(text):
+    """Lines of the table text in an image element, which comes without line breaks.
+
+    A line end followed by a line start, such as "││", marks a break, because these tables
+    have no cell without spaces.
+    """
+    return text if "\n" in text.strip("\n") else "\n".join(LINE_BREAK.split(text))
+
+
+def segments(text):
+    """Runs of text between box-drawing characters, as (line, start column, end column, text).
+
+    Runs of spaces are left out: they carry no text and change with the layout.
+    """
+    found = []
+    for number, line in enumerate(text.split("\n")):
+        if not line.strip():
             continue
-        lines += ["".join(column) for column in row]
-        row = []
-        lines.append(line)
-    lines += ["".join(column) for column in row]
-    return "\n".join(lines)
+        if not BOX.search(line):
+            found.append((number, 0, width(line), line))
+            continue
+        column = columns(line)
+        start = 0
+        for match in [*BOX.finditer(line), None]:
+            end = match.start() if match else len(line)
+            if line[start:end].strip():
+                found.append((number, column[start], column[end], line[start:end]))
+            if match:
+                start = match.end()
+    return found
+
+
+def cells(text):
+    """Cells of box-drawing tables and the text around them, in reading order.
+
+    Segments on adjacent lines whose display columns overlap belong to one cell, so a cell
+    keeps its wrapped lines together whatever the widths of the other columns. Cells are
+    ordered by their first line, then by column. Text without tables stays one cell per paragraph.
+    """
+    text = IMAGE.sub(lambda m: "\n" + image_lines(IMAGE_TAG.sub("", m.group(0))) + "\n", text)
+    found = segments(IMAGE_TAG.sub("", text))
+    parent = list(range(len(found)))
+
+    def root(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    by_line = {}
+    for i, segment in enumerate(found):
+        by_line.setdefault(segment[0], []).append(i)
+    for number, indices in by_line.items():
+        for i in indices:
+            for j in by_line.get(number - 1, []):
+                overlap = min(found[i][2], found[j][2]) - max(found[i][1], found[j][1])
+                narrow = min(found[i][2] - found[i][1], found[j][2] - found[j][1]) < 2
+                if overlap >= (1 if narrow else 2):
+                    parent[root(i)] = root(j)
+    groups = {}
+    for i in range(len(found)):
+        groups.setdefault(root(i), []).append(i)
+    ordered = sorted(groups.values(), key=lambda g: (found[g[0]][0], found[g[0]][1]))
+    return ["\n".join(found[i][3] for i in group) for group in ordered]
+
+
+def cell_order(text):
+    """Text with box-drawing tables read cell by cell, one cell after another."""
+    return "\n".join(cells(text))
 
 
 def canonical(text):
-    """Comparison text for quotes and numbers: cell order, no image tags, whitespace or box-drawing characters."""
-    return BOX.sub("", re.sub(r"\s+", "", IMAGE_TAG.sub("", cell_order(text))))
+    """Comparison text for quotes: cell order without whitespace and box-drawing characters."""
+    return re.sub(r"\s+", "", cell_order(text))
 
 
 def version_text(text):
@@ -122,7 +201,12 @@ def version_text(text):
 
 
 def sha256(text):
-    return hashlib.sha256(version_text(text).encode("utf-8")).hexdigest()
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def body_hash(text):
+    """Hash of a 고용24 body area, whose page stays out of Git: the SHA-256 of its text without whitespace."""
+    return sha256(re.sub(r"\s+", "", text))
 
 
 def scrub(text):
@@ -156,8 +240,17 @@ def law_api(endpoint, **params):
 
 
 def law_units(law):
-    """Canonical text of every unit of an eflaw response, keyed as in identifiers."""
-    units = {}
+    """Canonical text of every unit of an eflaw response, keyed as in identifiers.
+
+    부칙 are keyed by 공포일자 and 공포번호, because two 부칙 can share a 공포번호, such as the two 제263호 of 고용보험법 시행규칙 dated 2019-09-30 and 2019-10-15.
+    """
+    units, levels = {}, {}
+
+    def put(key, text):
+        if key in units:
+            raise ValueError(f"two units with the key {key}")
+        units[key] = text
+
     for row in as_list(law.get("조문", {}).get("조문단위")):
         parts = [row.get("조문내용", "")]
         for p in as_list(row.get("항")):
@@ -169,23 +262,50 @@ def law_units(law):
         parts.append(row.get("조문참고자료", ""))
         text = "\n".join(x for x in parts if x)
         if row.get("조문여부") == "조문":
-            key = f"art-{row['조문번호']}" + (f"-{row['조문가지번호']}" if row.get("조문가지번호") else "")
+            key = article_key(row["조문번호"], row.get("조문가지번호"))
         else:
-            key = f"heading-{row.get('조문키')}"
-        units[key] = text
+            key = heading_key(text, levels) or f"heading-{row.get('조문키')}"
+        put(key, text)
     for row in as_list(law.get("별표", {}).get("별표단위")):
         kind = "annex" if row.get("별표구분") == "별표" else "form"
         number = row.get("별표번호", "").lstrip("0") or "0"
         branch = row.get("별표가지번호", "00").lstrip("0")
-        key = f"{kind}-{number}" + (f"-{branch}" if branch else "")
-        units[key if key not in units else f"{key}-{row.get('별표키')}"] = "\n".join(flatten(row.get("별표내용")))
+        put(f"{kind}-{number}" + (f"-{branch}" if branch else ""), "\n".join(flatten(row.get("별표내용"))))
     for row in as_list(law.get("부칙", {}).get("부칙단위")):
-        units[f"sup-{row.get('부칙공포번호')}"] = "\n".join(flatten(row.get("부칙내용")))
+        put(sup_key(row.get("부칙공포일자", ""), row.get("부칙공포번호", "")), "\n".join(flatten(row.get("부칙내용"))))
     return units
 
 
-def law_text(law):
-    return "\n".join(law_units(law).values())
+def article_key(number, branch):
+    """Key of an article, such as art-56-10 for 제56조의10."""
+    return f"art-{int(number)}" + (f"-{int(branch)}" if branch and int(branch) else "")
+
+
+HEADING = re.compile(r"\s*제(\d+)(편|장|절|관)(?:의(\d+))?")
+LEVELS = {"편": "part", "장": "ch", "절": "sec", "관": "sub"}
+
+
+def heading_key(text, levels):
+    """Key of a 편, 장, 절 or 관 heading from its place in the hierarchy, such as heading-ch4-sec1."""
+    match = HEADING.match(text)
+    if not match:
+        return None
+    number = match.group(1) + (f"-{match.group(3)}" if match.group(3) else "")
+    order = list(LEVELS.values())
+    level = LEVELS[match.group(2)]
+    for lower in order[order.index(level):]:
+        levels.pop(lower, None)
+    levels[level] = number
+    return "heading-" + "-".join(f"{name}{levels[name]}" for name in order if name in levels)
+
+
+def promulgation(number):
+    """공포번호 as an integer, from forms such as "00479" and "제21473호"."""
+    return int(re.sub(r"\D", "", number) or 0)
+
+
+def sup_key(published, number):
+    return f"sup-{published}-{promulgation(number)}"
 
 
 def amendment_dates(text):
@@ -194,6 +314,71 @@ def amendment_dates(text):
     for match in TAG.finditer(text):
         found += [f"{y}{int(m):02d}{int(d):02d}" for y, m, d in TAG_DATE.findall(match.group(0))]
     return found
+
+
+SUP_ARTICLE = re.compile(r"(?:^|\n)\s*제(\d+)조(?:의(\d+))?\(([^)\n]*)\)")
+TRANSITIONAL = re.compile(r"경과조치|적용례|특례|유효기간")
+REFERENCE = re.compile(
+    r"(?:「[^」]+」\s*)?(?:별지\s*)?제\d+호(?:의\d+)?\s*서식"
+    r"|(?:「[^」]+」\s*)?별표\s*\d+(?:의\d+)?"
+    r"|같은\s*조\s*제\d+항(?:\s*제\d+호(?:의\d+)?)?(?:\s*각\s*호\s*외의\s*부분)?(?:\s*(?:본문|단서|전단|후단))?"
+    r"|(?<!부칙 )(?<!부칙)(?:「[^」]+」\s*|(?:법|영|규칙)\s*)?제\d+조(?:의\d+)?(?:\s*제\d+항)?(?:\s*제\d+호(?:의\d+)?)?"
+    r"(?:\s*각\s*호\s*외의\s*부분)?(?:\s*(?:본문|단서|전단|후단))?"
+)
+
+
+def transitional(laws, rows, window_start):
+    """Articles of 부칙 titled 경과조치, 적용례, 특례 or 유효기간 whose promulgation still comes into force within the window.
+
+    laws are the current and scheduled versions, whose 부칙 together cover every promulgation, and rows the version list.
+    A promulgation counts when any of its 시행일자 is on or after the first day of the window.
+    """
+    effective = {}
+    for row in rows:
+        effective.setdefault((row["공포일자"], promulgation(row["공포번호"])), set()).add(row["시행일자"])
+    start = window_start.strftime("%Y%m%d")
+    seen, found = set(), []
+    for law in laws:
+        for unit in as_list(law["부칙"]["부칙단위"]):
+            key = (unit.get("부칙공포일자", ""), promulgation(unit.get("부칙공포번호", "")))
+            if key in seen:
+                continue
+            seen.add(key)
+            dates = effective.get(key, {key[0]})
+            if max(dates) < start:
+                continue
+            text = "\n".join(flatten(unit.get("부칙내용")))
+            articles = list(SUP_ARTICLE.finditer(text))
+            for match, following in zip(articles, [*articles[1:], None]):
+                if not TRANSITIONAL.search(match.group(3)):
+                    continue
+                body = text[match.end(): following.start() if following else None]
+                units = [re.sub(r"\s+", " ", m.group(0)).strip() for m in REFERENCE.finditer(body)]
+                found.append({
+                    "promulgation": f"{key[0]}-{key[1]}",
+                    "effective": sorted(dates),
+                    "article": f"제{match.group(1)}조" + (f"의{match.group(2)}" if match.group(2) else ""),
+                    "title": match.group(3),
+                    "units": list(dict.fromkeys(units)),
+                })
+    return found
+
+
+def pdf_text(data):
+    reader = PdfReader(io.BytesIO(data))
+    return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+
+def notice_text(service, attachments):
+    """Text of a 고시: its 조문내용, then the text of the PDF attachment named after it.
+
+    Some years keep the text only in the PDF, and 조문내용 is empty or points to the attachment.
+    attachments are (content, file name) pairs in the order of the response.
+    """
+    text = "\n".join(flatten(service.get("조문내용")))
+    name = service["행정규칙기본정보"]["행정규칙명"]
+    pdf = next((data for data, file_name in attachments if file_name.lower().endswith(".pdf") and name in file_name), None)
+    return "\n".join(x for x in (text, pdf_text(pdf) if pdf else "") if x)
 
 
 def choose_versions(rows):
@@ -225,7 +410,14 @@ def write_note(path, meta, body):
     path.write_text(f"---\n{front}---\n\n{body}\n", encoding="utf-8", newline="\n")
 
 
+def json_payload(text):
+    """The stored form of a JSON response: parsed, then written with an indent of one space."""
+    return json.dumps(json.loads(text), ensure_ascii=False, indent=1) + "\n"
+
+
 def write_json(path, text):
+    """Write a JSON response in its stored form and return the SHA-256 of what was written."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    data = json.loads(text)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    payload = json_payload(text)
+    path.write_text(payload, encoding="utf-8", newline="\n")
+    return sha256(payload)

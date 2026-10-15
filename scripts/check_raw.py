@@ -2,17 +2,25 @@
 
 Usage:
     uv run python -X utf8 scripts/check_raw.py
+
+Needs the local cache that scripts/collect.py writes, because the gates compare every
+version within the transitional window.
 """
 
 import json
 import re
 import sys
 from collections import defaultdict
+from pathlib import Path
 
+import yaml
+
+import collect
 import lawlib as L
 
 NOTE = re.compile(r"^(?P<name>.+) (?P<date>\d{8})-(?P<serial>\d+) (?P<stamp>\d{8}T\d{4})$")
 REQUIRED = ("identifier", "title", "publisher", "url", "generatedAtTime", "sha256", "license")
+DELETED = re.compile(r"삭제\s*<")
 
 
 def load(path):
@@ -20,29 +28,36 @@ def load(path):
 
 
 def law_versions(name):
-    """Every stored version of a law, from raw notes and the cache, keyed by 시행일자."""
+    """Every stored version of a law, from raw notes and the cache, keyed by 시행일자, with the version list."""
     versions = {}
     folder = L.RAW / "law" / name
     for note in sorted(folder.glob(f"{name} *-* *.md")):
         match = NOTE.match(note.stem)
         if match:
             versions[match["date"]] = load(note.with_suffix(".json"))["법령"]
-    listing = sorted(folder.glob(f"{name} versions *.json"))
-    rows = [r for p in load(listing[-1])["pages"] for r in L.as_list(p.get("law")) if r.get("법령명한글") == name]
-    cache = L.CACHE / "law" / rows[0]["법령ID"]
-    for path in sorted(cache.glob("*.json")):
-        effective = path.stem.split("-")[1]
-        versions.setdefault(effective, load(path)["법령"])
-    return dict(sorted(versions.items())), rows, load(listing[-1])
+    listing = load(sorted(folder.glob(f"{name} versions *.json"))[-1])
+    rows = [r for p in listing["pages"] for r in L.as_list(p.get("law")) if r.get("법령명한글") == name]
+    for path in sorted((L.CACHE / "law" / rows[0]["법령ID"]).glob("*.json")):
+        versions.setdefault(path.stem.split("-")[1], load(path)["법령"])
+    return dict(sorted(versions.items())), rows, listing
 
 
 def changed_flags(law):
     """Articles that 법제처 marks as changed (조문변경여부 Y) in this version."""
-    flagged = set()
-    for row in L.as_list(law["조문"]["조문단위"]):
-        if row.get("조문여부") == "조문" and row.get("조문변경여부") == "Y":
-            flagged.add(f"art-{row['조문번호']}" + (f"-{row['조문가지번호']}" if row.get("조문가지번호") else ""))
-    return flagged
+    return {
+        L.article_key(row["조문번호"], row.get("조문가지번호"))
+        for row in L.as_list(law["조문"]["조문단위"])
+        if row.get("조문여부") == "조문" and row.get("조문변경여부") == "Y"
+    }
+
+
+def moved_from(law):
+    """Articles that this version says it moved, from the 조문이동이전 of their new place, such as 005610."""
+    return {
+        L.article_key(code[:4], code[4:])
+        for row in L.as_list(law["조문"]["조문단위"])
+        if (code := row.get("조문이동이전", "")) and int(code or 0)
+    }
 
 
 def image_text(text):
@@ -50,75 +65,159 @@ def image_text(text):
     return L.canonical("".join(L.IMAGE.findall(text)))
 
 
-def check_law(name, problems, notes):
-    versions, rows, listing = law_versions(name)
+def image_problems(name, effective, key, text):
+    """Lines restored from image text must start and end with a frame, or the table is misread."""
+    found = []
+    for image in L.IMAGE.findall(text):
+        inner = L.IMAGE_TAG.sub("", image)
+        if not L.canonical(inner) or "\n" in inner.strip("\n"):
+            continue
+        for line in L.image_lines(inner).split("\n"):
+            if line and not (line[0] in L.LINE_START and line[-1] in L.LINE_END):
+                found.append(f"{name} {effective}: {key} image text breaks into a line without a frame: {line[:40]}")
+                break
+    return found
+
+
+def check_versions(name, versions, rows, listing, window_start, as_of):
+    """Gates on the versions of one law. Returns problems and notes."""
+    problems, notes = [], []
     seen = sum(len(L.as_list(p.get("law"))) for p in listing["pages"])
     if seen != listing["totalCnt"]:
         problems.append(f"{name}: list pages hold {seen} rows, totalCnt is {listing['totalCnt']}")
+    chosen = L.choose_versions(rows)
+    missing = sorted(d for d in chosen if d >= L.in_force(chosen, window_start) and d not in versions)
+    if missing:
+        problems.append(f"{name}: versions in the list but not collected {missing}")
     published_on = defaultdict(set)
     for row in rows:
         published_on[row["시행일자"]].add(row["공포일자"])
-    _, window_start = L.release()
-    chosen = L.choose_versions(rows)
-    expected_dates = {d for d in chosen if d >= L.in_force(chosen, window_start)}
-    if expected_dates - set(versions):
-        problems.append(f"{name}: versions in the list but not collected {sorted(expected_dates - set(versions))}")
+    units, texts = {}, {}
     for effective, law in versions.items():
         if law["기본정보"]["시행일자"] != effective:
             problems.append(f"{name} {effective}: response says {law['기본정보']['시행일자']}")
         revisions = [r["공포일자"] for r in rows if r.get("제개정구분명") in ("제정", "전부개정") and r["시행일자"] <= effective]
         since = max(revisions, default="")
-        expected = {
-            re.sub(r"\D", "", r["공포번호"]).lstrip("0")
-            for r in rows if r["시행일자"] <= effective and r["공포일자"] >= since
-        }
-        present = {re.sub(r"\D", "", u.get("부칙공포번호", "")).lstrip("0") for u in L.as_list(law["부칙"]["부칙단위"])}
-        missing = sorted(expected - present, key=int)
-        if missing:
-            problems.append(f"{name} {effective}: 부칙 missing for promulgations {missing[:10]}")
+        expected = {L.sup_key(r["공포일자"], r["공포번호"]) for r in rows if r["시행일자"] <= effective and r["공포일자"] >= since}
+        units[effective] = L.law_units(law)
+        texts[effective] = {key: L.version_text(text) for key, text in units[effective].items()}
+        absent = sorted(expected - set(units[effective]))
+        if absent:
+            problems.append(f"{name} {effective}: 부칙 missing for promulgations {absent[:10]}")
         for annex in L.as_list(law.get("별표", {}).get("별표단위")):
             title = annex.get("별표제목", "")
             if "삭제" not in title and not L.canonical("".join(L.flatten(annex.get("별표내용")))):
                 problems.append(f"{name} {effective}: empty {annex.get('별표구분')} {annex.get('별표번호')} {title[:30]}")
+        for key, text in units[effective].items():
+            problems += image_problems(name, effective, key, text)
     dates = list(versions)
+    last_image = {}
+    for key, text in units[dates[0]].items():
+        if image_text(text):
+            last_image[key] = (image_text(text), texts[dates[0]][key])
     for before, after in zip(dates, dates[1:]):
-        old, new = L.law_units(versions[before]), L.law_units(versions[after])
-        flagged = changed_flags(versions[after])
+        old, new = units[before], units[after]
+        flagged, moved = changed_flags(versions[after]), moved_from(versions[after])
         allowed = published_on[after]
         counts = defaultdict(int)
+        for key in old.keys() - new.keys():
+            if key in moved or DELETED.search(old[key]):
+                counts["removed"] += 1
+            else:
+                problems.append(f"{name} {before}->{after}: {key} removed with no move or earlier deletion")
         for key, text in new.items():
-            if key.startswith(("sup-", "heading-")):
-                continue
-            if L.version_text(old.get(key, "")) == L.version_text(text):
-                before_images, after_images = image_text(old.get(key, "")), image_text(text)
-                if before_images and after_images and before_images != after_images:
+            current = texts[after][key]
+            pictured = image_text(text)
+            if pictured:
+                seen_image = last_image.get(key)
+                if seen_image and seen_image[0] != pictured and seen_image[1] == current and key not in flagged:
                     problems.append(f"{name} {before}->{after}: {key} image text changed, version text did not")
+                last_image[key] = (pictured, current)
+            if texts[before].get(key, "") == current:
                 continue
-            if set(L.amendment_dates(text)) & allowed:
+            if key.startswith("sup-") and key not in old and key.split("-")[1] in allowed:
+                counts["new 부칙"] += 1
+            elif set(L.amendment_dates(text)) & allowed:
                 counts["tag"] += 1
             elif key in flagged:
                 counts["flag"] += 1
             else:
                 problems.append(f"{name} {before}->{after}: {key} changed with no amendment tag dated {sorted(allowed)} and no change flag")
-        notes.append(f"{name} {before}->{after}: changed units explained by tag {counts['tag']}, flag {counts['flag']}")
+        notes.append(
+            f"{name} {before}->{after}: changed units explained by tag {counts['tag']}, flag {counts['flag']}, "
+            f"new 부칙 {counts['new 부칙']}; removed {counts['removed']}"
+        )
+    current_units = units[L.in_force(dates, as_of)]
+    textless = sorted(k for k, t in current_units.items() if L.IMAGE_TAG.search(t) and not image_text(t))
+    if textless:
+        notes.append(f"{name}: current units with images that carry no text, for review: {textless}")
+    return problems, notes
+
+
+def check_law(name, problems, notes):
+    if not (L.CACHE / "law").exists():
+        problems.append(f"{name}: no local cache; run scripts/collect.py laws first")
+        return
+    versions, rows, listing = law_versions(name)
+    as_of, window_start = L.release()
+    found, remarks = check_versions(name, versions, rows, listing, window_start, as_of)
+    problems += found
+    notes += remarks
+
+
+def check_notices(problems, notes):
+    """Raw notes of 행정규칙: 시행일자 as named, and a text that is not empty."""
+    for note in sorted(L.RAW.glob("law/*/*.md")):
+        match = NOTE.match(note.stem)
+        payload = note.with_suffix(".json")
+        if not match or not payload.exists() or "AdmRulService" not in load(payload):
+            continue
+        service = load(payload)["AdmRulService"]
+        if service["행정규칙기본정보"]["시행일자"] != match["date"]:
+            problems.append(f"{note.name}: response says {service['행정규칙기본정보']['시행일자']}")
+        names = L.as_list(service.get("첨부파일", {}).get("첨부파일명"))
+        stored = [note.parent / f"{note.stem}-{index}{Path(n).suffix}" for index, n in enumerate(names, start=1)]
+        if not all(p.exists() for p in stored):
+            problems.append(f"{note.name}: attachments missing")
+            continue
+        attachments = [(p.read_bytes(), n) for p, n in zip(stored, names)]
+        if not L.canonical(L.notice_text(service, attachments)):
+            problems.append(f"{note.name}: no text in the response or its PDF attachment")
+    as_of, window_start = L.release()
+    for listing in sorted((L.CACHE / "admrul").glob("*/versions.json")):
+        chosen = load(listing)
+        stored = {p.stem.split("-")[1] for p in listing.parent.glob("*-*.json")}
+        stored |= {m["date"] for p in L.RAW.glob("law/*/*.md") if (m := NOTE.match(p.stem)) and m["serial"] in {r["행정규칙일련번호"] for r in chosen.values()}}
+        missing = sorted(d for d in chosen if d >= L.in_force(chosen, window_start) and d not in stored)
+        if missing:
+            problems.append(f"행정규칙 {listing.parent.name}: versions in the list but not collected {missing}")
+        notes.append(f"행정규칙 {listing.parent.name}: {len(chosen)} versions listed, {len(stored)} collected")
 
 
 def check_notes(problems):
+    """Required properties of every raw note, and its sha256 against the stored file."""
     for note in sorted(L.RAW.rglob("*.md")):
         meta = L.frontmatter(note)
         missing = [k for k in REQUIRED if not meta.get(k)]
         if missing:
             problems.append(f"{note.relative_to(L.VAULT)}: missing {missing}")
-        payload = note.with_suffix(".json")
-        if note.parts[-3] == "law" and payload.exists():
-            data = load(payload)
-            text = L.law_text(data["법령"]) if "법령" in data else None
-            if text is not None and L.sha256(text) != meta.get("sha256"):
-                problems.append(f"{note.relative_to(L.VAULT)}: sha256 differs from the response")
+        payload, page = note.with_suffix(".json"), note.with_suffix(".html")
+        if payload.exists():
+            digest = L.sha256(payload.read_text(encoding="utf-8"))
+        elif page.exists():
+            sections, _ = collect.page_sections(page.read_text(encoding="utf-8"), meta["title"])
+            digest = L.body_hash("\n".join(f"{k}\n{v}" for k, v in sections.items()))
+        else:
+            continue
+        if digest != meta.get("sha256"):
+            problems.append(f"{note.relative_to(L.VAULT)}: sha256 differs from the stored file")
 
 
-def check_secrets(problems):
+def check_secrets(problems, notes):
     secrets = L.secrets()
+    if not secrets:
+        notes.append("no .env: secret check skipped")
+        return
     for path in list(L.RAW.rglob("*")) + list(L.CACHE.rglob("*.json")):
         if path.is_file() and path.suffix in (".md", ".json", ".html"):
             text = path.read_text(encoding="utf-8", errors="replace")
@@ -129,14 +228,13 @@ def check_secrets(problems):
 def main():
     if not sys.flags.utf8_mode:
         sys.exit("Run with python -X utf8.")
-    import yaml
-    from pathlib import Path
     sources = yaml.safe_load((Path(__file__).parent / "sources.yaml").read_text(encoding="utf-8"))
     problems, notes = [], []
     for name in sources["laws"]:
         check_law(name, problems, notes)
+    check_notices(problems, notes)
     check_notes(problems)
-    check_secrets(problems)
+    check_secrets(problems, notes)
     for line in notes:
         print(line)
     for line in problems:
