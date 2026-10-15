@@ -7,6 +7,7 @@ import re
 import time
 import urllib.parse
 import urllib.request
+from collections import namedtuple
 from datetime import date, datetime, timedelta, timezone
 from itertools import accumulate
 from pathlib import Path
@@ -129,34 +130,40 @@ def image_lines(text):
 
 
 def segments(text):
-    """Runs of text between box-drawing characters, as (line, start column, end column, text).
+    """Runs of text between box-drawing characters, as (line, start column, end column, text, boxed).
 
-    Runs of spaces are left out: they carry no text and change with the layout.
+    boxed tells whether the line has box-drawing characters. Runs of spaces are left out:
+    they carry no text and change with the layout.
     """
     found = []
     for number, line in enumerate(text.split("\n")):
         if not line.strip():
             continue
         if not BOX.search(line):
-            found.append((number, 0, width(line), line))
+            found.append((number, 0, width(line), line, False))
             continue
         column = columns(line)
         start = 0
         for match in [*BOX.finditer(line), None]:
             end = match.start() if match else len(line)
             if line[start:end].strip():
-                found.append((number, column[start], column[end], line[start:end]))
+                found.append((number, column[start], column[end], line[start:end], True))
             if match:
                 start = match.end()
     return found
 
 
-def cells(text):
-    """Cells of box-drawing tables and the text around them, in reading order.
+Cell = namedtuple("Cell", "table lines")
 
-    Segments on adjacent lines whose display columns overlap belong to one cell, so a cell
-    keeps its wrapped lines together whatever the widths of the other columns. Cells are
-    ordered by their first line, then by column. Text without tables stays one cell per paragraph.
+
+def cells(text):
+    """Cells of box-drawing tables and the paragraphs around them, in reading order.
+
+    Segments on adjacent lines that start at about the same display column and overlap belong
+    to one cell, so a cell keeps its wrapped lines together whatever the widths of the other
+    columns, and text that runs past a border does not join the next column. Lines with
+    box-drawing characters and lines without them never join. Cells are ordered by their
+    first line, then by column.
     """
     text = IMAGE.sub(lambda m: "\n" + image_lines(IMAGE_TAG.sub("", m.group(0))) + "\n", text)
     found = segments(IMAGE_TAG.sub("", text))
@@ -174,6 +181,8 @@ def cells(text):
     for number, indices in by_line.items():
         for i in indices:
             for j in by_line.get(number - 1, []):
+                if found[i][4] != found[j][4] or abs(found[i][1] - found[j][1]) > 2:
+                    continue
                 overlap = min(found[i][2], found[j][2]) - max(found[i][1], found[j][1])
                 narrow = min(found[i][2] - found[i][1], found[j][2] - found[j][1]) < 2
                 if overlap >= (1 if narrow else 2):
@@ -182,12 +191,23 @@ def cells(text):
     for i in range(len(found)):
         groups.setdefault(root(i), []).append(i)
     ordered = sorted(groups.values(), key=lambda g: (found[g[0]][0], found[g[0]][1]))
-    return ["\n".join(found[i][3] for i in group) for group in ordered]
+    return [Cell(found[group[0]][4], tuple(found[i][3] for i in group)) for group in ordered]
 
 
 def cell_order(text):
     """Text with box-drawing tables read cell by cell, one cell after another."""
-    return "\n".join(cells(text))
+    return "\n".join("\n".join(cell.lines) for cell in cells(text))
+
+
+def number_text(text, wrapped=False):
+    """Text for reading numbers as tokens, with a line break between cells.
+
+    Lines of a table cell, and every line of wrapped text such as 별표, 별지 서식 and PDF text, wrap in the middle of words, as in "210" and "만원", so they join without a break. Lines of 조문 fields stay apart, because each is a 항, 호 or 목.
+    """
+    return "\n".join(
+        "".join(line.strip() for line in cell.lines) if cell.table or wrapped else "\n".join(cell.lines)
+        for cell in cells(text)
+    )
 
 
 def canonical(text):
@@ -202,6 +222,14 @@ def version_text(text):
 
 def sha256(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def files_hash(payload, attachments=()):
+    """SHA-256 of a stored response followed by the bytes of its attachments in their order."""
+    digest = hashlib.sha256(payload.encode("utf-8"))
+    for data in attachments:
+        digest.update(data)
+    return digest.hexdigest()
 
 
 def body_hash(text):
@@ -318,6 +346,7 @@ def amendment_dates(text):
 
 SUP_ARTICLE = re.compile(r"(?:^|\n)\s*제(\d+)조(?:의(\d+))?\(([^)\n]*)\)")
 TRANSITIONAL = re.compile(r"경과조치|적용례|특례|유효기간")
+OWN_ARTICLES = re.compile(r"부칙\s*제\d+조(?:의\d+)?(?:\s*(?:부터|,|및|ㆍ|·|와|과)\s*제\d+조(?:의\d+)?)*(?:\s*까지)?")
 REFERENCE = re.compile(
     r"(?:「[^」]+」\s*)?(?:별지\s*)?제\d+호(?:의\d+)?\s*서식"
     r"|(?:「[^」]+」\s*)?별표\s*\d+(?:의\d+)?"
@@ -353,6 +382,7 @@ def transitional(laws, rows, window_start):
                 if not TRANSITIONAL.search(match.group(3)):
                     continue
                 body = text[match.end(): following.start() if following else None]
+                body = OWN_ARTICLES.sub(" ", body)
                 units = [re.sub(r"\s+", " ", m.group(0)).strip() for m in REFERENCE.finditer(body)]
                 found.append({
                     "promulgation": f"{key[0]}-{key[1]}",

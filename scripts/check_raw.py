@@ -14,13 +14,22 @@ from collections import defaultdict
 from pathlib import Path
 
 import yaml
+from pypdf.errors import PyPdfError
 
 import collect
 import lawlib as L
 
 NOTE = re.compile(r"^(?P<name>.+) (?P<date>\d{8})-(?P<serial>\d+) (?P<stamp>\d{8}T\d{4})$")
 REQUIRED = ("identifier", "title", "publisher", "url", "generatedAtTime", "sha256", "license")
-DELETED = re.compile(r"삭제\s*<")
+DELETED = re.compile(r"(?:제\d+(?:조|장|절|편|관)(?:의\d+)?|■[가-힣]+)?삭제")
+
+
+IMAGE_FILE = re.compile(r'<img\b[^>]*?src="([^"]+)"[^>]*>(?:(?:(?!<img\b).)*?</img>)?', re.S)
+
+
+def deleted(text):
+    """Whether a whole unit is a deletion, such as "제22조 삭제 <2006.12.28>" or "[별지 제33호서식] 삭제 <2018. 7. 11.>"."""
+    return bool(DELETED.fullmatch(re.sub(r"\s+|<[^>]*>|\[[^\]]*\]", "", text)))
 
 
 def load(path):
@@ -65,17 +74,33 @@ def image_text(text):
     return L.canonical("".join(L.IMAGE.findall(text)))
 
 
+def images(text):
+    """Image files of a unit with the comparison text each carries, empty when the response leaves it out."""
+    return [(source, L.canonical(L.IMAGE_TAG.sub("", element)))
+            for element, source in ((m.group(0), m.group(1)) for m in IMAGE_FILE.finditer(text))]
+
+
+def replaced_without_text(before, after):
+    """Whether image files changed where no image text shows that their content stayed the same."""
+    if [source for source, _ in before] == [source for source, _ in after]:
+        return False
+    return len(before) != len(after) or any(not (a and a == b) for (_, a), (_, b) in zip(before, after))
+
+
 def image_problems(name, effective, key, text):
-    """Lines restored from image text must start and end with a frame, or the table is misread."""
+    """Lines restored from image text must start and end with a frame and be about as wide as each other."""
     found = []
     for image in L.IMAGE.findall(text):
         inner = L.IMAGE_TAG.sub("", image)
         if not L.canonical(inner) or "\n" in inner.strip("\n"):
             continue
-        for line in L.image_lines(inner).split("\n"):
-            if line and not (line[0] in L.LINE_START and line[-1] in L.LINE_END):
-                found.append(f"{name} {effective}: {key} image text breaks into a line without a frame: {line[:40]}")
-                break
+        lines = [line for line in L.image_lines(inner).split("\n") if line]
+        unframed = [line for line in lines if not (line[0] in L.LINE_START and line[-1] in L.LINE_END)]
+        widths = [L.width(line) for line in lines]
+        if unframed:
+            found.append(f"{name} {effective}: {key} image text breaks into a line without a frame: {unframed[0][:40]}")
+        elif max(widths) - min(widths) > 2:
+            found.append(f"{name} {effective}: {key} image text breaks into lines of widths {min(widths)} to {max(widths)}")
     return found
 
 
@@ -121,7 +146,7 @@ def check_versions(name, versions, rows, listing, window_start, as_of):
         allowed = published_on[after]
         counts = defaultdict(int)
         for key in old.keys() - new.keys():
-            if key in moved or DELETED.search(old[key]):
+            if key in moved or deleted(old[key]):
                 counts["removed"] += 1
             else:
                 problems.append(f"{name} {before}->{after}: {key} removed with no move or earlier deletion")
@@ -130,10 +155,12 @@ def check_versions(name, versions, rows, listing, window_start, as_of):
             pictured = image_text(text)
             if pictured:
                 seen_image = last_image.get(key)
-                if seen_image and seen_image[0] != pictured and seen_image[1] == current and key not in flagged:
+                if seen_image and seen_image[0] != pictured and seen_image[1] == current:
                     problems.append(f"{name} {before}->{after}: {key} image text changed, version text did not")
                 last_image[key] = (pictured, current)
             if texts[before].get(key, "") == current:
+                if replaced_without_text(images(old.get(key, "")), images(text)):
+                    problems.append(f"{name} {before}->{after}: {key} image files changed with no text to compare")
                 continue
             if key.startswith("sup-") and key not in old and key.split("-")[1] in allowed:
                 counts["new 부칙"] += 1
@@ -165,6 +192,15 @@ def check_law(name, problems, notes):
     notes += remarks
 
 
+def attachments(note, response):
+    """Stored attachments of a raw note as (content, file name) pairs in the order of the response, or None if any is missing."""
+    names = L.as_list(response.get("AdmRulService", {}).get("첨부파일", {}).get("첨부파일명"))
+    stored = [note.parent / f"{note.stem}-{index}{Path(name).suffix}" for index, name in enumerate(names, start=1)]
+    if not all(path.exists() for path in stored):
+        return None
+    return [(path.read_bytes(), name) for path, name in zip(stored, names)]
+
+
 def check_notices(problems, notes):
     """Raw notes of 행정규칙: 시행일자 as named, and a text that is not empty."""
     for note in sorted(L.RAW.glob("law/*/*.md")):
@@ -175,13 +211,15 @@ def check_notices(problems, notes):
         service = load(payload)["AdmRulService"]
         if service["행정규칙기본정보"]["시행일자"] != match["date"]:
             problems.append(f"{note.name}: response says {service['행정규칙기본정보']['시행일자']}")
-        names = L.as_list(service.get("첨부파일", {}).get("첨부파일명"))
-        stored = [note.parent / f"{note.stem}-{index}{Path(n).suffix}" for index, n in enumerate(names, start=1)]
-        if not all(p.exists() for p in stored):
-            problems.append(f"{note.name}: attachments missing")
+        stored = attachments(note, load(payload))
+        if stored is None:
             continue
-        attachments = [(p.read_bytes(), n) for p, n in zip(stored, names)]
-        if not L.canonical(L.notice_text(service, attachments)):
+        try:
+            text = L.notice_text(service, stored)
+        except PyPdfError as error:
+            problems.append(f"{note.name}: PDF attachment unreadable: {error}")
+            continue
+        if not L.canonical(text):
             problems.append(f"{note.name}: no text in the response or its PDF attachment")
     as_of, window_start = L.release()
     for listing in sorted((L.CACHE / "admrul").glob("*/versions.json")):
@@ -203,7 +241,12 @@ def check_notes(problems):
             problems.append(f"{note.relative_to(L.VAULT)}: missing {missing}")
         payload, page = note.with_suffix(".json"), note.with_suffix(".html")
         if payload.exists():
-            digest = L.sha256(payload.read_text(encoding="utf-8"))
+            text = payload.read_text(encoding="utf-8")
+            stored = attachments(note, json.loads(text))
+            if stored is None:
+                problems.append(f"{note.relative_to(L.VAULT)}: attachments missing")
+                continue
+            digest = L.files_hash(text, [data for data, _ in stored])
         elif page.exists():
             sections, _ = collect.page_sections(page.read_text(encoding="utf-8"), meta["title"])
             digest = L.body_hash("\n".join(f"{k}\n{v}" for k, v in sections.items()))

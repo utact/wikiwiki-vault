@@ -20,6 +20,8 @@ def staged():
 
 def main():
     secrets = [s.encode("utf-8") for s in L.secrets()]
+    if not secrets:
+        print("no .env: secret scan skipped", file=sys.stderr)
     found = []
     for name in staged():
         content = subprocess.run(["git", "show", f":{name}"], cwd=L.VAULT, capture_output=True, check=True).stdout

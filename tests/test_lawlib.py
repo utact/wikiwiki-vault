@@ -47,7 +47,7 @@ def test_table_layouts_read_the_same():
 
 
 def test_merged_cell_stays_together():
-    cells = [" ".join(c.split()) for c in L.cells(MERGED)]
+    cells = [" ".join(" ".join(c.lines).split()) for c in L.cells(MERGED)]
     assert "거짓이나 그 밖의 부정한 방 법으로 지급받거나 받으려고 한 금액" in cells
     assert cells.index("300만원 미만") < cells.index("3개월") < cells.index("300만원 이상 500만원 미만")
 
@@ -70,7 +70,7 @@ def test_image_table_is_read_by_cell():
 
 
 def test_cells_keep_numbers_apart():
-    assert "100분의 100" in [c.strip() for c in L.cells(IMAGE)]
+    assert "100분의 100" in [" ".join(c.lines).strip() for c in L.cells(IMAGE)]
 
 
 def test_version_text_leaves_out_images():
@@ -157,3 +157,32 @@ def test_choose_versions_prefers_the_later_promulgation():
         {"시행일자": "20260918", "공포일자": "20250101", "공포번호": "제30000호", "법령일련번호": "3"},
     ]
     assert L.choose_versions(rows)["20260918"]["법령일련번호"] == "2"
+
+
+# 고용보험법 시행규칙 별지 제32호서식, where the text of the middle column runs past its border on one line
+OVERFLOW = """───────┬─────────────────────────────────────┬─────────
+  신청인      │ 1. 근로자의 월별 임금대장 사본 1부                                       │수수료            
+  제출서류    │ 2. 고용유지조치 기간 중 사업주가 임금을 보전하기 위하여 지급한 금품을 확인할 수 있는 자료 1부│없음              
+              │ 3. 출퇴근카드 또는 출퇴근기록부 등 출퇴근 현황을 확인할 수 있는 서류 사본 1부│                  
+───────┼─────────────────────────────────────┤"""
+
+
+def test_text_past_a_border_does_not_join_the_next_column():
+    texts = [" ".join(" ".join(cell.lines).split()) for cell in L.cells(OVERFLOW)]
+    middle = next(t for t in texts if t.startswith("1. 근로자의"))
+    assert middle.startswith("1. 근로자의 월별 임금대장 사본 1부 2. 고용유지조치")
+    assert "수수료" not in middle and "수수료" in texts
+
+
+def test_paragraph_lines_stay_apart_from_table_cells():
+    found = L.cells("①법 제62조제2항 본문에 따른 추가징수액은 다음 표와 같다." + IMAGE[IMAGE.index("<img"):])
+    assert [cell.table for cell in found][:3] == [False, True, True]
+
+
+def test_number_text_joins_wrapped_lines():
+    # 고용보험법 시행령 별표 3 and 고용보험법 시행규칙 별지 제52호서식
+    cell = "┌──────┐\n│피보험자  │\n│1명당 3   │\n│만원      │\n└──────┘"
+    assert "1명당 3만원" in L.number_text(cell)
+    paragraph = "  14. 정년연장형 840만원(분기 210  \n  만원, 월 70만원)"
+    assert "분기 210만원" in L.number_text(paragraph, wrapped=True)
+    assert "분기 210만원" not in L.number_text(paragraph)

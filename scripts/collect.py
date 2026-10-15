@@ -110,9 +110,17 @@ def collect_laws(as_of, window_start, stamp, generated, report):
 
 def notices(source):
     """Versions of an administrative rule by 시행일자, without proposals such as 최저임금안 고시."""
-    text, _ = L.law_api("lawSearch", target="admrul", query=source["query"], display=100, nw=2)
-    rows = [r for r in L.as_list(json.loads(text)["AdmRulSearch"].get("admrul"))
-            if r.get("행정규칙ID") == source["id"] and not DRAFT.search(r["행정규칙명"])]
+    found, page = [], 1
+    while True:
+        text, _ = L.law_api("lawSearch", target="admrul", query=source["query"], display=100, nw=2, page=page)
+        data = json.loads(text)["AdmRulSearch"]
+        found += L.as_list(data.get("admrul"))
+        if page * 100 >= int(data["totalCnt"]):
+            break
+        page += 1
+    if len(found) != int(data["totalCnt"]):
+        raise ValueError(f"{source['query']}: {len(found)} rows for totalCnt {data['totalCnt']}")
+    rows = [r for r in found if r.get("행정규칙ID") == source["id"] and not DRAFT.search(r["행정규칙명"])]
     by_date = {}
     for row in rows:
         rank = (row.get("발령일자", ""), int(row.get("행정규칙일련번호", "0")))
@@ -156,7 +164,7 @@ def collect_admrul(as_of, window_start, stamp, generated, report):
             text, url, attachments = fetch_notice(row)
             folder = L.RAW / "law" / name
             basename = f"{name} {effective}-{serial} {stamp}"
-            digest = L.sha256(L.json_payload(text))
+            digest = L.files_hash(L.json_payload(text), [data for data, _ in attachments])
             written = not unchanged(folder, basename, digest)
             if written:
                 L.write_json(folder / f"{basename}.json", text)
