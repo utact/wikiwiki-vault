@@ -38,6 +38,9 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Read API keys from `.env`.
   - Strip credential parameters such as `OC` from every stored URL and response.
   - Check the result with `uv run python -X utf8 scripts/check_raw.py` before committing.
+  - It needs the local cache that `scripts/collect.py` writes, because it compares every version in the transitional window.
+  - It explains each changed unit by an amendment tag dated as a promulgation of that version, by 조문변경여부, or as the new 부칙 of that version, and each removed unit by 조문이동이전 or an earlier deletion.
+  - It works per unit: one matching tag explains every change in the unit.
 - Use one folder per publisher.
   - `raw/law/`: 법제처, for both 법령 and 행정규칙
   - `raw/work24/`: 고용24 guides
@@ -45,21 +48,27 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Give every raw note a basename that is unique in the vault: the source name, its version and the retrieval time in KST.
   - 법령: `raw/law/<법령명>/<법령명> <시행일자>-<MST> <YYYYMMDDTHHMM>.md`
   - 행정규칙: `raw/law/<행정규칙명>/<행정규칙명> <시행일자>-<행정규칙일련번호> <YYYYMMDDTHHMM>.md`
-  - Keep the original response next to the note with the same basename and `.json`, and attachments with the same basename and their own extension.
+  - Keep the original response next to the note with the same basename and `.json`.
+  - Keep attachments with the same basename followed by `-1`, `-2` in the order of the response, and their own extension.
   - Keep version lists as `<법령명> versions <YYYYMMDDTHHMM>.json`.
-- Collect these versions of every law in scope.
+- Collect these versions of every 법령 and 행정규칙 in scope.
   - The current version
   - Every scheduled version (시행예정)
   - Every earlier version in force during the transitional window, so that text kept by a 경과조치 is at hand, such as 고용보험법 시행령 제68조 before 2026-01-01
+  - Leave out proposals published under the same 행정규칙ID, such as `2027년 적용 최저임금안 고시`.
 - The transitional window is `transitionalWindow` in `ontology/release.yaml`, counted back from the reference date.
   - It starts with the version in force on its first day.
-  - It is the longest time a person can still receive 구직급여 after 이직: 4 years (고용보험법 제48조제2항) plus 2 years of 훈련연장급여 (시행령 제72조), 60 days of 개별연장급여 (법 제52조제2항) and 60 days of 특별연장급여 (법 제53조제1항), which are paid one after another (법 제55조).
+  - It is the longest time a person can still receive 구직급여 after 이직: 4 years (고용보험법 제48조제2항) plus 2 years of 훈련연장급여 (시행령 제72조), 60 days of 개별연장급여 (법 제52조제2항) and 60 days of 특별연장급여 (법 제53조제1항), which are paid one after another (법 제55조) and lengthen the 수급기간 (법 제54조제1항).
   - Recompute it when any of those provisions changes.
-- The collection report `.cache/collect-laws.json` lists the 부칙 articles titled 경과조치 or 적용례 promulgated within the window, with the units they name.
+  - It covers entitlement and payment. Recovery under 법 제62조 can concern 부정수급 before the window, because the right to recover lasts 3 years (법 제107조제1항제3호) and can be interrupted (같은 조 제2항).
+  - For such cases, cite the 경과조치 and leave the earlier text as a question until a competency question needs it.
+- List the 부칙 articles that govern the window with `uv run python -X utf8 scripts/transitional.py`.
+  - It reads the 부칙 of the current and scheduled versions, whose titles contain 경과조치, 적용례, 특례 or 유효기간, of every promulgation with a 시행일자 on or after the first day of the window.
+  - It shows the units each article names: articles, 항, 호, 별표, 별지 서식 and 같은 조.
   - List those that name no unit for review in `log.md`.
 - Walk back the version list as far as needed to date the text of each generated unit, as described in Statute notes.
   - Commit only the versions that the wiki cites or that are current or scheduled.
-  - Keep the others in the local cache `.cache/law/`, which Git ignores.
+  - Keep the others in the local cache, `.cache/law/` and `.cache/admrul/`, which Git ignores.
 - Re-collect scheduled versions after each new promulgation, because a later amendment can change them.
 - Keep 고용24 guide bodies local and out of Git.
   - 고용24 content without a 공공누리 mark needs prior consultation before redistribution.
@@ -67,11 +76,14 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Commit the raw note next to it, with the short quotations the wiki cites in `hasPart`, quoted under 저작권법 제28조.
   - Number the quotation blocks `^q1`, `^q2` in the order of `hasPart`, and cite them as `[[<raw note>#^q1]]`.
 - Fill every required property in the Raw sources section of `ontology/schema.md`, and the optional ones that apply.
+- Set `sha256` to the SHA-256 of the stored response file.
+  - For a 고용24 guide, whose page stays out of Git, use the text of its body area without whitespace.
+  - The hash never depends on how scripts read the text, so a change in the reading rules leaves raw notes as they are.
 - Record the terms of use in `license`.
   - Statutes: not protected works under 저작권법 제7조
   - Other sources: the 공공누리 type or the 공공데이터포털 terms of use
 - Never edit a saved source.
-  - The only allowed edit is appending a quotation to `hasPart` of a 고용24 raw note.
+  - The only allowed edits are appending a quotation to `hasPart` of a 고용24 raw note, and recomputing `sha256` in every raw note in one `schema` operation when its definition changes.
   - On re-collection, write a new note with the new retrieval time.
   - Skip it if its `sha256` equals that of the previous retrieval.
 
@@ -91,10 +103,12 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
+  - When two 부칙 of a law share a 공포번호, add the 공포일자 in parentheses, as in `고용보험법 시행규칙 부칙 제263호 (2019. 9. 30.)` and `고용보험법 시행규칙 부칙 제263호 (2019. 10. 15.)`.
 - Give a unit a new version only when its version text, defined in Text checks, changes.
   - Date the version by the 시행일자 of the earliest law version in the latest unbroken run of versions that have this text of the unit. This is the version's `firstDateEntryInForce`.
-  - Check the date against the text: the law version found must carry the 공포번호 of the latest amendment tag of the unit, such as `<개정 2021.1.5>`.
-  - A 부칙 has one version, dated by the earliest law version that contains it.
+  - Check the date against the text: a promulgation of the law version found must have the date of the latest amendment tag of the unit, such as `<개정 2021.1.5>`.
+  - List the unit for review when it has none, as with the tag `2021.7.2` of 고용보험법 시행규칙 제87조 in the version of the promulgation dated 2021-07-01.
+  - A 부칙 gets versions like any other unit, because a later act can amend it, as 대통령령 제35100호 deleted 제18조 of 고용보험법 시행령 부칙 제22603호 from 2025-01-01.
 - Put the current, scheduled and cited versions of the unit in the body, each under its own heading, and mark the current one.
   - Never remove a version that a note cites.
 - Prefix every block ID with the date of its version, so that a block ID never changes meaning.
@@ -203,25 +217,33 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
   - 조문 block: 조문내용, 항내용, 호내용 and 목내용 of the block and all its children, then 조문참고자료 such as `[본조신설 2020.6.9]`, joined with newlines
   - 별표 and 별지 서식: 별표내용
   - 부칙: 부칙내용
-  - 고시 whose 조문내용 is empty: the text extracted from its PDF attachment
-  - 고용24 guide: the text of the body area
+  - 고시: 조문내용, then the text extracted from the PDF attachment named after the 고시, because some years keep the text only there
+  - 고용24 guide: the text of the body area, section by section as its table of contents lists them
 - Keep amendment tags such as `<개정 2019.1.15>`.
-- Compare quotes and numbers against the comparison text: the canonical text without whitespace and without box-drawing characters (U+2500 to U+257F).
-  - Read tables drawn with box-drawing characters cell by cell, row by row, then column by column within a row.
+- Read the text in cell order before any comparison.
+  - Count display columns with ASCII 1 wide and every other character 2 wide, and a "?" between two wide characters 2 wide, because it stands for a lost glyph such as an arrow.
+  - Split each line at box-drawing characters (U+2500 to U+257F), and leave out runs of spaces.
+  - Runs on adjacent lines that share at least 2 columns, or 1 when a run is narrower than 2, belong to one cell, so a cell keeps its wrapped lines whatever the widths of the other columns.
+  - Put cells in the order of their first line, then of their column.
+  - Inside `<img>` elements, whose table text comes without line breaks, break the line where a line end meets a line start, such as `││`.
+  - Text without box-drawing characters stays one cell per paragraph.
+- Compare quotes against the comparison text: the text in cell order without whitespace.
   - Wrapped lines of 별표 and spaces inserted by PDF extraction then stop mattering.
   - Table text inside `<img>` elements stays without the tags, because some tables exist only there, such as 고용보험법 시행규칙 제105조.
   - "ㆍ" (U+318D) and "·" (U+00B7) stay different.
-- Decide versions and hashes on the version text: the comparison text without `<img>` elements and the text inside them.
-  - Some versions of a 법제처 response leave out the text inside `<img>` elements that other versions carry, such as 고용보험법 시행규칙 제105조 in the version of 2024-07-01.
-  - An amendment of such a table shows in the amendment tag of its unit, as the table of 제105조제1항 did in `<개정 2020.8.28, 2026.7.1>`.
-  - `scripts/check_raw.py` fails when the text inside images changes while the version text does not.
+- Compare numbers as whole tokens of the text in cell order, keeping whitespace and the breaks between cells.
+  - Then 100분의 30 does not match inside 100분의 300, and the cells 100분의 100 and 100분의 150 stay two numbers.
 - Read numbers in these forms.
   - Digits with or without commas, such as 113,500
   - Korean units, such as 11만3500원 and 3천만원
   - Fractions and percentages, such as 100분의 60 and 70퍼센트
   - Dates, such as 2026-01-01, 2026.1.1. and 2026년 1월 1일
+- Decide versions and hashes of units on the version text: the comparison text without `<img>` elements and the text inside them.
+  - Some versions of a 법제처 response leave out the text inside `<img>` elements that other versions carry, such as 고용보험법 시행규칙 제105조 in the version of 2024-07-01.
+  - An amendment of such a table shows in the amendment tag of its unit, as the table of 제105조제1항 did in `<개정 2020.8.28, 2026.7.1>`.
+  - `scripts/check_raw.py` fails when the text inside images differs from the last version that carried it while the version text does not.
+  - It lists current units with images that carry no text, such as the formulas of 고용산재보험료징수법 시행령 제18조의2, for review.
 - The hash of a block is the SHA-256 of its version text.
-- The `sha256` of a raw source is computed the same way over the fields listed above, and over no other field.
 
 ## Review
 
