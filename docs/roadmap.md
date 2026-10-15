@@ -35,6 +35,7 @@
 
 - 작업
   - 법제처 `eflaw`로 현행과 시행예정 버전 전부 수집
+  - 부칙의 경과조치·적용례로 이전 버전을 찾아 수집하고, 인용하지 않는 버전은 로컬 캐시에 보관
   - 행정규칙(고시) 수집
   - 고용24 안내의 본문 영역과 수정일 수집, 인용을 담은 원문 노트 기록
   - 커밋 전 비밀값 검사(Git pre-commit hook)
@@ -52,9 +53,13 @@
 
 - 작업
   - 법령 노트, 별표, 인용 관계(`cites`)를 원문에서 스크립트로 생성
+  - 단위 본문이 바뀔 때만 버전을 만들고, block 버전 노드와 버전 무관 block 노드 생성
+  - fixture 법령 노트를 실제 본문으로 교체
   - frontmatter를 RDF로 변환하고 SHACL로 검사
+  - CPSV-AP 3.2.0·CCCEV 2.1.0 공식 SHACL shape 검사, PublicService의 `dct:title`·`dct:description` 출력, 상태 값과 하위 단위 종류의 ConceptScheme 선언
   - lint
-  - 인용 문자열과 숫자를 원문과 대조
+  - 인용 문자열과 숫자를 원문과 대조하고, 계산식을 평가
+  - 선언되지 않은 block·인용 링크, FEEL 구문과 자료형, 결정표 일관성 검사
   - 검증 원장(`ontology/verification.jsonl`)
   - vault 노트용 markdownlint 설정
   - `reviewed` 보호 hook
