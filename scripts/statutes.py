@@ -1155,7 +1155,7 @@ def main():
     OFFLINE = check
     statutes, notes = generate()
     changed = [path for path, (_, text, _) in notes.items() if not path.exists() or path.read_text(encoding="utf-8") != text]
-    for line in statutes.review:
+    for line in dict.fromkeys(statutes.review):
         print("REVIEW", line)
     if check:
         ledger = latest_ledger()
