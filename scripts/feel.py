@@ -8,10 +8,11 @@ Expressions: arithmetic, comparisons, and, or, if then else, lists, names, .year
 """
 
 import re
+from datetime import date as calendar_date, datetime, timedelta
 from fractions import Fraction
 
 INFINITY = None
-NUMBER, STRING, BOOLEAN, DATE = "number", "string", "boolean", "date"
+NUMBER, STRING, BOOLEAN, DATE, DATETIME = "number", "string", "boolean", "date", "date and time"
 DAYS, MONTHS = "days and time duration", "years and months duration"
 
 
@@ -21,26 +22,30 @@ class FeelError(ValueError):
 
 VALUE = re.compile(
     r'\s*(?:(?P<number>-?\d+(?:\.\d+)?)|"(?P<string>[^"]*)"|date\(\s*"(?P<date>\d{4}-\d{2}-\d{2})"\s*\)'
-    r'|duration\(\s*"(?P<duration>-?P(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?)"\s*\)|(?P<boolean>true|false))\s*'
+    r'|date and time\(\s*"(?P<datetime>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)"\s*\)'
+    r'|duration\(\s*"(?P<duration>-?P(?:\d+Y)?(?:\d+M)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?)"\s*\)|(?P<boolean>true|false))\s*'
 )
 COMPARISON = re.compile(r"\s*(<=|>=|!=|<|>|=)?")
 INTERVAL = re.compile(r"\s*([\[(\]])(.+?)\.\.(.+?)([\])\[])\s*$")
-DURATION_PART = re.compile(r"(\d+)([YMWDHS])")
+DURATION_PART = re.compile(r"(\d+)([YMDHS])")
+DURATION = re.compile(r"-?P(?:\d+Y)?(?:\d+M)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?")
 
 
 def duration(text):
     """(type, size) of an ISO 8601 duration: months for years and months, seconds for days and time."""
+    if not DURATION.fullmatch(text):
+        raise FeelError(f"not a FEEL duration: {text!r}")
     sign = -1 if text.startswith("-") else 1
     body = text.lstrip("-")[1:]
     date_part, _, time_part = body.partition("T")
     if not body or body == "T" or (time_part == "" and body.endswith("T")):
         raise FeelError(f"empty duration: {text!r}")
     parts = DURATION_PART.findall(date_part)
-    if any(unit in "YM" for _, unit in parts) and not any(unit in "WD" for _, unit in parts) and not time_part:
+    if any(unit in "YM" for _, unit in parts) and not any(unit == "D" for _, unit in parts) and not time_part:
         return MONTHS, sign * sum(int(n) * (12 if unit == "Y" else 1) for n, unit in parts)
     if any(unit in "YM" for _, unit in parts):
         raise FeelError(f"duration mixes years or months with days: {text!r}")
-    seconds = sum(int(n) * {"W": 604800, "D": 86400}[unit] for n, unit in parts)
+    seconds = sum(int(n) * 86400 for n, unit in parts)
     seconds += sum(int(n) * {"H": 3600, "M": 60, "S": 1}[unit] for n, unit in DURATION_PART.findall(time_part))
     return DAYS, sign * seconds
 
@@ -55,7 +60,17 @@ def value(text):
     if match["string"] is not None:
         return STRING, match["string"]
     if match["date"]:
+        try:
+            calendar_date.fromisoformat(match["date"])
+        except ValueError:
+            raise FeelError(f"not a calendar date: {match['date']}") from None
         return DATE, match["date"]
+    if match["datetime"]:
+        try:
+            datetime.fromisoformat(match["datetime"])
+        except ValueError:
+            raise FeelError(f"not a date and time: {match['datetime']}") from None
+        return DATETIME, match["datetime"]
     if match["duration"]:
         return duration(match["duration"])
     return BOOLEAN, match["boolean"] == "true"
@@ -190,10 +205,24 @@ def complement(tests):
     return found
 
 
+def closed_days(test):
+    """An interval of dates with open ends moved in by one day, because no date lies between two consecutive dates."""
+    kind, low, low_closed, high, high_closed = test
+    if kind != DATE:
+        return test
+    shift = lambda day, days: (calendar_date.fromisoformat(day) + timedelta(days=days)).isoformat()
+    if low is not INFINITY and not low_closed:
+        low, low_closed = shift(low, 1), True
+    if high is not INFINITY and not high_closed:
+        high, high_closed = shift(high, -1), True
+    return kind, low, low_closed, high, high_closed
+
+
 def meet(x, y):
     """Whether two intervals share a value."""
     if x[0] and y[0] and x[0] != y[0]:
         return False
+    x, y = closed_days(x), closed_days(y)
     low, low_closed = max_bound((x[1], x[2]), (y[1], y[2]))
     high, high_closed = min_bound((x[3], x[4]), (y[3], y[4]))
     if low is INFINITY or high is INFINITY:
@@ -223,18 +252,19 @@ def min_bound(a, b):
 
 # expressions
 
-PHRASES = {"years and months duration": "years_and_months_duration", "round half up": "round_half_up",
+PHRASES = {"years and months duration": "years_and_months_duration", "date and time": "date_and_time", "round half up": "round_half_up",
            "round half down": "round_half_down", "round up": "round_up", "round down": "round_down"}
 FUNCTIONS = {
     "min", "max", "sum", "mean", "count", "floor", "ceiling", "abs", "decimal", "modulo", "round_half_up",
-    "round_half_down", "round_up", "round_down", "date", "duration", "years_and_months_duration", "not", "string", "number",
+    "round_half_down", "round_up", "round_down", "date", "date_and_time", "duration", "years_and_months_duration", "not", "string", "number",
 }
 KEYWORDS = {"if", "then", "else", "and", "or", "true", "false", "null"}
 TOKEN = re.compile(
     r'\s*(?:(?P<number>\d+(?:\.\d+)?)|"(?P<string>[^"]*)"|\x00(?P<name>\d+)\x00'
-    r"|(?P<op><=|>=|!=|\.\.|[-+*/<>=(),.\[\]])|(?P<word>[A-Za-z가-힣_][A-Za-z가-힣_0-9]*))"
+    r"|(?P<op><=|>=|!=|\*\*|\.\.|[-+*/<>=(),.\[\]])|(?P<word>[A-Za-z가-힣_][A-Za-z가-힣_0-9]*))"
 )
-PROPERTIES = {DATE: {"year", "month", "day", "weekday"}, DAYS: {"days", "hours", "minutes", "seconds"}, MONTHS: {"years", "months"}}
+PROPERTIES = {DATE: {"year", "month", "day", "weekday"}, DATETIME: {"year", "month", "day", "weekday", "hour", "minute", "second"},
+              DAYS: {"days", "hours", "minutes", "seconds"}, MONTHS: {"years", "months"}}
 
 
 def tokens(text, names):
@@ -343,10 +373,17 @@ class Parser:
         return kind
 
     def product(self):
-        kind = self.unary()
+        kind = self.power()
         while self.peek("*", "/"):
             op = self.take()[1]
-            kind = arithmetic(op, kind, self.unary(), self.text)
+            kind = arithmetic(op, kind, self.power(), self.text)
+        return kind
+
+    def power(self):
+        kind = self.unary()
+        while self.peek("**"):
+            self.take("**")
+            kind = arithmetic("**", kind, self.unary(), self.text)
         return kind
 
     def unary(self):
@@ -427,17 +464,19 @@ def arithmetic(op, a, b, text):
     """Type of a + b, a - b, a * b or a / b."""
     if a is None or b is None:
         return None
-    durations = (DAYS, MONTHS)
+    durations, moments = (DAYS, MONTHS), (DATE, DATETIME)
     if a == b == NUMBER:
         return NUMBER
-    if op in "+-":
+    if op == "+" and a == b == STRING:
+        return STRING
+    if op in ("+", "-"):
         if a == b and a in durations:
             return a
-        if a == DATE and b in durations:
-            return DATE
-        if op == "+" and b == DATE and a in durations:
-            return DATE
-        if op == "-" and a == b == DATE:
+        if a in moments and b in durations:
+            return a
+        if op == "+" and b in moments and a in durations:
+            return b
+        if op == "-" and a == b and a in moments:
             return DAYS
     if op == "*" and {a, b} in ({NUMBER, DAYS}, {NUMBER, MONTHS}):
         return a if a != NUMBER else b
@@ -477,9 +516,13 @@ def function_type(function, arguments, literal, text):
         if len(literal) == 1 and arguments == [STRING]:
             return duration(literal[0])[0]
         return None
+    if function == "date_and_time":
+        if len(literal) == 1 and arguments == [STRING]:
+            value(f'date and time("{literal[0]}")')
+        return DATETIME
     if function == "years_and_months_duration":
         for kind in known:
-            if kind != DATE:
+            if kind not in (DATE, DATETIME):
                 raise FeelError(f"years and months duration of {kind} in {text!r}")
         return MONTHS
     if function == "not":

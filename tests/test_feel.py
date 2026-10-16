@@ -66,7 +66,10 @@ def test_expression_types(text, expected):
     "floor(이직일)",
     "기초일액 *",
     "min(기초일액, 이직일)",
-    "date(\"2026-13-01\") and true",
+    "date(\"2026-13-01\")",
+    "date(\"2026-02-30\")",
+    "duration(\"P1W\")",
+    "\"a\" + 1",
 ])
 def test_expression_type_errors(text):
     with pytest.raises(feel.FeelError):
@@ -76,3 +79,24 @@ def test_expression_type_errors(text):
 def test_unknown_names_are_reported():
     assert feel.unknown_names("min(기초일액, 상한 금액)", ["기초일액"]) == ["상한 금액"]
     assert feel.unknown_names("years and months duration(이직일, 이직일)", ["이직일"]) == []
+
+
+def test_dates_are_discrete():
+    assert not feel.overlaps('> date("2025-12-31")', '< date("2026-01-01")')
+    assert feel.overlaps('>= date("2025-12-31")', '< date("2026-01-01")')
+
+
+def test_values_that_are_not_valid():
+    for text in ('date("2026-13-01")', 'date("2026-02-30")', 'duration("P1W")', 'duration("PT")'):
+        with pytest.raises(feel.FeelError):
+            feel.unary_tests(text)
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("2 ** 3", "number"),
+    ("\"고용\" + \"보험\"", "string"),
+    ("date and time(\"2026-01-01T09:00:00\") + duration(\"PT8H\")", "date and time"),
+    ("date and time(\"2026-01-01T09:00:00\").hour", "number"),
+])
+def test_more_expression_types(text, expected):
+    assert feel.expression_type(text, NAMES) == (expected, [])
