@@ -983,10 +983,13 @@ def review_unit(unit):
             for field, meaning in (("조문이동이전", "moved here from"), ("조문이동이후", "moved away to")):
                 code = row.get(field, "")
                 if code and int(code):
-                    found.append(f"{unit.name}: the article {meaning} {L.article_key(code[:4], code[4:])} by the version of {effective}; keep the identifiers of existing notes")
+                    line = f"{unit.name}: the article {meaning} {L.article_key(code[:4], code[4:])} by the version of {effective}"
+                    if effective > law.current:
+                        line += "; notes follow numbers, not moves, so this note will show another article from then on"
+                    found.append(line)
             note = row.get("조문참고자료", "")
             for number, branch in MOVED_FROM.findall(note):
-                found.append(f"{unit.name}: the article moved here from {L.article_key(number, branch)}, as its 조문참고자료 says; keep the identifiers of existing notes")
+                found.append(f"{unit.name}: the article moved here from {L.article_key(number, branch)}, as its 조문참고자료 says")
             for number, branch in MOVED_AWAY.findall(note):
                 found.append(f"{unit.name}: the earlier article of this number moved to {L.article_key(number, branch)}, as its 조문참고자료 says; the number is reused")
     text = law.units(law.needed()[-1] if unit.key not in law.units(law.current) else law.current)[unit.key]
