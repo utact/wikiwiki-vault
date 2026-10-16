@@ -1,7 +1,7 @@
 """Collect raw sources listed in scripts/sources.yaml.
 
 Usage:
-    uv run python -X utf8 scripts/collect.py [laws|admrul|work24|all]
+    uv run python -X utf8 scripts/collect.py [laws|admrul|work24|shapes|all]
 
 Writes raw notes under raw/, keeps uncited earlier versions in .cache/law/ and
 .cache/admrul/, and writes a report to .cache/collect-<what>.json.
@@ -270,6 +270,28 @@ def collect_work24(stamp, generated, report):
         print(f"{source['name']}: sections {len(sections)}, empty {empty}, written {written}")
 
 
+def collect_shapes(generated, report):
+    """Official SHACL shapes of the standards the schema follows, stored with their attribution."""
+    folder = L.VAULT / "ontology" / "shapes"
+    folder.mkdir(parents=True, exist_ok=True)
+    lines = ["# 공식 SHACL shape", "", "schema가 따르는 표준의 공식 SHACL shape이다. `scripts/vault.py check`가 RDF를 이 shape으로도 검사한다.", "",
+             "| 파일 | 표준 | 원본 | 이용 조건 | 수집 일시 | SHA-256 |", "| --- | --- | --- | --- | --- | --- |"]
+    for source in SOURCES.get("shapes", []):
+        data = L.get(source["url"])
+        path = folder / source["file"]
+        written = not path.exists() or path.read_bytes() != data
+        if written:
+            path.write_bytes(data)
+        digest = L.sha256(path.read_text(encoding="utf-8"))
+        lines.append(f"| `{source['file']}` | {source['name']} | [{source['url'].rsplit('/', 1)[-1]}]({source['url']}) | {source['license']} | {generated[:16].replace('T', ' ')} | `{digest[:12]}` |")
+        report["shapes"].append({"file": source["file"], "written": written})
+        print(f"{source['file']}: written {written}")
+    readme = folder / "README.md"
+    previous = readme.read_text(encoding="utf-8") if readme.exists() else ""
+    if any(entry["written"] for entry in report["shapes"]) or not previous:
+        readme.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+
+
 def main():
     if not sys.flags.utf8_mode:
         sys.exit("Run with python -X utf8.")
@@ -277,13 +299,15 @@ def main():
     as_of, window_start = L.release()
     stamp_time, stamp = L.now()
     generated = stamp_time.isoformat()
-    report = {"asOf": str(as_of), "windowStart": str(window_start), "stamp": stamp, "laws": [], "admrul": [], "work24": []}
+    report = {"asOf": str(as_of), "windowStart": str(window_start), "stamp": stamp, "laws": [], "admrul": [], "work24": [], "shapes": []}
     if what in ("laws", "all"):
         collect_laws(as_of, window_start, stamp, generated, report)
     if what in ("admrul", "all"):
         collect_admrul(as_of, window_start, stamp, generated, report)
     if what in ("work24", "all"):
         collect_work24(stamp, generated, report)
+    if what in ("shapes", "all"):
+        collect_shapes(generated, report)
     L.CACHE.mkdir(exist_ok=True)
     (L.CACHE / f"collect-{what}.json").write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
 

@@ -14,3 +14,12 @@ admrul:
 work24:
   - name: 실업급여(상용직)
     url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000254&systCnntId=&systId=SI00000411
+shapes:
+  - name: CPSV-AP 3.2.0
+    file: cpsv-ap-3.2.0-shacl.ttl
+    url: https://raw.githubusercontent.com/SEMICeu/CPSV-AP/master/releases/3.2.0/shacl/cpsv-ap-SHACL.ttl
+    license: CC BY 4.0, Copyright © 2024 European Union
+  - name: CCCEV 2.1.0
+    file: cccev-2.1.0-shacl.ttl
+    url: https://raw.githubusercontent.com/SEMICeu/CCCEV/master/releases/2.1.0/shacl/cccev-ap-SHACL.ttl
+    license: CC BY 4.0, Copyright © 2026 European Union

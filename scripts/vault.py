@@ -336,6 +336,114 @@ def class_hierarchy():
     return graph
 
 
+DCT = Namespace("http://purl.org/dc/terms/")
+SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
+ELI = Namespace("http://data.europa.eu/eli/ontology#")
+M8G = Namespace("http://data.europa.eu/m8g/")
+CPSV = Namespace("http://purl.org/vocab/cpsv#")
+STANDARD_SHAPES = VAULT / "ontology" / "shapes"
+ALIGNMENT = [
+    (ELI.LegalResourceSubdivision, RDFS.subClassOf, ELI.LegalResource),
+    (ELI.LegalResource, RDFS.subClassOf, M8G.ReferenceFramework),
+    (ELI.LegalExpression, RDFS.subClassOf, M8G.ReferenceFramework),
+]
+DESCRIBED = {CPSV.PublicService, CPSV.Rule, M8G.Criterion, M8G.Constraint, M8G.Participation, M8G.PublicOrganisation,
+             M8G.Channel, M8G.Output, M8G.LifeEvent, M8G.BusinessEvent, M8G.EvidenceType, M8G.InformationConcept}
+DEVIATIONS = {(M8G.Participation, M8G.hasParticipant)}
+
+
+def profile(graph):
+    """The graph as the standards expect it.
+
+    dct:title and dct:description come from the name and the definition, names and definitions carry the language tag ko, public organisations get the jurisdiction in ontology/release.yaml as dct:spatial, and the values of the schema's enumerations become SKOS concepts in concept schemes.
+    """
+    jurisdiction = URIRef(yaml.safe_load((VAULT / "ontology" / "release.yaml").read_text(encoding="utf-8"))["jurisdiction"])
+    tagged = language_tagged()
+    out = Graph()
+    for prefix, namespace in graph.namespaces():
+        out.bind(prefix, namespace)
+    out += graph
+
+    hierarchy = class_hierarchy()
+    for triple in ALIGNMENT:
+        hierarchy.add(triple)
+
+    def lineage(cls):
+        found, queue = set(), [cls]
+        while queue:
+            item = queue.pop()
+            if item not in found:
+                found.add(item)
+                queue += list(hierarchy.objects(item, RDFS.subClassOf))
+        return found
+
+    tagged = {(cls, predicate) for cls in set(graph.objects(None, RDF.type)) for ancestor in lineage(cls)
+              for anc, predicate in tagged if anc == ancestor}
+
+    def text(subject, cls, predicate, value):
+        return Literal(str(value), lang="ko") if (cls, predicate) in tagged else Literal(str(value))
+
+    for subject, cls in graph.subject_objects(RDF.type):
+        if cls in DESCRIBED:
+            for label in graph.objects(subject, SKOS.prefLabel):
+                out.add((subject, DCT.title, text(subject, cls, DCT.title, label)))
+            for definition in graph.objects(subject, SKOS.definition):
+                out.add((subject, DCT.description, text(subject, cls, DCT.description, definition)))
+            for predicate in (SKOS.prefLabel, SKOS.altLabel, SKOS.definition):
+                if (cls, predicate) in tagged:
+                    for value in list(graph.objects(subject, predicate)):
+                        out.remove((subject, predicate, value))
+                        out.add((subject, predicate, Literal(str(value), lang="ko")))
+        if cls == M8G.PublicOrganisation:
+            out.add((subject, DCT.spatial, jurisdiction))
+            out.add((jurisdiction, RDF.type, DCT.Location))
+    view = SchemaView(str(SCHEMA))
+    writer = RdfWriter(view)
+    for name, enum in view.all_enums().items():
+        values = {k: v for k, v in enum.permissible_values.items() if v.meaning}
+        if not values:
+            continue
+        scheme = writer.iri(f"{PREFIX}:" + re.sub(r"(?<!^)(?=[A-Z])", "-", name).lower())
+        out.add((scheme, RDF.type, SKOS.ConceptScheme))
+        out.add((scheme, SKOS.prefLabel, Literal(enum.description, lang="ko")))
+        for key, permissible in values.items():
+            concept = writer.iri(permissible.meaning)
+            out.add((concept, RDF.type, SKOS.Concept))
+            out.add((concept, SKOS.inScheme, scheme))
+            out.add((concept, SKOS.notation, Literal(key)))
+            out.add((concept, SKOS.prefLabel, Literal(permissible.description, lang="ko")))
+    return out
+
+
+def language_tagged():
+    """(class, property) pairs whose values the official shapes require as rdf:langString."""
+    found = set()
+    for path in STANDARD_SHAPES.glob("*.ttl"):
+        shapes = Graph().parse(path)
+        for shape, cls in shapes.subject_objects(SH.targetClass):
+            for prop in shapes.objects(shape, SH.property):
+                if (prop, SH.datatype, RDF.langString) in shapes:
+                    found.add((cls, shapes.value(prop, SH.path)))
+    return found
+
+
+def standard_problems(graph):
+    """Violations of the official CPSV-AP and CCCEV shapes in ontology/shapes, except the deviations the schema documents."""
+    ontology = class_hierarchy()
+    for triple in ALIGNMENT:
+        ontology.add(triple)
+    found = []
+    for path in sorted(STANDARD_SHAPES.glob("*.ttl")):
+        _, report, _ = shacl_validate(graph, shacl_graph=Graph().parse(path), ont_graph=ontology, inference="none")
+        for result in report.subjects(SH.resultSeverity, SH.Violation):
+            focus, predicate = report.value(result, SH.focusNode), report.value(result, SH.resultPath)
+            if any((focus, RDF.type, cls) in graph and predicate == prop for cls, prop in DEVIATIONS):
+                continue
+            found.append(f"{path.name}: {graph.qname(focus) if isinstance(focus, URIRef) else focus} "
+                         f"{graph.qname(predicate) if isinstance(predicate, URIRef) else predicate}: {report.value(result, SH.resultMessage)}")
+    return found
+
+
 def check(root):
     vault = Vault(root)
     data = vault.container()
@@ -351,6 +459,9 @@ def check(root):
         )
         if not conforms:
             problems.append(f"shacl:\n{text}")
+    if not problems:
+        graph = profile(graph)
+        problems += standard_problems(graph)
     return problems, graph
 
 

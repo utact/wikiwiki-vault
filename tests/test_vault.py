@@ -31,3 +31,13 @@ def test_unknown_raw_publisher_is_reported(tmp_path):
     shutil.rmtree(root / "wiki" / "PublicOrganisation")
     problems, _ = vault.check(root)
     assert any("unknown identifier: ministry-of-government-legislation" in p for p in problems)
+
+
+def test_official_shapes_report_a_missing_title():
+    """CPSV-AP requires dct:title on a PublicService; vault.profile derives it from the note name."""
+    problems, graph = vault.check(FIXTURES)
+    assert problems == []
+    service = next(graph.subjects(vault.RDF.type, vault.CPSV.PublicService))
+    assert vault.standard_problems(graph) == []
+    graph.remove((service, vault.DCT.title, None))
+    assert any("dct:title" in p for p in vault.standard_problems(graph))
