@@ -10,6 +10,7 @@ import urllib.parse
 import urllib.request
 from collections import namedtuple
 from datetime import date, datetime, timedelta, timezone
+from fractions import Fraction
 from itertools import accumulate
 from pathlib import Path
 
@@ -211,6 +212,60 @@ def number_text(text, wrapped=False):
     )
 
 
+CITATION = re.compile(
+    r"제\s*\d+\s*(?:조|항|호|장|절|편|관)(?:의\s*\d+)?|별표\s*\d+(?:의\d+)?|부칙\s*\(?\s*제\d+호\)?|별지\s*제\d+호(?:의\d+)?서식"
+    r"|제\d{4}-\d+호|<[^>]*>|\[[^\]]*\]"
+)
+DATE_TOKEN = re.compile(r"(\d{4})\s*(?:-|\.\s*|년\s*)(\d{1,2})\s*(?:-|\.\s*|월\s*)(\d{1,2})(?:\s*일|\.)?")
+FRACTION_TOKEN = re.compile(r"(\d[\d,]*)\s*분의\s*(\d[\d,]*)")
+PERCENT_TOKEN = re.compile(r"(\d[\d,]*(?:\.\d+)?)\s*(?:퍼센트|%)")
+CODE_TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Z]{1,3}\d{2,}(?![A-Za-z0-9])")
+AMOUNT_TOKEN = re.compile(r"\d[\d,]*\s*[억만천백](?:\s*(?:\d[\d,]*)?\s*[억만천백])*(?:\s*\d[\d,]*)?|\d[\d,]*(?:\.\d+)?")
+UNIT = re.compile(r"\s*(원|일|개월|년|세|시간|명|회|배|주)")
+KOREAN_UNITS = {"억": 10 ** 8, "만": 10 ** 4, "천": 1000, "백": 100}
+
+
+def korean_number(text):
+    """Value of a number such as 113,500, 11만3500 or 3천만, as a Fraction."""
+    total, group = Fraction(0), Fraction(0)
+    for digits, unit in re.findall(r"(\d[\d,]*(?:\.\d+)?)?\s*([억만천백]?)", text.replace(" ", "")):
+        if not digits and not unit:
+            continue
+        number = Fraction(digits.replace(",", "")) if digits else Fraction(0)
+        if unit in ("천", "백"):
+            group += (number or 1) * KOREAN_UNITS[unit]
+        elif unit in ("만", "억"):
+            total += (group + number) * KOREAN_UNITS[unit]
+            group = Fraction(0)
+        else:
+            group += number
+    return total + group
+
+
+def number_tokens(text):
+    """Dates, ratios, codes and amounts in a text, as (kind, value, unit) tuples, leaving out citations such as 제45조제5항.
+
+    Ratios join 100분의 60 and 60퍼센트 as one value, and amounts keep their unit, such as 원 or 개월.
+    """
+    text = CITATION.sub(" ", text)
+    found = []
+
+    def take(pattern, make):
+        nonlocal text
+        for match in pattern.finditer(text):
+            found.append(make(match))
+        text = pattern.sub(" ", text)
+
+    take(DATE_TOKEN, lambda m: ("date", f"{int(m[1]):04d}-{int(m[2]):02d}-{int(m[3]):02d}", None))
+    take(FRACTION_TOKEN, lambda m: ("ratio", Fraction(int(m[2].replace(",", "")), int(m[1].replace(",", ""))), None))
+    take(PERCENT_TOKEN, lambda m: ("ratio", Fraction(m[1].replace(",", "")) / 100, None))
+    take(CODE_TOKEN, lambda m: ("code", m.group(0), None))
+    for match in AMOUNT_TOKEN.finditer(text):
+        unit = UNIT.match(text, match.end())
+        found.append(("number", korean_number(match.group(0)), unit.group(1) if unit else None))
+    return found
+
+
 def canonical(text):
     """Comparison text for quotes: cell order without whitespace and box-drawing characters."""
     return re.sub(r"\s+", "", cell_order(text))
@@ -286,6 +341,12 @@ def note_attachments(note, response):
 def extension(data):
     """File extension of an image from its first bytes."""
     return next((suffix for signature, suffix in SIGNATURES.items() if data.startswith(signature)), ".bin")
+
+
+def note_hash(text):
+    """SHA-256 of a wiki note without the lines of status, reviewedBy and lastReviewed."""
+    kept = [line for line in text.split("\n") if not re.match(r"(status|reviewedBy|lastReviewed):", line)]
+    return hashlib.sha256("\n".join(kept).encode("utf-8")).hexdigest()
 
 
 def files_hash(payload, attachments=()):

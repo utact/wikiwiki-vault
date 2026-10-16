@@ -591,12 +591,19 @@ def attachments_of(law, effective):
 
 
 def render_text(text, images):
-    """Statute text for a note: image elements become embeds of the stored image files."""
+    """Statute text for a note: image elements become embeds of the stored image files.
+
+    The table text that an image carries follows in an Obsidian comment, hidden when reading, so that quotes and numbers can be checked against it.
+    """
 
     def embed(match):
         source = re.search(r'src="([^"]+)"|id="(\d+)"', match.group(0))
         link_ = source.group(1) or L.FILE_URL.format(source.group(2))
-        return f" ![[{images[link_]}]] " if link_ in images else match.group(0)
+        if link_ not in images:
+            return match.group(0)
+        inner = L.IMAGE_TAG.sub("", match.group(0))
+        comment = f" %%<img>{inner}</img>%%" if L.canonical(inner) else ""
+        return f" ![[{images[link_]}]]{comment} "
 
     return IMAGE_ELEMENT.sub(embed, text)
 
@@ -777,10 +784,7 @@ def note_path(unit):
     return WIKI / folder / f"{unit.name}.md"
 
 
-def note_hash(text):
-    """SHA-256 of a note without status, reviewedBy and lastReviewed."""
-    kept = [line for line in text.split("\n") if not re.match(r"(status|reviewedBy|lastReviewed):", line)]
-    return hashlib.sha256("\n".join(kept).encode("utf-8")).hexdigest()
+note_hash = L.note_hash
 
 
 def block_hashes(unit, versions):
