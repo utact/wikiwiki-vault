@@ -170,3 +170,92 @@ def test_block_hash_covers_its_children():
     lines = [t for s, t, _ in S.unit_lines(unit, EFFECTIVE) if s and s.startswith("p1")]
     assert hashes["v20260101-p1"] == L.sha256(L.version_text("\n".join(lines)))
     assert hashes["v20260101-p1-i1"] != hashes["v20260101-p1"]
+
+
+def history_law(name, history, rows, current, notes=()):
+    """A law with several stored versions: history maps 시행일자 to (articles, addenda), rows are the promulgations."""
+    law = object.__new__(S.Law)
+    law.name = name
+    law.versions = {d: {"기본정보": {"시행일자": d, "법종구분": {"법종구분코드": "A0002"}}, "조문": {"조문단위": list(arts)},
+                        "부칙": {"부칙단위": [{"부칙공포일자": p, "부칙공포번호": n, "부칙내용": list(lines)} for p, n, lines in addenda]}}
+                    for d, (arts, addenda) in history.items()}
+    law.rows = [{"법령ID": "000002", "법령명한글": name, **row} for row in rows]
+    law.chosen = L.choose_versions(law.rows)
+    law.current, law.law_id, law.kind_code = current, "000002", "A0002"
+    law.scheduled = [d for d in law.chosen if d > current]
+    law.notes = {d: L.VAULT / "raw" / f"{name} {d}-{law.chosen[d]['법령일련번호']} 20261016T0000.md" for d in notes}
+    law.published = {}
+    for row in law.rows:
+        law.published.setdefault(row["시행일자"], {})[row["공포일자"]] = row
+    law.aliases, law._units, law._texts, law._rows = {}, {}, {}, {}
+    return law
+
+
+def promulgation(effective, published, number, kind="일부개정", serial=None):
+    return {"시행일자": effective, "공포일자": published, "공포번호": number, "법령일련번호": serial or number, "제개정구분명": kind}
+
+
+def test_a_cited_earlier_version_ends_at_the_next_change():
+    texts = {"20200101": "가 <개정 2019.12.1>", "20210101": "나 <개정 2020.12.1>", "20260101": "다 <개정 2025.12.1>"}
+    history = {d: ([article(5, "시험", text=t)], []) for d, t in texts.items()}
+    rows = [promulgation(d, f"{int(d[:4]) - 1}1201", str(i)) for i, d in enumerate(texts, 1)]
+    law = history_law("이력법", history, rows, "20260101", notes=["20200101", "20260101"])
+    S.CITED.clear()
+    S.VERSIONS.clear()
+    S.CITED[("이력법", "art-5")] = {"20200101"}
+    versions = S.unit_versions(law, "art-5")
+    assert [(v["first"], v.get("last")) for v in versions] == [("20200101", "20201231"), ("20260101", None)]
+    assert S.CITED.get("review") is None
+
+
+def test_promulgation_needs_the_tag_or_a_single_enactment():
+    article_rows = {"20200101": ([article(5, "시험", text="본문")], [])}
+    two = history_law("이력법", article_rows, [promulgation("20200101", "20191201", "1"), promulgation("20200101", "20191215", "2", "타법개정")], "20200101")
+    review = []
+    assert S.promulgation_of(two, "art-5", {"first": "20200101", "effective": "20200101"}, review) is None
+    assert "not one 제정 or 전부개정" in review[0]
+    one = history_law("이력법", article_rows, [promulgation("20200101", "20191201", "1", "제정")], "20200101")
+    assert S.promulgation_of(one, "art-5", {"first": "20200101", "effective": "20200101"}, [])["공포번호"] == "1"
+    tagged = history_law("이력법", {"20200101": ([article(5, "시험", text="본문 <개정 2019.12.15>")], [])},
+                         [promulgation("20200101", "20191201", "1"), promulgation("20200101", "20191215", "2")], "20200101")
+    assert S.promulgation_of(tagged, "art-5", {"first": "20200101", "effective": "20200101"}, [])["공포번호"] == "2"
+
+
+def test_same_law_is_the_law_named_just_before():
+    statutes = family([article(5, "범위", [("「시험법」 제10조제1항 및 같은 법 제11조제2항에 따른다.", [])]),
+                       article(6, "범위", [("「다른법」 제3조 및 같은 법 제11조에 따른다.", [])])])
+    assert [(r.law, r.key, r.block) for r in refs(statutes, "시험법 시행령", "art-5")] == [("시험법", "art-10", "p1"), ("시험법", "art-11", "p2")]
+    assert refs(statutes, "시험법 시행령", "art-6") == []
+
+
+def test_ranges_of_paragraphs_and_continued_subitems():
+    subitems = {"조문여부": "조문", "조문번호": "20", "조문내용": "제20조(제한) 다음 각 호의 경우는 제외한다.",
+                "항": [{"항번호": "", "호": [{"호번호": "1.", "호내용": "1. 다음 각 목의 경우",
+                                           "목": [{"목번호": f"{m}.", "목내용": f"{m}. 경우"} for m in "가나다"]}]}]}
+    ACT.append(subitems)
+    try:
+        statutes = family([article(5, "범위", [("법 제11조제1항부터 제3항까지의 규정과 법 제20조제1호나목 및 다목에 따른다.", [])])])
+        found = [(r.key, r.block) for r in refs(statutes, "시험법 시행령", "art-5")]
+    finally:
+        ACT.remove(subitems)
+    assert found == [("art-11", "p1"), ("art-11", "p2"), ("art-11", "p3"), ("art-20", "i1-m2"), ("art-20", "i1-m3")]
+
+
+def test_a_noun_after_에_따른_must_be_the_delegated_matter():
+    statutes = family([article(5, "범위", [("법 제10조제1항에 따른 적용 범위는 다음과 같다.", []), ("법 제10조제1항에 따른 기간 동안 신고한다.", [])])])
+    first, second = refs(statutes, "시험법 시행령", "art-5")
+    assert is_delegation(statutes, "시험법 시행령", first) is True
+    assert is_delegation(statutes, "시험법 시행령", second) == "review"
+
+
+def test_same_item_is_the_item_cited_just_before():
+    subitems = {"조문여부": "조문", "조문번호": "20", "조문내용": "제20조(제한) 다음 각 호의 경우는 제외한다.",
+                "항": [{"항번호": "", "호": [{"호번호": "1.", "호내용": "1. 다음 각 목의 경우",
+                                           "목": [{"목번호": f"{m}.", "목내용": f"{m}. 경우"} for m in "가나"]}]}]}
+    ACT.append(subitems)
+    try:
+        statutes = family([article(5, "범위", [("법 제20조제1호나목에 해당하는 사람은 같은 호 가목에 따른다.", [])])])
+        found = [(r.key, r.block) for r in refs(statutes, "시험법 시행령", "art-5")]
+    finally:
+        ACT.remove(subitems)
+    assert found == [("art-20", "i1-m2"), ("art-20", "i1-m1")]

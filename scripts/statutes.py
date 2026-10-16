@@ -2,7 +2,7 @@
 
 Usage:
     uv run python -X utf8 scripts/statutes.py           write the notes and append ledger lines
-    uv run python -X utf8 scripts/statutes.py --check   list notes that differ from a fresh generation
+    uv run python -X utf8 scripts/statutes.py --check   list notes that differ from a fresh generation or the ledger, fetching nothing
     uv run python -X utf8 scripts/statutes.py --versions "고용보험법 시행령 제68조"   list versions in the window with block IDs
 
 The units to generate are those that docs/competency-questions.md cites, their parent units,
@@ -24,6 +24,8 @@ import lawlib as L
 
 WIKI = L.VAULT / "wiki"
 LEDGER = L.VAULT / "ontology" / "verification.jsonl"
+# --check fetches nothing: a version missing from the cache stops it instead.
+OFFLINE = False
 QUESTIONS = L.VAULT / "docs" / "competency-questions.md"
 SOURCES = yaml.safe_load((Path(__file__).parent / "sources.yaml").read_text(encoding="utf-8"))
 CIRCLED = {chr(0x2460 + i): i + 1 for i in range(20)} | {chr(0x3251 + i): i + 21 for i in range(15)}
@@ -32,15 +34,17 @@ KIND_NOTES = {"A0002": "법률", "A0007": "대통령령", "A0097": "고용노동
 SUBDIVISIONS = {"heading-ch": "chapter", "heading-sec": "section", "article": "article", "annex": "annex", "form": "form", "addendum": "addendum"}
 FAMILY = {"법": "", "영": " 시행령", "규칙": " 시행규칙"}
 REFERENCE = re.compile(
-    r"(?:「(?P<quoted>[^」]+)」\s*|(?P<short>법|영|규칙)\s+|(?P<alias>[가-힣]+법)\s+)?"
+    r"(?:「(?P<quoted>[^」]+)」\s*|같은\s*(?P<same_law>법(?:\s*시행령|\s*시행규칙)?|영|규칙)\s+|(?P<short>법|영|규칙)\s+|(?P<alias>[가-힣]+법)\s+)?"
     r"(?:"
     r"같은\s*조\s*제(?P<same_p>\d+)항(?:\s*제(?P<same_i>\d+)호(?:의(?P<same_ib>\d+))?)?"
     r"|같은\s*항\s*제(?P<same_item>\d+)호(?:의(?P<same_item_b>\d+))?"
+    r"|같은\s*호\s*(?P<same_m>[가나다라마바사아자차카타파하])목"
     r"|별표\s*(?P<annex>\d+)(?:의(?P<annex_b>\d+))?"
     r"|별지\s*제(?P<form>\d+)호(?:의(?P<form_b>\d+))?\s*서식"
-    r"|제(?P<art>\d+)조(?:의(?P<art_b>\d+))?(?:\s*제(?P<p>\d+)항)?(?:\s*제(?P<i>\d+)호(?:의(?P<i_b>\d+))?)?(?:\s*(?P<m>[가-하])목)?"
+    r"|제(?P<art>\d+)조(?:의(?P<art_b>\d+))?(?:\s*제(?P<p>\d+)항)?(?:\s*제(?P<i>\d+)호(?:의(?P<i_b>\d+))?)?(?:\s*(?P<m>[가나다라마바사아자차카타파하])목)?"
     r"|제(?P<part_p>\d+)항(?:\s*제(?P<part_i>\d+)호(?:의(?P<part_ib>\d+))?)?"
     r"|제(?P<part_item>\d+)호(?:의(?P<part_item_b>\d+))?"
+    r"|(?P<part_m>[가나다라마바사아자차카타파하])목(?!적|록)"
     r")"
 )
 CONTINUATION = re.compile(r"\s*(?:부터|까지|ㆍ|·|,|및|와|과|또는)?\s*")
@@ -48,13 +52,35 @@ RANGE_START = re.compile(r"\s*부터\s*")
 RANGE_END = re.compile(r"\s*까지")
 ARTICLE_HEAD = re.compile(r"\s*제\d+조(?:의\d+)?\([^)]*\)")
 PART_WORDS = r"\s*(?:본문|단서|전단|후단|각\s*호\s*외의\s*부분)?"
-DELEGATED_TO = {False: re.compile(r"대통령령으로\s*정하"), True: re.compile(r"고용노동부령으로\s*정하")}
+DELEGATED_TO = {False: re.compile(r"대통령령으로\s*정(?:하|한|할|함)"), True: re.compile(r"고용노동부령으로\s*정(?:하|한|할|함)")}
 AMENDS_OTHER = re.compile(r"\s*제\d+조(?:의\d+)?\(다른\s*법(?:률|령)의\s*개정\)")
-DELEGATION = re.compile(PART_WORDS + r"\s*(?:에\s*따라|에\s*따른|에서)")
+DELEGATION = re.compile(PART_WORDS + r"\s*(?P<joint>에\s*따라|에\s*따른|에서)")
 QUOTED_PHRASE = re.compile(PART_WORDS + r'\s*에서\s*"([^"]+)"')
 AMENDED = re.compile(PART_WORDS + r"\s*(?:의)?\s*개정\s*규정")
 PART = re.compile(r"\s*(본문|단서|전단|후단|각\s*호\s*외의\s*부분)")
-Ref = namedtuple("Ref", "law key block part delegation phrase amended")
+Ref = namedtuple("Ref", "law key block part delegation phrase amended follow")
+PARTICLE = re.compile(r"(?:에게|에서|으로|까지|부터|이나|은|는|이|가|을|를|의|에|로|과|와|도|만|나)$")
+
+
+def segments(block):
+    """Levels of a block suffix, keeping branch numbers with their item: p1-i3-2 is p1 and i3-2."""
+    found = []
+    for part in block.split("-"):
+        if part.isdigit() and found:
+            found[-1] += "-" + part
+        else:
+            found.append(part)
+    return found
+
+
+def following_word(text):
+    """The first word after 에 따라, 에 따른 or 에서, without its particle, such as 기준기간 in "기준기간 동안"."""
+    match = re.match(r"\s*([가-힣A-Za-z0-9]+)", text)
+    if not match:
+        return None
+    word = match.group(1)
+    stripped = PARTICLE.sub("", word)
+    return stripped if len(stripped) >= 2 else word
 DEFINED = re.compile(r"「([^」]+)」\s*\(이하\s*\"([^\"]+)\"(?:이)?라\s*한다\)")
 CQ_GROUP = re.compile(r"\(((?:[^()]|\([^()]*\))*)\)")
 CQ_REF = re.compile(
@@ -140,6 +166,8 @@ class Law:
         mst = self.chosen[effective]["법령일련번호"]
         path = L.CACHE / "law" / self.law_id / f"{mst}-{effective}.json"
         if not path.exists():
+            if OFFLINE:
+                sys.exit(f"{self.name}: the cache lacks the version of {effective}; run scripts/statutes.py without --check, which fetches it")
             text, _ = collect.fetch_law(mst, effective)
             L.write_json(path, text)
         self.versions[effective] = json.loads(path.read_text(encoding="utf-8"))["법령"]
@@ -230,9 +258,11 @@ def compute_versions(law, key):
             continue
         found.append({"first": date_, "effective": holder, "text": law.text(date_, key)})
     found.sort(key=lambda v: v["first"])
-    for version, following in zip(found, found[1:]):
-        if version.get("last", "99999999") >= following["first"]:
-            version["last"] = before(following["first"])
+    for version in found:
+        version.pop("last", None)
+        later = next((d for d in law.versions if d > version["first"] and law.text(d, key) != version["text"]), None)
+        if later:
+            version["last"] = before(later)
     return found
 
 
@@ -246,9 +276,13 @@ def promulgation_of(law, key, version, review):
         tag = max(tags) if tags else None
     if tag in rows:
         return rows[tag]
-    if tag is None and (key.startswith("heading-") or version["first"] == min(law.chosen)
-                        or any(r.get("제개정구분명") in ("제정", "전부개정") for r in rows.values())):
-        return law.chosen[version["first"]]
+    only = list(rows.values())
+    if tag is None and len(only) == 1 and only[0].get("제개정구분명") in ("제정", "전부개정"):
+        return only[0]
+    if tag is None:
+        kinds = ", ".join(f"{r['공포일자']} {r.get('제개정구분명', '')}" for r in only)
+        review.append(f"{law.name} {key} v{version['first']}: the unit has no amendment tag, and the promulgations in force from {version['first']} are {kinds or 'none'}, not one 제정 or 전부개정")
+        return None
     review.append(f"{law.name} {key} v{version['first']}: no promulgation in force from {version['first']} has the date of the latest amendment tag {tag}")
     return None
 
@@ -474,6 +508,14 @@ class Statutes:
         if match["quoted"]:
             compact = re.sub(r"\s+", "", match["quoted"])
             target = next((l for name, l in self.laws.items() if re.sub(r"\s+", "", name) == compact), None)
+        elif match["same_law"]:
+            named = state.get("named")
+            if named is None:
+                return None
+            word = re.sub(r"\s+", "", match["same_law"])
+            decree, rule = self.laws.get(named.root + " 시행령"), self.laws.get(named.root + " 시행규칙")
+            target = {"법": named, "영": named if named.name.endswith(" 시행령") else decree,
+                      "규칙": named if named.name.endswith(" 시행규칙") else rule, "법시행령": decree, "법시행규칙": rule}[word]
         elif match["short"]:
             target = self.family(law, match["short"])
         elif match["alias"]:
@@ -490,6 +532,11 @@ class Statutes:
                 return None
             prefix = f"{state['p']}-" if state["p"] else ""
             return state["law"], state["key"], prefix + f"i{match['same_item']}" + (f"-{match['same_item_b']}" if match["same_item_b"] else "")
+        if match["part_m"] or match["same_m"]:
+            item = re.sub(r"-m\d+$", "", state.get("block") or "")
+            if not state["key"] or not (state["continued"] or match["same_m"]) or "i" not in item:
+                return None
+            return state["law"], state["key"], f"{item}-m{LETTERS.index(match['part_m'] or match['same_m']) + 1}"
         if match["part_p"] or match["part_item"]:
             if not state["key"] or not state["continued"]:
                 return None
@@ -510,6 +557,27 @@ class Statutes:
                 block += f"-m{LETTERS.index(match['m']) + 1}"
         return target, L.article_key(match["art"], match["art_b"]), block
 
+    def range_inside(self, target, previous_law, previous, previous_block, key, block):
+        """Units strictly inside a range such as 제56조부터 제58조까지 or 제1항부터 제3항까지, as (key, block) pairs."""
+        if previous_law is not target:
+            return []
+        if key != previous and key.startswith("art-") and previous.startswith("art-") and not block and not previous_block:
+            keys = [k for k in target.rows_of(target.current) if k.startswith("art-")]
+            if previous in keys and key in keys:
+                return [(k, None) for k in keys[keys.index(previous) + 1: keys.index(key)]]
+            return []
+        unit = self.unit(target.name, key) if key == previous and block and previous_block else None
+        if unit is None:
+            return []
+        first, last = segments(previous_block), segments(block)
+        if first[:-1] != last[:-1] or first[-1][0] != last[-1][0]:
+            return []
+        blocks = [s for s, _, _ in unit_lines(unit, target.current) if s]
+        if previous_block not in blocks or block not in blocks:
+            return []
+        inside = blocks[blocks.index(previous_block) + 1: blocks.index(block)]
+        return [(key, s) for s in inside if segments(s)[:-1] == first[:-1] and segments(s)[-1][0] == first[-1][0]]
+
     def delegates(self, law, target):
         """Whether a law can receive a delegation from the target: 시행령 from 법, 시행규칙 from 법 and 시행령."""
         if law.name.endswith(" 시행령"):
@@ -522,8 +590,8 @@ class Statutes:
         """References in the shown versions of a unit, in order of appearance.
 
         Title lines, 조문참고자료 and the heading of each 부칙 article are not references.
-        A 같은 조 or a continued 제3항 belongs to the article cited just before.
-        A range such as 제56조부터 제58조까지 cites every article in it.
+        A 같은 조 or a continued 제3항 belongs to the article cited just before, and 같은 법 to the law named just before.
+        A range such as 제56조부터 제58조까지 or 제1항부터 제3항까지 cites every unit in it.
         """
         found = []
         for effective in [v["effective"] for v in unit_versions(unit.law, unit.key)] or unit.law.needed():
@@ -543,7 +611,7 @@ class Statutes:
                 state = {"law": unit.law, "key": unit.key if unit.kind == "article" else None, "p": None, "end": None, "continued": False}
                 chain = []
                 for match in REFERENCE.finditer(text, head.end() if head else 0):
-                    prefixed = match["quoted"] or match["short"] or match["alias"]
+                    prefixed = match["quoted"] or match["short"] or match["alias"] or match["same_law"]
                     preceding = text[max(0, match.start() - 3): match.start()]
                     if not prefixed and preceding.endswith(("이 ", "부칙 ", "부칙")):
                         state["end"] = match.end()
@@ -554,34 +622,45 @@ class Statutes:
                         chain = []
                     origin = state["law"] if state["continued"] and not prefixed else unit.law
                     previous = state["key"] if state["end"] is not None else None
+                    previous_law, previous_block = state["law"], state.get("block")
                     state["end"] = match.end()
                     resolved = self.resolve(origin, match, state) if origin else None
                     if not resolved:
                         if prefixed or state["continued"]:
                             state["law"] = None
+                        if match["quoted"] or match["short"] or match["alias"]:
+                            state["named"] = None
                         continue
                     target, key, block = resolved
-                    state.update(law=target, key=key if key.startswith("art-") else None, p=(block or "").split("-")[0] if block and block.startswith("p") else None)
+                    if match["quoted"] or match["short"] or match["alias"]:
+                        state["named"] = target
+                    state.update(law=target, key=key if key.startswith("art-") else None, block=block,
+                                 p=(block or "").split("-")[0] if block and block.startswith("p") else None)
                     if (target, key) == (unit.law, unit.key) and unit.kind == "article":
                         continue
-                    if previous and RANGE_START.fullmatch(gap or "") and RANGE_END.match(text, match.end()) and key.startswith("art-") and previous.startswith("art-"):
-                        keys = [k for k in target.rows_of(target.current) if k.startswith("art-")]
-                        if previous in keys and key in keys:
-                            for inner in keys[keys.index(previous) + 1: keys.index(key)]:
-                                chain.append(len(found))
-                                found.append(Ref(target.name, inner, None, None, False, None, None))
+                    if previous and RANGE_START.fullmatch(gap or "") and RANGE_END.match(text, match.end()):
+                        for inner_key, inner_block in self.range_inside(target, previous_law, previous, previous_block, key, block):
+                            chain.append(len(found))
+                            found.append(Ref(target.name, inner_key, inner_block, None, False, None, None, None))
                     rest = text[match.end():]
                     before_match = text[:match.start()]
                     enclosed = before_match.count("(") > before_match.count(")") or before_match.count("[") > before_match.count("]")
-                    delegation = target is not unit.law and self.delegates(unit.law, target) and bool(DELEGATION.match(rest)) and not enclosed
+                    delegation = DELEGATION.match(rest)
+                    delegation = bool(target is not unit.law and self.delegates(unit.law, target) and delegation and not enclosed) and delegation
+                    follow = None
+                    if delegation:
+                        follow = "" if re.sub(r"\s+", "", delegation["joint"]) == "에따라" else following_word(rest[delegation.end():])
                     part = PART.match(rest)
                     phrase = QUOTED_PHRASE.match(rest)
                     amended = unit.key.split("-")[1] if unit.kind == "addendum" and AMENDED.match(rest) else None
                     chain.append(len(found))
-                    found.append(Ref(target.name, key, block, re.sub(r"\s+", " ", part.group(1)) if part else None, delegation, phrase.group(1) if phrase else None, amended))
+                    found.append(Ref(target.name, key, block, re.sub(r"\s+", " ", part.group(1)) if part else None, bool(delegation),
+                                     phrase.group(1) if phrase else None, amended, follow))
                     if delegation or amended:
                         for index in chain:
-                            found[index] = found[index]._replace(delegation=found[index].delegation or delegation, amended=amended or found[index].amended)
+                            ref = found[index]
+                            found[index] = ref._replace(delegation=ref.delegation or bool(delegation),
+                                                        follow=ref.follow if ref.follow is not None else follow, amended=amended or ref.amended)
         return list(dict.fromkeys(found))
 
     def unit(self, name, key):
@@ -677,6 +756,8 @@ class Statutes:
                 else:
                     add(cited)
         for unit in self.existing():
+            if unit not in chosen:
+                self.review.append(f"{unit.name}: kept because its note exists; nothing in scope cites it")
             add(unit)
         return chosen
 
@@ -703,12 +784,13 @@ def part_of(text, part):
 
 
 def delegated(ref, lines, found, law):
-    """Whether a reference is a delegation: the cited block delegates to the citing kind of law, or the text quotes such a phrase of it.
+    """Whether a reference is a delegation, as True, False or "review" when the cited provision delegates but the matter may differ.
 
-    "법 제45조제5항에 따라" counts when the text of 제45조제5항 itself, without its 호, says "대통령령으로 정하는".
-    "법 제45조제4항 후단에 따른" counts only when the 후단 says it.
     "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란" counts when the quoted phrase is in the 본문 of 제61조제2항.
-    A reference to a whole article, such as "법 제15조에 따라", counts when one of its 항 or 호 delegates.
+    "법 제45조제5항에 따라" counts when a sentence of 제45조제5항 says "대통령령으로 정하는".
+    "법 제62조제2항 본문에 따른 추가징수액" counts when such a sentence of the 본문 also has 추가, the start of the word after 에 따른.
+    "법 제40조제2항제1호에 따른 기준기간" does not, when the delegating sentence of that 호 lacks 기준.
+    The cited provision is the text of the block itself, without its 호, or the part named, or every 항 and 호 of a whole article.
     A reference to a block that the cited version does not declare never counts.
     """
     if not ref.delegation or (ref.block and not found):
@@ -720,11 +802,15 @@ def delegated(ref, lines, found, law):
     else:
         own = [t for s, t in lines.items() if s]
     cited = " ".join(part_of(t, ref.part) for t in own)
-    if DELEGATED_TO[law.name.endswith(" 시행규칙")].search(cited):
+    if ref.phrase:
+        return bool(re.search(r"대통령령|고용노동부령", ref.phrase)) and L.canonical(ref.phrase) in L.canonical(cited)
+    pattern = DELEGATED_TO[law.name.endswith(" 시행규칙")]
+    sentences = [s for s in re.split(r"(?<=다\.)\s+", cited) if pattern.search(s)]
+    if not sentences:
+        return False
+    if ref.follow == "" or (ref.follow and (ref.follow == "위임" or any(ref.follow[:2] in s for s in sentences))):
         return True
-    if ref.phrase and re.search(r"대통령령|고용노동부령", ref.phrase):
-        return L.canonical(ref.phrase) in L.canonical(cited)
-    return False
+    return "review"
 
 
 def block_id(version, suffix):
@@ -779,12 +865,19 @@ def render_unit(statutes, unit, chosen):
             version = current.get((ref.law, ref.key))
             if ref.amended:
                 version = next((v for v in unit_versions(target.law, target.key)
-                                if (promulgation_of(target.law, target.key, v, []) or {}).get("공포일자") == ref.amended), version)
+                                if (promulgation_of(target.law, target.key, v, []) or {}).get("공포일자") == ref.amended), None)
+                if version is None and ref.block:
+                    statutes.review.append(f"{unit.name}: the 개정규정 of {target.name} is the version promulgated on {ref.amended}, "
+                                           "which its note does not show; the link names the unit")
             lines = {s: t for s, t, _ in unit_lines(target, version["effective"])} if version else {}
             found = bool(version and ref.block and ref.block in lines)
             text = link(target.name, block_id(version, ref.block) if found else None)
             cites.append(text)
-            if delegated(ref, lines, found, law):
+            delegation = delegated(ref, lines, found, law)
+            if delegation == "review":
+                statutes.review.append(f"{unit.name}: cites {text} before {ref.follow!r}, which the delegating sentence does not name; "
+                                       "no basedOn is written")
+            elif delegation:
                 based.append(text)
     if based:
         meta["basedOn"] = list(dict.fromkeys(based))
@@ -999,6 +1092,8 @@ def review_unit(unit):
             break
     if L.LOST_GLYPH.search(text):
         found.append(f"{unit.name}: \"?\" stands for lost glyphs; check quotes against the PDF of the 서식 or 별표")
+    if unit.kind in ("annex", "form") and IMAGE_ELEMENT.search(text):
+        found.append(f"{unit.name}: an image inside the text of a 별표 or 서식 shows as an embed that its code block does not render")
     if unit.kind == "form" and any(SIDE_BY_SIDE.search(line) and not L.BOX.search(line) for line in text.split("\n")):
         found.append(f"{unit.name}: text stands side by side without frames; quotes across it can fail")
     return list(dict.fromkeys(found))
@@ -1056,15 +1151,22 @@ def main():
     check = sys.argv[1:] == ["--check"]
     if not check and subprocess.run(["git", "status", "--porcelain", "--", "scripts"], cwd=L.VAULT, capture_output=True, text=True).stdout.strip():
         sys.exit("Commit scripts/ first, so that the ledger names the generator that wrote the notes.")
+    global OFFLINE
+    OFFLINE = check
     statutes, notes = generate()
     changed = [path for path, (_, text, _) in notes.items() if not path.exists() or path.read_text(encoding="utf-8") != text]
     for line in statutes.review:
         print("REVIEW", line)
     if check:
+        ledger = latest_ledger()
+        stale = [path for path, (identifier, text, blocks) in notes.items()
+                 if path not in changed and (ledger.get(identifier, {}).get("note") != note_hash(text) or ledger.get(identifier, {}).get("blocks") != blocks)]
         for path in changed:
             print("DIFFERS", path.relative_to(L.VAULT))
-        print(f"{len(notes)} notes, {len(changed)} differ")
-        sys.exit(1 if changed else 0)
+        for path in stale:
+            print("LEDGER", path.relative_to(L.VAULT))
+        print(f"{len(notes)} notes, {len(changed)} differ, {len(stale)} differ from the ledger")
+        sys.exit(1 if changed or stale else 0)
     ledger, head = latest_ledger(), commit()
     entries = []
     for path, (identifier, text, blocks) in notes.items():
