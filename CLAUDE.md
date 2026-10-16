@@ -106,7 +106,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - The LLM never writes or edits statute text.
   - Write one note per law, 장, 절, 조, 별표, 별지 서식 and 부칙.
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
-  - It prints dates that fail the check below as `REVIEW` lines. Record them in `log.md`.
+  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
+  - When an article moves to another number, keep the identifier and the links of its existing note, and give a reused number a new note.
   - `--check` lists the notes that differ from a fresh generation, and changes nothing.
 - List laws that the wiki cites only for a definition, such as 정부조직법 for 고용노동부, under `references` in `scripts/sources.yaml`.
   - Collect their current and scheduled versions only.
@@ -118,6 +119,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
   - When two 부칙 of a law share a 공포번호, add the 공포일자 in parentheses, as in `고용보험법 시행규칙 부칙 제263호 (2019. 9. 30.)` and `고용보험법 시행규칙 부칙 제263호 (2019. 10. 15.)`.
 - Give a unit a new version only when its version text, defined in Text checks, changes.
+  - A change of the amendment tags alone also makes a new version, because the tag records an amendment, as in 32 of 1,537 unit changes up to 2026-10-15.
   - Date the version by the 시행일자 of the earliest law version in the latest unbroken run of versions that have this text of the unit. This is the version's `firstDateEntryInForce`.
   - Check the date against the text: a promulgation of the law version found must have the date of the latest amendment tag of the unit, such as `<개정 2021.1.5>`.
   - List the unit for review when it has none, as with the tag `2021.7.2` of 고용보험법 시행규칙 제87조 in the version of the promulgation dated 2021-07-01.

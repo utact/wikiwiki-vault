@@ -810,6 +810,36 @@ def commit():
     return subprocess.run(["git", "rev-parse", "HEAD"], cwd=L.VAULT, capture_output=True, text=True, check=True).stdout.strip()
 
 
+SIDE_BY_SIDE = re.compile(r"\S {8,}\S")
+
+
+def review_unit(unit):
+    """Things in a unit that a person should look at: moved or reused numbers, images without text, lost glyphs and text side by side in a form."""
+    if unit.kind in ("law", "heading"):
+        return []
+    found = []
+    law = unit.law
+    if unit.kind == "article":
+        dates = sorted({v["first"] for v in unit_versions(law, unit.key)} | set(law.needed()))
+        for effective in dates:
+            kind_row = law.rows_of(effective).get(unit.key)
+            row = kind_row[1] if kind_row else {}
+            for field, meaning in (("조문이동이전", "moved here from"), ("조문이동이후", "moved away to")):
+                code = row.get(field, "")
+                if code and int(code):
+                    found.append(f"{unit.name}: the article {meaning} {L.article_key(code[:4], code[4:])} by the version of {effective}; keep the identifiers of existing notes")
+    text = law.units(law.needed()[-1] if unit.key not in law.units(law.current) else law.current)[unit.key]
+    for element in IMAGE_ELEMENT.findall(text):
+        if not L.canonical(L.IMAGE_TAG.sub("", element)):
+            found.append(f"{unit.name}: an image carries no text, such as a formula; quote it from the stored image file")
+            break
+    if L.LOST_GLYPH.search(text):
+        found.append(f"{unit.name}: \"?\" stands for lost glyphs; check quotes against the PDF of the 서식 or 별표")
+    if unit.kind == "form" and any(SIDE_BY_SIDE.search(line) and not L.BOX.search(line) for line in text.split("\n")):
+        found.append(f"{unit.name}: text stands side by side without frames; quotes across it can fail")
+    return list(dict.fromkeys(found))
+
+
 def generate():
     """Every statute note as path -> (identifier, text, block hashes), and the generator with its review list."""
     as_of, _ = L.release()
@@ -820,6 +850,7 @@ def generate():
         meta, body = render_unit(statutes, unit, chosen)
         versions = unit_versions(unit.law, unit.key) if unit.kind != "law" else []
         notes[note_path(unit)] = (unit.identifier, note_text(meta, body), block_hashes(unit, versions))
+        statutes.review += review_unit(unit)
     for source in SOURCES["admrul"]:
         path, identifier, meta, body, blocks = render_notice(source, as_of)
         notes[path] = (identifier, note_text(meta, body), blocks)
