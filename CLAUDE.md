@@ -109,8 +109,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
   - Keep generating every unit that already has a statute note, so that no note goes stale.
   - Commit `scripts/` first: `statutes.py` writes notes only from a committed generator, so that the ledger names it.
-  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers, cited versions without a raw note, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
-  - `--check` lists the notes that differ from a fresh generation, and changes nothing.
+  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers, cited versions without a raw note, references not counted as delegations, units kept only because their note exists, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
+  - `--check` lists the notes that differ from a fresh generation or from the ledger. It changes and fetches nothing, and stops when the cache lacks a version it needs.
   - `--versions "<unit>"` lists the versions of a unit in the transitional window with their block IDs, for citing an earlier version.
 - Statute notes follow article numbers.
   - `statutes.py` does not yet carry an identifier across a move, or keep the earlier article of a reused number apart.
@@ -130,7 +130,9 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Date the version by the 시행일자 of the earliest law version in the latest unbroken run of versions that have this text of the unit. This is the version's `firstDateEntryInForce`.
   - Check the date against the text: a promulgation of the law version found must have the date of the latest amendment tag of the unit, such as `<개정 2021.1.5>`.
   - Record that promulgation's 공포일자, 공포번호 and MST in the version.
-  - List the unit for review when it has none, as with the tag `2021.7.2` of 고용보험법 시행규칙 제87조 in the version of the promulgation dated 2021-07-01, and leave out the 공포일자 and 공포번호.
+  - A unit without amendment tags, such as a 장 heading, takes the promulgation only when it is the single one in force from that date and is a 제정 or 전부개정.
+  - List the unit for review when no promulgation qualifies, as with the tag `2021.7.2` of 고용보험법 시행규칙 제87조 in the version of the promulgation dated 2021-07-01, and leave out the 공포일자 and 공포번호.
+  - End each version the day before the first later law version whose text of the unit differs, or that lacks the unit. This is its `dateNoLongerInForce`.
   - A 부칙 gets versions like any other unit, because a later act can amend it, as 대통령령 제35100호 deleted 제18조 of 고용보험법 시행령 부칙 제22603호 from 2025-01-01.
 - Put the current, scheduled and cited versions of the unit in the body, each under its own heading, and mark the current one.
   - Never remove a version that a note cites.
@@ -149,17 +151,20 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Keep the table text an image carries after the embed, inside an Obsidian comment (`%%<img>…</img>%%`), so that quotes and numbers can be checked against it.
 - Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".
   - Resolve 법, 영 and 규칙 against the law family, and short names defined in the text, such as 고용산재보험료징수법.
-  - Resolve 같은 조 and 같은 항 against the article and 항 cited just before in the line, or the current article when none is.
+  - Resolve 같은 조, 같은 항 and 같은 호 against the article, 항 and 호 cited just before in the line, or the current article when none is.
+  - Resolve 같은 법, 같은 영 and 같은 규칙 against the law named just before in the line, and drop the reference when that law is out of scope, as 같은 법 제49조 after 「부가가치세법」 제32조.
   - A reference after 부터, 까지, ㆍ, 및, 또는 or a comma belongs to the law of the reference before it, as 제132조 in "「형법」 제129조부터 제132조까지".
-  - A bare 항 or 호 after such a word continues the article before it, as 제3항 in "제11조제2항ㆍ제3항".
-  - A range such as "제56조부터 제58조까지" cites every article in it.
+  - A bare 항, 호 or 목 after such a word continues the article before it, as 제3항 in "제11조제2항ㆍ제3항" and 다목 in "제58조제1호나목 및 다목".
+  - A range such as "제56조부터 제58조까지" or "제1항부터 제3항까지" cites every unit in it.
   - Title lines, 조문참고자료 and the headings of 부칙 articles are not references, because they name the unit itself or its history, as "제44조에서 이동".
   - Read references in 별표 and 별지 서식 with their wrapped lines joined, because a law name can wrap, as "「고용보" and "험법 시행규칙」".
   - Skip the 부칙 articles titled 다른 법률의 개정 or 다른 법령의 개정, because their references belong to another law.
   - Link the 개정규정 that a 부칙 names to the version of the 부칙's promulgation, as 제45조제1항 in 고용보험법 부칙 제21473호 to the version of 2028-01-01.
+  - When the note of the cited unit does not show that version, link the unit and list it for review.
   - Count a reference as a delegation only when it is followed by 에 따라, 에 따른 or 에서, stands outside parentheses, and the cited provision delegates to the citing kind of law.
     - The cited provision is the text of the cited block without its children, the part the reference names, such as 단서 or 후단, or any 항 or 호 of a whole article.
-    - It delegates when it says "대통령령으로 정하는" for a 시행령 or "고용노동부령으로 정하는" for a 시행규칙, or when the reference quotes such a phrase of it, as in "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란".
+    - It delegates when a sentence of it says "대통령령으로 정하는" for a 시행령 or "고용노동부령으로 정하는" for a 시행규칙, in any form such as 정한다, or when the reference quotes such a phrase of it, as in "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란".
+    - After 에 따른 or 에서, the word that follows names the matter, and its first two syllables must appear in that sentence, as 추가 for "법 제62조제2항 본문에 따른 추가징수액". "법 제40조제2항제1호에 따른 기준기간" is not a delegation, because the delegating sentence of that 호 is about a 사유. Such references are listed for review.
     - A reference in parentheses qualifies the provision, as "(법 제63조에 따라 상병급여를 받은 경우의 질병이나 부상은 제외한다)".
   - Link only units that have statute notes, and a block only when the cited version declares it.
 
@@ -232,14 +237,16 @@ decisionTable:
   - Statute text itself uses ASCII double quotes, as in `[이하 "기초일액(基礎日額)"이라 한다]`.
   - Use no other quotation marks in prose, such as ‘ ’ or ASCII double quotes.
   - Keep source text and interpretation in separate sentences.
-- Write numbers in Arabic numerals, as statutes do, so that they can be checked: 2배, not 두 배.
+- Write numbers in Arabic numerals, so that they can be checked: 2배, not 두 배. Keep the words only where the cited block writes them so, as 두 번 이상 in some statutes.
 - Every number, amount and date in a footnoted sentence must appear in a cited block, with the same unit.
   - Numbers inside citations, such as 제45조제5항, 별표 1 and 부칙 제21473호, are exempt.
   - Numbers inside the names of wiki notes, such as 이직 전 1일 소정근로시간, are exempt, because the note they name carries its own sources.
   - Give a calculated number a footnote that links its `Rule` and states the calculation in inline code, such as `113500 * 60 / 100`; the checker evaluates it.
   - The operands of a calculation must appear in a cited block, as a number or as a ratio such as 100분의 60 for `60 / 100`.
-  - Mark a calculation on example inputs with 예시 in its footnote, as in `` [^3]: [[최저기초일액 산정]] 예시 `8 * 10320` ``; its operands are then exempt.
+  - Mark a calculation on example inputs with 예시 in its footnote, as in `` [^3]: [[최저기초일액 산정]] 예시 `8 * 10320` ``. Its operands may then appear in the sentence instead.
+  - Numbers in the labels of wikilinks, as in `[[기초일액|11만3500원]]`, count as part of the sentence.
 - Numbers and dates in `definition`, `unaryTests`, decision table cells and `literalExpression` must appear in the blocks of `source` or `isDerivedFrom`.
+  - A number in a test or cell carries the unit of its concept's `unitCode` or `currency`, such as 일 for `DAY` and 원 for `KRW`, and a part of a duration its own unit, such as 개월 for `M`.
   - 0 and 1 in FEEL are exempt, because they often encode structure, as `duration("P1M")` for 다음 달.
 - Rank sources in this order.
   1. 법률
@@ -254,7 +261,8 @@ decisionTable:
 - Write limits and conditions as FEEL `unaryTests` on a `Constraint` or `Criterion`.
   - Use `validFrom` and `validThrough` only for calendar validity.
   - Model a transitional provision (경과조치) as a `Criterion` on the date it depends on, such as 이직일, and link it with `appliesWhen`.
-  - A note with `appliesWhen` may cite a version that is not in force on the reference date, when the version's period meets the dates of its criteria.
+  - A note with `appliesWhen` may cite a version that is not in force on the reference date, when the version's period meets the dates in which all its criteria hold.
+  - Criteria that test no date leave such a citation unchecked, so lint reports it.
 - Never state unconfirmed content as fact.
   - Leave it as a question in a `> [!question]` callout, each line ending in "?".
 
@@ -290,7 +298,7 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
 - Read numbers in these forms.
   - Digits with or without commas, such as 113,500
   - Korean units, such as 11만3500원 and 3천만원
-  - Fractions and percentages, such as 100분의 60 and 70퍼센트
+  - Fractions and percentages, such as 100분의 60, 1천분의 5 and 70퍼센트
   - Dates, such as 2026-01-01, 2026.1.1. and 2026년 1월 1일
 - Keep the unit after a number, such as 원, 일, 개월, 세 or 달러, so that 113,500원 and 113,500달러 differ.
 - Decide versions and hashes of units on the version text: the comparison text without `<img>` elements and the text inside them.
@@ -319,6 +327,7 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
 - The checks also validate the export against the official shapes of CPSV-AP 3.2.0 and CCCEV 2.1.0 in `ontology/shapes/`, collected with `scripts/collect.py shapes`.
   - `ontology/shapes/README.md` records the SHA-256 of each stored file's bytes.
   - Statute units count as `eli:LegalResource`, because ELI makes subdivisions a kind of it, and as `cccev:ReferenceFramework`. Their versions do not.
+  - The export states these types for each unit, so that the file validates without the alignment.
   - `Participation` without `hasParticipant` is a documented deviation, because party types defined by law are not specific agents. It covers only the missing value.
 
 ## Review
@@ -371,7 +380,7 @@ Query answers a question from the wiki.
 Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint.py`.
 
 - Links
-  - Broken links, and links to blocks or quotations that the target note does not declare
+  - Broken links, and links to blocks, quotations or headings that the target note does not declare
   - Notes outside the graph: no other note links to them, and they link only to statute and raw notes, except generated statute notes
   - `source` values that point to anything other than a raw note, a statute block or a quotation
 - Schema
@@ -385,13 +394,13 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
   - Decision table inputs missing from `requiredInput`, and outputs other than `variable`
   - `UNIQUE` decision tables with overlapping rows, where the tests have literal bounds
 - Sources
-  - Factual sentences without a source
+  - Factual sentences, callout titles stating a fact included, whose footnotes cite no statute block, quotation or raw note
   - Quotes or numbers that do not match the cited block, numbers in other units, and numbers written in Korean numerals
   - Quotes in marks other than “ ”, and lines of question callouts that are not questions
   - Footnote links to statute blocks without the citation label, or with a part that the block lacks
-  - Calculation operands outside the cited blocks, unless the footnote marks an example
-  - Numbers and dates of frontmatter values outside the blocks of `source` and `isDerivedFrom`
-  - Facts that cite a version not in force on the reference date, without `appliesWhen` or outside the dates of its criteria
+  - Calculation operands outside the cited blocks, or outside the sentence too when the footnote marks an example
+  - Numbers and dates of frontmatter values outside the blocks of `source` and `isDerivedFrom`, or in another unit
+  - Facts that cite a version not in force on the reference date, without an `appliesWhen` date condition or outside the dates of its criteria
   - Cited blocks whose hash differs from the one in the verification ledger
   - `verified` or `reviewed` notes without a matching ledger entry, or whose entry lacks a cited block
   - `reviewed` notes without `reviewedBy` and `lastReviewed`
@@ -403,7 +412,7 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
 - Synthetic data
   - Links, embeds and Markdown links from `wiki/` to `synthetic/`
 
-Lint compares each number with the cited blocks, not the claim it makes. A sentence that puts two numbers of a block together wrongly passes, so the verifier agent compares the meaning.
+Lint compares each number with the cited blocks, not the claim it makes. A sentence that puts two numbers of a block together wrongly passes, and so does `duration("P15D")` for "다음 달 15일까지", whose 15일 is in the block. The verifier agent compares the meaning.
 
 ## Log
 
