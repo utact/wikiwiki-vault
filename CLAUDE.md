@@ -134,6 +134,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Articles of a 부칙 and their parts: `^v20260317-a3`, `^v20260317-a3-p1`
   - 별지 서식: only the whole text, `^v20260918-t`, with its parts cited by quotation
 - Show image files in place of the `<img>` elements of statute text, as embeds of the attachments of the raw note.
+  - Keep the table text an image carries after the embed, inside an Obsidian comment (`%%<img>…</img>%%`), so that quotes and numbers can be checked against it.
 - Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".
   - Resolve 법, 영 and 규칙 against the law family, 같은 조 against the current article, and short names defined in the text, such as 고용산재보험료징수법.
   - A reference after 부터, 까지, ㆍ, 및, 또는 or a comma belongs to the law of the reference before it, as 제132조 in "「형법」 제129조부터 제132조까지".
@@ -210,6 +211,8 @@ decisionTable:
   - Keep source text and interpretation in separate sentences.
 - Every number, amount and date in a footnoted sentence must appear in a cited block.
   - Numbers inside citations, such as 제45조제5항, 별표 1 and 부칙 제21473호, are exempt.
+  - Numbers inside the names of wiki notes, such as 이직 전 1일 소정근로시간, are exempt, because the note they name carries its own sources.
+  - Numbers that are the operands of a calculation footnote are exempt, such as a 소정근로시간 of 8 in an example.
   - Give a calculated number a footnote that links its `Rule` and states the calculation in inline code, such as `113500 * 60 / 100`; the checker evaluates it.
 - Rank sources in this order.
   1. 법률
@@ -316,11 +319,11 @@ Query answers a question from the wiki.
 
 ### Lint
 
-Lint checks the wiki for these problems.
+Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint.py`.
 
 - Links
   - Broken links, and links to blocks or quotations that the target note does not declare
-  - Notes that nothing links to, except generated statute notes
+  - Notes outside the graph: no other note links to them, and they link only to statute and raw notes, except generated statute notes
   - `source` values that point to anything other than a raw note, a statute block or a quotation
 - Schema
   - Notes that fail `uv run python -X utf8 scripts/vault.py check`, which validates them against LinkML and SHACL
@@ -441,7 +444,7 @@ An entry for ingesting 고용보험법 looks like this.
 - Checking
   - Check formatting with `npx markdownlint-cli2 "**/*.md"`, configured in `.markdownlint.jsonc` with ignored paths in `.markdownlint-cli2.jsonc`.
   - `wiki/.markdownlint.jsonc` turns off MD041, because vault notes have no `#` heading.
-  - The statute note folders also turn off MD029, MD030 and MD052, which statute text trips with its 호 numbers and bracketed notes.
+  - The statute note folders also turn off MD029, MD030 and MD052, which statute text trips with its 호 numbers and bracketed notes, and MD033 and MD045 for the image text kept in comments.
 
 ### Scripts
 
