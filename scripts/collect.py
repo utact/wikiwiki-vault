@@ -7,6 +7,7 @@ Writes raw notes under raw/, keeps uncited earlier versions in .cache/law/ and
 .cache/admrul/, and writes a report to .cache/collect-<what>.json.
 """
 
+import hashlib
 import html as htmllib
 import json
 import re
@@ -296,7 +297,11 @@ def collect_shapes(generated, report):
     """Official SHACL shapes of the standards the schema follows, stored with their attribution."""
     folder = L.VAULT / "ontology" / "shapes"
     folder.mkdir(parents=True, exist_ok=True)
+    readme = folder / "README.md"
+    previous = readme.read_text(encoding="utf-8") if readme.exists() else ""
+    times = dict(re.findall(r"^\| `([^`]+)` \|.*\| (\d{4}-\d{2}-\d{2} \d{2}:\d{2}) \| `[0-9a-f]+` \|$", previous, re.M))
     lines = ["# 공식 SHACL shape", "", "schema가 따르는 표준의 공식 SHACL shape이다. `scripts/vault.py check`가 RDF를 이 shape으로도 검사한다.", "",
+             "SHA-256은 저장한 파일 바이트의 hash다.", "",
              "| 파일 | 표준 | 원본 | 이용 조건 | 수집 일시 | SHA-256 |", "| --- | --- | --- | --- | --- | --- |"]
     for source in SOURCES.get("shapes", []):
         data = L.get(source["url"])
@@ -304,14 +309,14 @@ def collect_shapes(generated, report):
         written = not path.exists() or path.read_bytes() != data
         if written:
             path.write_bytes(data)
-        digest = L.sha256(path.read_text(encoding="utf-8"))
-        lines.append(f"| `{source['file']}` | {source['name']} | [{source['url'].rsplit('/', 1)[-1]}]({source['url']}) | {source['license']} | {generated[:16].replace('T', ' ')} | `{digest[:12]}` |")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        when = times.get(source["file"]) if not written and source["file"] in times else generated[:16].replace("T", " ")
+        lines.append(f"| `{source['file']}` | {source['name']} | [{source['url'].rsplit('/', 1)[-1]}]({source['url']}) | {source['license']} | {when} | `{digest}` |")
         report["shapes"].append({"file": source["file"], "written": written})
         print(f"{source['file']}: written {written}")
-    readme = folder / "README.md"
-    previous = readme.read_text(encoding="utf-8") if readme.exists() else ""
-    if any(entry["written"] for entry in report["shapes"]) or not previous:
-        readme.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    text = "\n".join(lines) + "\n"
+    if text != previous:
+        readme.write_text(text, encoding="utf-8", newline="\n")
 
 
 def main():
