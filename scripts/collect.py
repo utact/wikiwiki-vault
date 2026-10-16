@@ -1,7 +1,7 @@
 """Collect raw sources listed in scripts/sources.yaml.
 
 Usage:
-    uv run python -X utf8 scripts/collect.py [laws|admrul|work24|shapes|all]
+    uv run python -X utf8 scripts/collect.py [laws|admrul|work24|shapes|cited|all]
 
 Writes raw notes under raw/, keeps uncited earlier versions in .cache/law/ and
 .cache/admrul/, and writes a report to .cache/collect-<what>.json.
@@ -78,6 +78,46 @@ def fetch_law(mst, effective):
     return text, url
 
 
+def write_law_note(name, law_id, effective, mst, stamp, generated):
+    """Write the raw note of one law version with its response and image files, unless the latest retrieval is the same."""
+    folder = L.RAW / "law" / name
+    text, url = fetch_law(mst, effective)
+    files = images(text)
+    basename = f"{name} {effective}-{mst} {stamp}"
+    digest = L.files_hash(L.json_payload(text), [data for data, _ in files])
+    if unchanged(folder, basename, digest):
+        return None
+    L.write_json(folder / f"{basename}.json", text)
+    write_attachments(folder, basename, files)
+    meta = {
+        "identifier": f"raw-law-{law_id}-{effective}-{mst}-{stamp.lower()}",
+        "title": name,
+        "publisher": L.PUBLISHERS["law"],
+        "url": url,
+        "generatedAtTime": generated,
+        "sha256": digest,
+        "license": L.LICENSES["law"],
+    }
+    body = f"{name}의 {effective} 시행 버전 원문 노트다. 원문 응답은 같은 이름의 JSON 파일이고, 응답이 링크하는 이미지는 같은 이름 뒤에 나오는 순서대로 번호를 붙여 둔다."
+    L.write_note(folder / f"{basename}.md", meta, body)
+    return folder / f"{basename}.md"
+
+
+def collect_cited(as_of, stamp, generated, report):
+    """Raw notes of the earlier law versions that wiki notes cite and that no committed raw note holds."""
+    import statutes as S
+
+    statutes = S.Statutes(as_of)
+    for (name, key), dates in sorted((k, v) for k, v in S.CITED.items() if k != "review"):
+        law = statutes.laws[name]
+        for effective in sorted(dates):
+            if effective not in law.chosen or S.raw_holder(law, key, effective):
+                continue
+            note = write_law_note(name, law.law_id, effective, law.chosen[effective]["법령일련번호"], stamp, generated)
+            report["cited"].append({"law": name, "unit": key, "effective": effective, "written": note.name if note else None})
+            print(f"{name} {key}: version of {effective}, written {bool(note)}")
+
+
 def collect_laws(as_of, window_start, stamp, generated, report):
     """Laws in scope with their earlier versions in the window, and reference laws with their current and scheduled versions only."""
     for name in SOURCES["laws"] + SOURCES.get("references", []):
@@ -99,27 +139,9 @@ def collect_laws(as_of, window_start, stamp, generated, report):
         entry = {"law": name, "rows": len(rows), "seen": seen, "totalCnt": total, "current": current,
                  "scheduled": [d for d in chosen if d > current], "written": [], "cached": []}
         for effective in (d for d in chosen if d >= current):
-            mst = chosen[effective]["법령일련번호"]
-            text, url = fetch_law(mst, effective)
-            files = images(text)
-            basename = f"{name} {effective}-{mst} {stamp}"
-            digest = L.files_hash(L.json_payload(text), [data for data, _ in files])
-            if unchanged(folder, basename, digest):
-                continue
-            L.write_json(folder / f"{basename}.json", text)
-            write_attachments(folder, basename, files)
-            meta = {
-                "identifier": f"raw-law-{law_id}-{effective}-{mst}-{stamp.lower()}",
-                "title": name,
-                "publisher": L.PUBLISHERS["law"],
-                "url": url,
-                "generatedAtTime": generated,
-                "sha256": digest,
-                "license": L.LICENSES["law"],
-            }
-            body = f"{name}의 {effective} 시행 버전 원문 노트다. 원문 응답은 같은 이름의 JSON 파일이고, 응답이 링크하는 이미지는 같은 이름 뒤에 나오는 순서대로 번호를 붙여 둔다."
-            L.write_note(folder / f"{basename}.md", meta, body)
-            entry["written"].append(f"{basename}.md")
+            note = write_law_note(name, law_id, effective, chosen[effective]["법령일련번호"], stamp, generated)
+            if note:
+                entry["written"].append(note.name)
         cache = L.CACHE / "law" / law_id
         earlier = [d for d in chosen if L.in_force(chosen, window_start) <= d < current] if name in SOURCES["laws"] else []
         for effective in earlier:
@@ -299,7 +321,7 @@ def main():
     as_of, window_start = L.release()
     stamp_time, stamp = L.now()
     generated = stamp_time.isoformat()
-    report = {"asOf": str(as_of), "windowStart": str(window_start), "stamp": stamp, "laws": [], "admrul": [], "work24": [], "shapes": []}
+    report = {"asOf": str(as_of), "windowStart": str(window_start), "stamp": stamp, "laws": [], "admrul": [], "work24": [], "shapes": [], "cited": []}
     if what in ("laws", "all"):
         collect_laws(as_of, window_start, stamp, generated, report)
     if what in ("admrul", "all"):
@@ -308,6 +330,8 @@ def main():
         collect_work24(stamp, generated, report)
     if what in ("shapes", "all"):
         collect_shapes(generated, report)
+    if what in ("cited", "all"):
+        collect_cited(as_of, stamp, generated, report)
     L.CACHE.mkdir(exist_ok=True)
     (L.CACHE / f"collect-{what}.json").write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
 
