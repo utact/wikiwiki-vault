@@ -20,7 +20,7 @@ def entries(name, window_start):
     folder = L.RAW / "law" / name
     laws = [json.loads(p.read_text(encoding="utf-8"))["법령"] for p in sorted(folder.glob(f"{name} *-* *.json"))]
     listing = json.loads(sorted(folder.glob(f"{name} versions *.json"))[-1].read_text(encoding="utf-8"))
-    rows = [r for p in listing["pages"] for r in L.as_list(p.get("law")) if r.get("법령명한글") == name]
+    rows = [r for p in listing["pages"] for r in L.as_list(p.get("law")) if L.same_name(r.get("법령명한글", ""), name)]
     return L.transitional(laws, rows, window_start)
 
 

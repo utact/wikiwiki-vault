@@ -62,7 +62,7 @@ def version_list(name):
         data = json.loads(text)["LawSearch"]
         pages.append(data)
         found = L.as_list(data.get("law"))
-        rows += [r for r in found if r.get("법령명한글") == name]
+        rows += [r for r in found if L.same_name(r.get("법령명한글", ""), name)]
         if page * 100 >= int(data["totalCnt"]):
             break
         page += 1
@@ -89,7 +89,7 @@ def collect_laws(as_of, window_start, stamp, generated, report):
         old_key = None
         if previous:
             old = json.loads(previous.read_text(encoding="utf-8"))
-            old_rows = [r for p in old["pages"] for r in L.as_list(p.get("law")) if r.get("법령명한글") == name]
+            old_rows = [r for p in old["pages"] for r in L.as_list(p.get("law")) if L.same_name(r.get("법령명한글", ""), name)]
             old_key = sorted((r["법령일련번호"], r["시행일자"], r["공포번호"]) for r in old_rows)
         if rows_key != old_key:
             L.write_json(folder / f"{name} versions {stamp}.json", json.dumps(listing, ensure_ascii=False))

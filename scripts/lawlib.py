@@ -547,6 +547,11 @@ def choose_versions(rows):
     return {d: r for d, (_, r) in sorted(chosen.items())}
 
 
+def same_name(a, b):
+    """Whether two law names are one name, as 고용보험법시행령 and 고용보험법 시행령 in versions before 2005."""
+    return re.sub(r"\s+", "", a) == re.sub(r"\s+", "", b)
+
+
 RAW_NOTE = re.compile(r"^(?P<name>.+) (?P<date>\d{8})-(?P<serial>\d+) (?P<stamp>\d{8}T\d{4})$")
 
 
@@ -563,7 +568,7 @@ def stored_versions(name):
             versions[match["date"]] = json.loads(note.with_suffix(".json").read_text(encoding="utf-8"))["법령"]
             notes[match["date"]] = note
     listing = json.loads(sorted(folder.glob(f"{glob.escape(name)} versions *.json"))[-1].read_text(encoding="utf-8"))
-    rows = [r for p in listing["pages"] for r in as_list(p.get("law")) if r.get("법령명한글") == name]
+    rows = [r for p in listing["pages"] for r in as_list(p.get("law")) if same_name(r.get("법령명한글", ""), name)]
     for path in sorted((CACHE / "law" / rows[0]["법령ID"]).glob("*.json")):
         versions.setdefault(path.stem.split("-")[1], json.loads(path.read_text(encoding="utf-8"))["법령"])
     return dict(sorted(versions.items())), rows, listing, notes
