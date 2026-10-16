@@ -13,7 +13,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 | `CLAUDE.md` | Schema | Operating rules |
 | `ontology/schema.yaml` | Schema | RDF model in LinkML |
 | `ontology/schema.md` | Schema | Document generated from `ontology/schema.yaml` |
-| `ontology/release.yaml` | Schema | Reference date of the wiki |
+| `ontology/release.yaml` | Schema | Reference date, transitional window and jurisdiction of the wiki |
+| `ontology/shapes/` | Schema | Official SHACL shapes of CPSV-AP and CCCEV |
 | `ontology/verification.jsonl` | — | Verification ledger |
 | `synthetic/` | — | Synthetic data |
 | `scripts/` | — | Collection, generation and validation scripts |
@@ -272,6 +273,21 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
   - It lists current units with images that carry no text, such as the formulas of 고용산재보험료징수법 시행령 제18조의2, for review.
 - The hash of a block is the SHA-256 of its version text.
 
+## RDF export
+
+`uv run python -X utf8 scripts/vault.py export OUT.ttl` writes the wiki as RDF after the checks of `vault.py check` pass.
+
+- Each declared block becomes a version-independent `LegalResourceSubdivision`, such as `law-001761-art-45-p5`, with one `LegalExpression` per version, such as `law-001761-art-45-v20210701-p5`.
+  - A link to a whole-text block `^v…-t` points to the version of the note's own unit.
+- The export adds what the standards expect and the notes leave implicit.
+  - `dct:title` and `dct:description` from the note name and `definition`, for the classes that CPSV-AP and CCCEV describe
+  - The language tag `ko` on the names and descriptions that the official shapes require as `rdf:langString`
+  - `dct:spatial` of every public organisation, from `jurisdiction` in `ontology/release.yaml`
+  - The values of the schema's enumerations as SKOS concepts in concept schemes
+- The checks also validate the export against the official shapes of CPSV-AP 3.2.0 and CCCEV 2.1.0 in `ontology/shapes/`, collected with `scripts/collect.py shapes`.
+  - Statute units count as `eli:LegalResource`, because ELI makes subdivisions a kind of it, and as `cccev:ReferenceFramework`.
+  - `Participation` without `hasParticipant` is a documented deviation, because party types defined by law are not specific agents.
+
 ## Review
 
 Notes written by the LLM move through three statuses in order.
@@ -326,7 +342,7 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
   - Notes outside the graph: no other note links to them, and they link only to statute and raw notes, except generated statute notes
   - `source` values that point to anything other than a raw note, a statute block or a quotation
 - Schema
-  - Notes that fail `uv run python -X utf8 scripts/vault.py check`, which validates them against LinkML and SHACL
+  - Notes that fail `uv run python -X utf8 scripts/vault.py check`, which validates them against LinkML, the SHACL shapes of the schema and the official shapes in `ontology/shapes/`
   - `ontology/schema.md` out of date with `ontology/schema.yaml`
   - Duplicate file names, identifiers or aliases
 - Rules
