@@ -1,0 +1,131 @@
+"""Tests for scripts/lint.py: the fixture vault is clean, and each planted defect is reported."""
+
+import shutil
+from pathlib import Path
+
+import pytest
+
+import lint
+
+FIXTURES = Path(__file__).parent / "fixtures" / "vault"
+CAP = "wiki/Constraint/기초일액 상한.md"
+RULE = "wiki/Rule/최저기초일액 산정.md"
+TABLE = "wiki/Rule/소정급여일수 산정.md"
+ARTICLE = "wiki/LegalResourceSubdivision/고용보험법 제45조.md"
+
+
+def run(tmp_path, *edits, schema=False):
+    """Lint a copy of the fixture vault after replacing text in its files, or writing new ones when old is None."""
+    root = tmp_path / "vault"
+    shutil.copytree(FIXTURES, root)
+    for path, old, new in edits:
+        target = root / path
+        if old is None:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(new, encoding="utf-8", newline="\n")
+            continue
+        text = target.read_text(encoding="utf-8")
+        assert old in text, (path, old)
+        target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+    return lint.Linter(root).run(repository=False, schema=schema)
+
+
+def test_fixture_vault_is_clean(tmp_path):
+    assert run(tmp_path, schema=True) == []
+
+
+NOTE = """---
+type: InformationConcept
+identifier: test-concept
+definition: 시험 개념
+typeRef: number
+source:
+- '[[고용보험법 제45조#^v20210701-p1]]'
+status: draft
+---
+
+{body}
+
+[^1]: [[고용보험법 제45조#^v20210701-p1|고용보험법 제45조제1항]]
+"""
+
+DEFECTS = {
+    "broken link": ((CAP, "## 근거", "[[없는 노트]]\n\n## 근거"),),
+    "undeclared block": ((CAP, "[^2]: [[고용보험법 시행령 부칙 제35934호#^v20260101-a1|", "[^2]: [[고용보험법 시행령 부칙 제35934호#^v20260101-a9|"),),
+    "embedded file not found": ((CAP, "## 근거", "![[없는 그림.gif]]\n\n## 근거"),),
+    "outside the graph": (("wiki/InformationConcept/시험 개념.md", None, NOTE.format(body="시험 개념은 구직급여의 산정 기초가 되는 임금일액이다.[^1]")),),
+    "source is not a raw note": ((CAP, "source:\n", "source:\n- '[[기초일액]]'\n"),),
+    "footnote source missing from source": ((CAP, "source:\n- '[[고용보험법 시행령 제68조#^v20260101-p1]]'\n", "source:\n"),),
+    "source no footnote cites": ((CAP, "source:\n", "source:\n- '[[고용보험법 제45조#^v20210701-p1]]'\n"),),
+    "sentence without a source": ((CAP, "## 근거", "기초일액에는 상한이 있다.\n\n## 근거"),),
+    "quote does not match": ((CAP, "11만3500원을 해당 임금일액으로 한다.”", "11만3500원을 기초일액으로 한다.”"),),
+    "quote without a footnote": ((CAP, "해당 임금일액으로 한다.”[^1]", "해당 임금일액으로 한다.” 이 조항이다.[^1]"),),
+    "number 114500원 is not in the cited blocks": ((CAP, "기초일액은 11만3500원을", "기초일액은 11만4500원을"),),
+    "date 2026-02-01 is not in the cited blocks": ((CAP, "2026-01-01 이후 이직한 사람의 기초일액은", "2026-02-01 이후 이직한 사람의 기초일액은"),),
+    "code A0003 is not in the cited sources": (("wiki/Concept/법률.md", "코드 A0002로 나타내는 법령의 종류다", "코드 A0003으로 나타내는 법령의 종류다"),),
+    "calculation `8 * 10320` gives 82560": ((RULE, "8만2560원", "8만2570원"),),
+    "links no Rule": ((RULE, "[^3]: [[최저기초일액 산정]] `8 * 10320`", "[^3]: [[2026년 적용 최저임금 고시#^v20260101-t|2026년 적용 최저임금 고시]] `8 * 10320`"),),
+    "is not the citation": ((CAP, "|고용보험법 시행령 제68조제1항]]", "|고용보험법 시행령 제68조]]"),),
+    "without appliesWhen": (("wiki/InformationConcept/기초일액.md", "[^1]: [[고용보험법 제45조#^v20210701-p1|", "[^1]: [[고용보험법 제45조#^v20280101-p1|"),
+                            ("wiki/InformationConcept/기초일액.md", "source:\n- '[[고용보험법 제45조#^v20210701-p1]]'", "source:\n- '[[고용보험법 제45조#^v20280101-p1]]'")),
+    "unaryTests does not parse": ((CAP, "unaryTests: <= 113500", "unaryTests: << 113500"),),
+    "but the concept is number": ((CAP, "unaryTests: <= 113500", "unaryTests: <= date(\"2026-01-01\")"),),
+    "uses '상한액', which is not a concept the note links": ((CAP, "unaryTests: <= 113500", "unaryTests: <= 상한액 * 2"),),
+    "literalExpression uses '시간당 임금'": ((RULE, "literalExpression: 이직 전 1일 소정근로시간 * 시간 단위 최저임금액", "literalExpression: 이직 전 1일 소정근로시간 * 시간당 임금"),),
+    "decision table input 피보험기간 is not in requiredInput": ((TABLE, "requiredInput:\n- '[[이직일 현재 연령]]'\n- '[[피보험기간]]'", "requiredInput:\n- '[[이직일 현재 연령]]'"),),
+    "are not the variable": ((TABLE, "  output:\n  - '[[소정급여일수]]'", "  output:\n  - '[[피보험기간]]'"),),
+    "rules 1 and 2 overlap": ((TABLE, "'[1..3)'", "'[0..3)'"),),
+    "statute note differs from its ledger entry": ((ARTICLE, "급여의 기초가 되는 임금일액)의 법령 노트다", "급여의 기초가 되는 임금일액)의 노트다"),),
+    "verified note without a matching ledger entry": ((CAP, "status: draft", "status: verified"),),
+    "reviewed note without reviewedBy": ((CAP, "status: draft", "status: reviewed"),),
+    "duplicate note name": (("synthetic/기초일액.md", None, "---\ntype: InformationConcept\nidentifier: synthetic-base\nsynthetic: true\n---\n"),),
+    "identifier base-daily-wage also in": (("wiki/InformationConcept/시험 개념.md", None, NOTE.format(body="시험 개념은 구직급여의 산정 기초가 되는 임금일액이다.[^1]").replace("test-concept", "base-daily-wage")),),
+    "alias 기초일액 is another note's name": (("wiki/InformationConcept/평균임금.md", "definition:", "aliases:\n- 기초일액\ndefinition:"),),
+    "links synthetic note": (("synthetic/합성 이직자.md", None, "---\ntype: InformationConcept\nidentifier: synthetic-person\nsynthetic: true\n---\n"),
+                             (CAP, "## 근거", "[[합성 이직자]]\n\n## 근거")),
+}
+
+
+@pytest.mark.parametrize("expected", list(DEFECTS))
+def test_planted_defect_is_reported(tmp_path, expected):
+    problems = run(tmp_path, *DEFECTS[expected])
+    assert any(expected in p for p in problems), problems
+
+
+def test_overlapping_statute_versions_are_reported(tmp_path):
+    problems = run(tmp_path, (ARTICLE, "  dateNoLongerInForce: '2027-12-31'", "  dateNoLongerInForce: '2028-06-30'"))
+    assert any("overlap" in p for p in problems)
+    assert all("overlap" in p or "ledger" in p for p in problems), problems
+
+
+def test_stale_scheduled_heading_is_reported(tmp_path):
+    problems = run(tmp_path, (ARTICLE, "## 2028-01-01 시행 (시행예정)", "## 2026-01-01 시행 (시행예정)"))
+    assert any("comes into force on or before the reference date" in p for p in problems)
+
+
+def test_schema_violation_is_reported(tmp_path):
+    problems = run(tmp_path, (CAP, "type: Constraint", "type: Limit"), schema=True)
+    assert any("unknown type" in p for p in problems)
+
+
+def test_changed_cited_block_is_reported(tmp_path):
+    """A verified note records the hashes of its cited blocks; a later change of a block shows against the statute ledger."""
+    import json
+
+    import lawlib as L
+
+    root = tmp_path / "vault"
+    shutil.copytree(FIXTURES, root)
+    note = root / CAP
+    note.write_text(note.read_text(encoding="utf-8").replace("status: draft", "status: verified"), encoding="utf-8", newline="\n")
+    entry = {"identifier": "base-daily-wage-cap", "note": L.note_hash(note.read_text(encoding="utf-8")),
+             "blocks": {"고용보험법 시행령 제68조#^v20260101-p1": "0" * 64}, "verifier": "test"}
+    with (root / "ontology" / "verification.jsonl").open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    problems = lint.Linter(root).run(repository=False, schema=False)
+    assert problems == ["wiki/Constraint/기초일액 상한.md: cited block 고용보험법 시행령 제68조#^v20260101-p1 changed since verification"]
+
+
+def test_versions_with_one_date_are_reported(tmp_path):
+    problems = run(tmp_path, (ARTICLE, "  firstDateEntryInForce: '2028-01-01'", "  firstDateEntryInForce: '2021-07-01'"))
+    assert any("two versions with the same date" in p for p in problems)
