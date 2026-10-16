@@ -26,17 +26,24 @@ import vault as V
 
 STATUTE_TYPES = ("LegalResource", "LegalResourceSubdivision")
 LINK = re.compile(r"(!?)\[\[([^\]|#]+)(?:#\^([a-z0-9-]+))?(?:\|([^\]]*))?\]\]")
+ANY_LINK = re.compile(r"(!?)\[\[([^\]|#]+)(#[^\]|]*)?(?:\|([^\]]*))?\]\]")
 FOOTNOTE_DEF = re.compile(r"^\[\^([^\]]+)\]:\s*(.*)$")
 FOOTNOTE_REF = re.compile(r"\[\^([^\]]+)\]")
 QUOTE = re.compile(r"“([^”]+)”((?:\[\^[^\]]+\])*)")
 OTHER_QUOTE = re.compile(r"‘[^’]*’|\"[^\"]*\"")
 SENTENCE_END = re.compile(r"(?:다\.|[.?!])((?:\[\^[^\]]+\])*)(?=\s|$)")
 DOTTED_DATE = re.compile(r"\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.")
-MARKDOWN_LINK = re.compile(r"(!?)\[[^\]]*\]\(([^)\s]+)\)")
+MARKDOWN_LINK = re.compile(r"(!?)\[([^\]]*)\]\((?:<([^>]*)>|([^)\s]+))[^)]*\)")
 KOREAN_NUMERAL = re.compile(
-    r"(?<![가-힣\d])(?:[일이삼사오육칠팔구십백천만억]{2,}|(?:[한두세네]|다섯|여섯|일곱|여덟|아홉|열|스무|서른|마흔|쉰)\s)"
-    r"(원|개월|년|세|시간|명|회|배|주|번)(?![가-힣])"
+    r"(?<![가-힣\d])(?:"
+    r"[일이삼사오육칠팔구]?[십백천만억][일이삼사오육칠팔구십백천만억]*\s?(?:원|개월|년|세|시간|명|회|배|주|번)"
+    r"|[일이삼사오육칠팔구]\s(?:년|개월|세|시간|명|회|배|번)"
+    r"|(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|스무|서른|마흔|쉰|예순|일흔|여든|아흔)\s?(?:번|회|배|명|달|해|개월|시간|살|가지|차례)"
+    r"|[일이삼사오육칠팔구십백천만]+분의\s?[일이삼사오육칠팔구십백천만]+"
+    r")(?=$|[^가-힣]|[은는이가을를의에과와도만로으까부보간다인씩쯤])"
 )
+UNITS = {"DAY": {"일"}, "WEE": {"주"}, "MON": {"개월", "달"}, "ANN": {"년", "세"}, "HUR": {"시간"}, "KRW": {"원"}}
+DURATION_UNITS = {"D": "DAY", "W": "WEE", "M": "MON", "Y": "ANN", "H": "HUR"}
 CREDENTIALS = {"oc", "servicekey", "authkey", "apikey", "key", "crtfckey", "token"}
 TABLE_DELIMITER = re.compile(r"^\|(?:\s*:?-{3,}:?\s*\|)+$")
 CODE_SPAN = re.compile(r"`([^`]+)`")
@@ -76,6 +83,7 @@ class Note:
         self.type = self.meta.get("type")
         self.statute = self.type in STATUTE_TYPES
         self.blocks = block_texts(self.body)
+        self.headings = {m.group(1).strip() for m in re.finditer(r"^#{1,6}\s+(.+)$", self.body, re.M)}
 
     def versions(self):
         """Versions of a statute note as first date -> (first, last), dates as YYYYMMDD and last None when open."""
@@ -107,16 +115,30 @@ def evaluate(expression):
 
 
 def feel_numbers(text):
-    """Numbers and dates in a FEEL text as (kind, value, ratio pairs), with the a / b pairs that may state a ratio such as 100분의 60."""
+    """Numbers and dates in a FEEL text as (kind, value, ratio pairs, unit code).
+
+    The ratio pairs are the a / b pairs that may state a ratio such as 100분의 60, and the unit code of a duration part is DAY, MON or ANN.
+    """
     text = re.sub(r'"(?:\\.|[^"\\])*"', lambda m: m.group(0) if re.fullmatch(r'"(?:\d{4}-\d{2}-\d{2}|-?P[0-9YMWDTHS]+)"', m.group(0)) else '""', text)
     pairs = [(Fraction(a), Fraction(b)) for a, b in re.findall(r"(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)", text)]
-    found = [("date", d, pairs) for d in re.findall(r'"(\d{4}-\d{2}-\d{2})"', text)]
+    found = [("date", d, pairs, None) for d in re.findall(r'"(\d{4}-\d{2}-\d{2})"', text)]
     text = re.sub(r'"\d{4}-\d{2}-\d{2}"', " ", text)
     for duration in re.findall(r'"-?P([0-9YMWDTHS]+)"', text):
-        found += [("number", Fraction(n), pairs) for n in re.findall(r"\d+", duration)]
+        date_part, _, time_part = duration.partition("T")
+        found += [("number", Fraction(n), pairs, DURATION_UNITS.get(u)) for n, u in re.findall(r"(\d+)([YMWD])", date_part)]
+        found += [("number", Fraction(n), pairs, "HUR" if u == "H" else None) for n, u in re.findall(r"(\d+)([HMS])", time_part)]
     text = re.sub(r'"-?P[0-9YMWDTHS]+"', " ", text)
-    found += [("number", Fraction(n), pairs) for n in re.findall(r"(?<![\w가-힣])(?<!\d\.)\d+(?:\.\d+)?(?![\w가-힣])", text)]
+    found += [("number", Fraction(n), pairs, None) for n in re.findall(r"(?<![\w가-힣])(?<!\d\.)\d+(?:\.\d+)?(?![\w가-힣])", text)]
     return found
+
+
+def intersect(a, b):
+    """The interval two intervals of one type share, or None."""
+    if not feel.meet(a, b):
+        return None
+    low, low_closed = feel.max_bound((a[1], a[2]), (b[1], b[2]))
+    high, high_closed = feel.min_bound((a[3], a[4]), (b[3], b[4]))
+    return (a[0], low, low_closed, high, high_closed)
 
 
 class Linter:
@@ -133,7 +155,7 @@ class Linter:
         self.files = {p.name for folder in ("wiki", "raw") for p in (self.root / folder).rglob("*") if p.is_file()}
         self.terms = sorted((n.stem for n in self.notes.values() if n.folder == "wiki" and not n.statute and re.search(r"\d", n.stem)),
                             key=len, reverse=True)
-        self.as_of = L.release()[0].strftime("%Y%m%d") if (self.root / "ontology" / "release.yaml").exists() else L.release()[0].strftime("%Y%m%d")
+        self.as_of = L.release(self.root)[0].strftime("%Y%m%d")
         ledger = self.root / "ontology" / "verification.jsonl"
         self.ledger = {}
         if ledger.exists():
@@ -169,11 +191,13 @@ class Linter:
                         incoming[target.stem] += 1
                 continue
             if note.folder == "wiki":
-                for _, target_path in MARKDOWN_LINK.findall(note.text):
-                    if "synthetic/" in target_path.replace("%2F", "/").replace("\\", "/"):
+                for _, _, angled, plain in MARKDOWN_LINK.findall(note.text):
+                    target_path = urllib.parse.unquote(angled or plain).replace("\\", "/")
+                    if "synthetic/" in target_path:
                         self.problem(note, f"links synthetic data: {target_path}")
-            for embed, name, block, _ in LINK.findall(note.text):
+            for embed, name, anchor, _ in ANY_LINK.findall(note.text):
                 name = name.strip().split("/")[-1]
+                block = anchor[2:] if anchor.startswith("#^") else None
                 if embed:
                     if name not in self.files and name not in self.notes:
                         self.problem(note, f"embedded file not found: {name}")
@@ -182,10 +206,12 @@ class Linter:
                     continue
                 target = self.notes.get(name)
                 if target is None:
-                    self.problem(note, f"broken link: [[{name}]]")
+                    self.problem(note, f"broken link: [[{name}{anchor}]]")
                     continue
-                if block and block not in target.blocks:
-                    self.problem(note, f"undeclared block: [[{name}#^{block}]]")
+                if block is not None and block not in target.blocks:
+                    self.problem(note, f"undeclared block: [[{name}{anchor}]]")
+                elif anchor and block is None and anchor[1:].strip() not in target.headings:
+                    self.problem(note, f"link to a heading the note lacks: [[{name}{anchor}]]")
                 if target.stem != note.stem:
                     incoming[target.stem] += 1
                     if target.folder == "wiki" and not target.statute:
@@ -199,14 +225,22 @@ class Linter:
     # sources and sentences
 
     def footnotes(self, note):
-        """Footnote definitions as id -> (links, inline code, whether the calculation is an example marked with 예시)."""
-        found = {}
+        """Footnote definitions as id -> (links, inline code, whether the calculation is an example marked with 예시).
+
+        A definition goes on over the indented lines after it, as Markdown footnotes do.
+        """
+        texts, current = {}, None
         for line in note.body.split("\n"):
-            match = FOOTNOTE_DEF.match(line.strip())
+            match = FOOTNOTE_DEF.match(line.strip()) if not line.startswith((" ", "\t")) else None
             if match:
-                text = match.group(2)
-                found[match.group(1)] = (LINK.findall(text), CODE_SPAN.findall(text), "예시" in CODE_SPAN.sub("", LINK.sub("", text)))
-        return found
+                current = match.group(1)
+                texts[current] = match.group(2)
+            elif current and line.startswith(("    ", "\t")) and line.strip():
+                texts[current] += " " + line.strip()
+            elif line.strip():
+                current = None
+        return {key: (LINK.findall(text), CODE_SPAN.findall(text), "예시" in CODE_SPAN.sub("", LINK.sub("", text)))
+                for key, text in texts.items()}
 
     def cited(self, note, links):
         """Texts of the sources that footnote links point to, as (text, table, target, block) tuples."""
@@ -269,7 +303,7 @@ class Linter:
 
         With questions, the lines of question callouts instead. Table header and delimiter rows state nothing.
         """
-        facts, asked, in_code, in_question = [], [], False, False
+        facts, asked, in_code, in_question, in_footnote = [], [], False, False, False
         lines = note.body.split("\n")
         for index, line in enumerate(lines):
             stripped = line.strip()
@@ -278,11 +312,17 @@ class Linter:
                 continue
             if in_code:
                 continue
+            if in_footnote and line.startswith(("    ", "\t")) and stripped:
+                continue
+            in_footnote = bool(FOOTNOTE_DEF.match(line)) or (in_footnote and not stripped)
             if stripped.startswith(">"):
                 inner = stripped.lstrip(">").strip()
-                callout = re.match(r"\[!(\w+)\]", inner)
+                callout = re.match(r"\[!(\w+)\][+-]?\s*(.*)$", inner)
                 if callout:
                     in_question = callout.group(1) == "question"
+                    title = callout.group(2).strip()
+                    if title and re.search(r"(?:다\.|[.?])$|\d", title):
+                        (asked if in_question else facts).append(title)
                     continue
                 if inner:
                     (asked if in_question else facts).append(inner)
@@ -317,11 +357,9 @@ class Linter:
                     return f"\x01{len(kept) - 1}\x01"
 
                 masked = QUOTE.sub(hide, line)
-                masked = DOTTED_DATE.sub(keep, LINK.sub(keep, masked))
+                masked = DOTTED_DATE.sub(keep, MARKDOWN_LINK.sub(keep, ANY_LINK.sub(keep, masked)))
                 for other in OTHER_QUOTE.findall(CODE_SPAN.sub("", masked)):
                     self.problem(note, f"quote statutory text in “ ”, not {other[:1]}…{other[-1:]}: {other[:40]}")
-                for numeral in KOREAN_NUMERAL.finditer(masked):
-                    self.problem(note, f"write numbers in Arabic numerals: {numeral.group(0)}")
                 start = 0
                 pieces = []
                 for match in SENTENCE_END.finditer(masked):
@@ -349,8 +387,8 @@ class Linter:
         ratios = {v for k, v, _ in pool if k == "ratio"}
         dates = {v for k, v, _ in pool if k == "date"}
 
-        def report(where, kind, value):
-            shown = value if kind == "date" else f"{float(value):g}"
+        def report(where, kind, value, unit=""):
+            shown = value if kind == "date" else f"{float(value):g}{unit}"
             self.problem(note, f"{where} has {kind} {shown}, which is not in the blocks of source or isDerivedFrom")
 
         definition = str(note.meta.get("definition") or "")
@@ -363,43 +401,65 @@ class Linter:
                 report("definition", kind, value)
             elif kind == "number" and not (("number", value, unit) in pool if unit else value in numbers):
                 report("definition", kind, value)
+        self.check_numerals(note, definition, [text for text, _, _, _ in sources], "definition")
         expressions = []
         if note.meta.get("unaryTests") is not None:
-            expressions.append(("unaryTests", str(note.meta["unaryTests"])))
+            concept = (note.meta.get("hasConcept") or [None])[0] if note.type == "Criterion" else note.meta.get("constrains")
+            expressions.append(("unaryTests", str(note.meta["unaryTests"]), self.concept_unit(concept)))
         if note.meta.get("literalExpression"):
-            expressions.append(("literalExpression", str(note.meta["literalExpression"])))
-        for number, row in enumerate((note.meta.get("decisionTable") or {}).get("rule") or [], start=1):
-            expressions += [(f"rule {number}", str(cell)) for cell in row]
-        for where, text in expressions:
-            for kind, value, pairs in feel_numbers(text):
+            expressions.append(("literalExpression", str(note.meta["literalExpression"]), None))
+        table = note.meta.get("decisionTable") or {}
+        columns = [self.concept_unit(v) for v in (table.get("input") or []) + (table.get("output") or [])]
+        for number, row in enumerate(table.get("rule") or [], start=1):
+            expressions += [(f"rule {number}", str(cell), unit) for cell, unit in zip(row, columns + [None] * len(row))]
+        for where, text, column_unit in expressions:
+            for kind, value, pairs, unit in feel_numbers(text):
+                units = UNITS.get(unit or column_unit)
                 if kind == "date" and value not in dates:
                     report(where, kind, value)
-                elif kind == "number" and value not in (0, 1) and not (
+                elif kind == "number" and value not in (0, 1) and units and not any(("number", value, u) in pool for u in units):
+                    report(where, kind, value, "/".join(sorted(units)))
+                elif kind == "number" and value not in (0, 1) and not units and not (
                     value in numbers or value in ratios or any(value in (a, b) and b and a / b in ratios for a, b in pairs)
                 ):
                     report(where, kind, value)
 
+    def concept_unit(self, value):
+        """The UN/CEFACT unit code or ISO 4217 currency of a linked concept, such as DAY or KRW."""
+        match = LINK.fullmatch(str(value or "").strip())
+        target = self.notes.get(match.group(2).strip()) if match else None
+        return (target.meta.get("unitCode") or target.meta.get("currency")) if target else None
+
+    def check_numerals(self, note, text, cited, where):
+        """Numbers written in Korean words, such as 두 배, unless a cited block writes them the same way, as 두 번 이상."""
+        pool = "".join(L.canonical(t) for t in cited)
+        for numeral in KOREAN_NUMERAL.finditer(text):
+            if re.sub(r"\s+", "", numeral.group(0)) not in pool:
+                self.problem(note, f"{where}: write numbers in Arabic numerals unless the cited block writes them in words: {numeral.group(0)}")
+
     def applies_periods(self, note):
-        """Date intervals of the criteria a note applies when, None without appliesWhen, or [] when they test no date."""
-        values = note.meta.get("appliesWhen")
-        if not values:
-            return None
-        periods = []
+        """Date intervals in which all the criteria a note applies when can hold, or None when none of them tests a date.
+
+        A note applies when every criterion holds, so the intervals of the criteria intersect.
+        """
+        values = note.meta.get("appliesWhen") or []
+        periods = None
         for value in values if isinstance(values, list) else [values]:
-            match = LINK.fullmatch(value.strip())
+            match = LINK.fullmatch(str(value).strip())
             target = self.notes.get(match.group(2).strip()) if match else None
-            if target is None or target.meta.get("unaryTests") is None:
+            if target is None or target.type != "Criterion" or target.meta.get("unaryTests") is None:
                 continue
             concept = (target.meta.get("hasConcept") or [None])[0]
             if self.concept_type(concept) != "date":
                 continue
             try:
                 negated, tests = feel.unary_tests(str(target.meta["unaryTests"]))
-                if any(kind == "expression" for kind, *_ in tests):
-                    continue
-                periods += [t for t in (feel.complement(tests) if negated else tests) if t[0] in ("date", None)]
             except feel.FeelError:
                 continue
+            if any(kind == "expression" for kind, *_ in tests):
+                continue
+            intervals = [("date", *t[1:]) for t in (feel.complement(tests) if negated else tests)]
+            periods = intervals if periods is None else [i for a in periods for b in intervals if (i := intersect(a, b))]
         return periods
 
     def version_meets(self, target, block, periods):
@@ -413,16 +473,20 @@ class Linter:
         return any(feel.meet(span, period) for period in periods)
 
     def check_sentence(self, note, sentence, quotes, piece, notes, periods):
-        bare = LINK.sub("", FOOTNOTE_REF.sub("", sentence))
+        unlinked = FOOTNOTE_REF.sub("", sentence)
+        skeleton = ANY_LINK.sub(" ", MARKDOWN_LINK.sub(" ", unlinked))
+        bare = ANY_LINK.sub(lambda m: f" {m.group(4)} " if m.group(4) else " ", MARKDOWN_LINK.sub(lambda m: f" {m.group(2)} ", unlinked))
         for name in self.terms:
             bare = bare.replace(name, " ")
-        if not re.search(r"[가-힣A-Za-z0-9]", CODE_SPAN.sub("", bare)):
+            skeleton = skeleton.replace(name, " ")
+        if not re.search(r"[가-힣A-Za-z0-9]", CODE_SPAN.sub("", skeleton)):
             return
         refs = FOOTNOTE_REF.findall(sentence)
         if not refs:
             self.problem(note, f"sentence without a source: {sentence[:60]}")
             return
         sources, values, operands = [], set(), []
+        stated = {v for kind, v, _ in L.number_tokens(bare, notes=False) if kind == "number"}
         for ref in refs:
             if ref not in notes:
                 self.problem(note, f"footnote [^{ref}] has no definition")
@@ -441,21 +505,26 @@ class Linter:
                     continue
                 values.add(result)
                 numbers = [Fraction(n.replace(",", "")) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", code)]
-                if example:
-                    values.update(numbers)
-                else:
-                    ratios = [(Fraction(a.replace(",", "")), Fraction(b.replace(",", "")))
-                              for a, b in re.findall(r"(\d[\d,]*(?:\.\d+)?)\s*/\s*(\d[\d,]*(?:\.\d+)?)", code)]
-                    operands += [(code, n, ratios) for n in numbers]
-                stated = {v for kind, v, _ in L.number_tokens(bare, notes=False) if kind == "number"}
+                ratios = [(Fraction(a.replace(",", "")), Fraction(b.replace(",", "")))
+                          for a, b in re.findall(r"(\d[\d,]*(?:\.\d+)?)\s*/\s*(\d[\d,]*(?:\.\d+)?)", code)]
+                for number in numbers:
+                    if example and number in stated:
+                        values.add(number)
+                    else:
+                        operands.append((code, number, ratios, example))
                 if result not in stated:
                     self.problem(note, f"calculation `{code}` gives {float(result):g}, which the sentence does not state")
+        if not sources and not values:
+            self.problem(note, f"sentence without a source: its footnotes cite no statute block, quotation or raw note: {sentence[:60]}")
+            return
+        self.check_numerals(note, ANY_LINK.sub(" ", MARKDOWN_LINK.sub(" ", re.sub(r"\x00\d+\x00", " ", piece))),
+                            [text for text, _, _, _ in sources], "sentence")
         for _, _, target, block in sources:
             if not (target.statute and block) or self.current(target, block):
                 continue
             if periods is None:
-                self.problem(note, f"cites a version not in force on the reference date without appliesWhen: [[{target.stem}#^{block}]]")
-            elif periods and not self.version_meets(target, block, periods):
+                self.problem(note, f"cites a version not in force on the reference date without an appliesWhen date condition: [[{target.stem}#^{block}]]")
+            elif not self.version_meets(target, block, periods):
                 self.problem(note, f"cites a version outside the dates of its appliesWhen: [[{target.stem}#^{block}]]")
         for index in map(int, re.findall(r"\x00(\d+)\x00", piece)):
             quote = quotes[index]
@@ -473,9 +542,13 @@ class Linter:
             pool += L.number_tokens(L.number_text(text, wrapped=table))
         numbers = {v for k, v, _ in pool if k == "number"}
         ratios = {v for k, v, _ in pool if k == "ratio"}
-        for code, number, pairs in operands:
+        for code, number, pairs, example in operands:
             in_ratio = any(number in (a, b) and b and a / b in ratios for a, b in pairs)
-            if not (number in numbers or number in ratios or number in values or in_ratio):
+            if number in numbers or number in ratios or number in values or in_ratio:
+                continue
+            if example:
+                self.problem(note, f"calculation `{code}` uses {float(number):g}, which is neither in the sentence nor in the cited blocks")
+            else:
                 self.problem(note, f"calculation `{code}` uses {float(number):g}, which is not in the cited blocks; mark an example input with 예시")
         for kind, value, unit in L.number_tokens(bare, notes=False):
             if value in values and kind == "number":

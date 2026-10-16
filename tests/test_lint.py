@@ -13,6 +13,7 @@ RULE = "wiki/Rule/최저기초일액 산정.md"
 TABLE = "wiki/Rule/소정급여일수 산정.md"
 ARTICLE = "wiki/LegalResourceSubdivision/고용보험법 제45조.md"
 BASE_RULE = "wiki/Rule/기초일액 산정.md"
+DEADLINE = "wiki/Constraint/피보험자격 상실 신고 기한.md"
 NOTICE_RAW = "raw/law/2026년 적용 최저임금 고시/2026년 적용 최저임금 고시 20260101-2100000262710 20261015T1337.md"
 
 
@@ -68,7 +69,7 @@ DEFECTS = {
     "calculation `8 * 10320` gives 82560": ((RULE, "8만2560원", "8만2570원"),),
     "links no Rule": ((RULE, "[^3]: [[최저기초일액 산정]] 예시 `8 * 10320`", "[^3]: [[2026년 적용 최저임금 고시#^v20260101-t|2026년 적용 최저임금 고시]] 예시 `8 * 10320`"),),
     "is not the citation": ((CAP, "|고용보험법 시행령 제68조제1항]]", "|고용보험법 시행령 제68조]]"),),
-    "without appliesWhen": (("wiki/InformationConcept/기초일액.md", "[^1]: [[고용보험법 제45조#^v20210701-p1|", "[^1]: [[고용보험법 제45조#^v20280101-p1|"),
+    "without an appliesWhen date condition": (("wiki/InformationConcept/기초일액.md", "[^1]: [[고용보험법 제45조#^v20210701-p1|", "[^1]: [[고용보험법 제45조#^v20280101-p1|"),
                             ("wiki/InformationConcept/기초일액.md", "source:\n- '[[고용보험법 제45조#^v20210701-p1]]'", "source:\n- '[[고용보험법 제45조#^v20280101-p1]]'")),
     "unaryTests does not parse": ((CAP, "unaryTests: <= 113500", "unaryTests: << 113500"),),
     "but the concept is number": ((CAP, "unaryTests: <= 113500", "unaryTests: <= date(\"2026-01-01\")"),),
@@ -108,6 +109,37 @@ DEFECTS = {
     "number 113500원 is not in the cited blocks": ((CAP, "[^1]: [[고용보험법 시행령 제68조#^v20260101-p1|고용보험법 시행령 제68조제1항]]",
                                                    "[^1]: [[고용보험법 시행령 20260918-288717 20261015T1940]]"),),
     "url keeps the credential parameter oc": ((NOTICE_RAW, "ID=2100000262710", "ID=2100000262710&OC=test"),),
+    "cite no statute block, quotation or raw note: 상한은 바뀌었다": ((CAP, "## 근거", "상한은 바뀌었다.[^9]\n\n## 근거"),
+                                                                 (CAP, "[^3]: [[고용보험법 시행령 부칙", "[^9]: 고용보험법 시행령 제68조제3항\n[^3]: [[고용보험법 시행령 부칙")),
+    "cite no statute block, quotation or raw note: 상한은 정해져 있다": ((CAP, "## 근거", "상한은 정해져 있다.[^9]\n\n## 근거"),
+                                                                   (CAP, "[^3]: [[고용보험법 시행령 부칙", "[^9]: [[기초일액 산정]]\n[^3]: [[고용보험법 시행령 부칙")),
+    "sentence without a source: 기초일액 상한은 11만4500원이다": ((CAP, "## 근거", "> [!note] 기초일액 상한은 11만4500원이다.\n\n## 근거"),),
+    "number 114500원 is not in the cited blocks: 2026-01-01 이후 이직한 사람의 기초일액은 [[기초일액|11만4500원]]": (
+        (CAP, "기초일액은 11만3500원을", "기초일액은 [[기초일액|11만4500원]]을"),),
+    "broken link: [[없는 노트#근거]]": ((CAP, "## 근거", "[[없는 노트#근거]]\n\n## 근거"),),
+    "link to a heading the note lacks: [[기초일액#없는 절]]": ((CAP, "## 근거", "[[기초일액#없는 절]]\n\n## 근거"),),
+    "links synthetic note [[합성 이직자]]": (("synthetic/합성 이직자.md", None, "---\ntype: InformationConcept\nidentifier: synthetic-person\nsynthetic: true\n---\n"),
+                                       (CAP, "## 근거", "[[합성 이직자#요약]]\n\n## 근거")),
+    "links synthetic data: ../../synthetic/합성 이직자.md": ((CAP, "## 근거", "[합성](<../../synthetic/합성 이직자.md>)\n\n## 근거"),),
+    "undeclared block: [[고용보험법 시행령 제68조#^V20260101-p1]]": ((CAP, "## 근거", "[[고용보험법 시행령 제68조#^V20260101-p1]]\n\n## 근거"),),
+    "without an appliesWhen date condition: [[고용보험법 제45조#^v20280101-p1]]": (
+        (BASE_RULE, "- '[[2028-01-01 전 이직]]'", "- '[[2026년 시간급 최저임금]]'"),
+        (BASE_RULE, "[^2]: [[고용보험법 제45조#^v20210701-p1|", "[^2]: [[고용보험법 제45조#^v20280101-p1|"),
+        (BASE_RULE, "- '[[고용보험법 제45조#^v20210701-p1]]'", "- '[[고용보험법 제45조#^v20280101-p1]]'")),
+    "outside the dates of its appliesWhen: [[고용보험법 제45조#^v20280101-p1]]": (
+        (BASE_RULE, "- '[[2028-01-01 전 이직]]'", "- '[[2028-01-01 전 이직]]'\n- '[[2026-01-01 이후 이직]]'"),
+        (BASE_RULE, "[^2]: [[고용보험법 제45조#^v20210701-p1|", "[^2]: [[고용보험법 제45조#^v20280101-p1|"),
+        (BASE_RULE, "- '[[고용보험법 제45조#^v20210701-p1]]'", "- '[[고용보험법 제45조#^v20280101-p1]]'")),
+    "uses 10500, which is neither in the sentence nor in the cited blocks": (
+        (RULE, "시간 단위 최저임금액이 10,320원이면 최저기초일액은 8만2560원이다", "최저기초일액은 8만4000원이다"),
+        (RULE, "예시 `8 * 10320`", "예시 `8 * 10500`")),
+    "unaryTests has number 15개월/달": ((DEADLINE, 'duration("P1M")', 'duration("P15M")'),),
+    "write numbers in Arabic numerals unless the cited block writes them in words: 칠십 세": ((CAP, "## 근거", "칠십 세 이상은 다르다.[^1]\n\n## 근거"),),
+    "write numbers in Arabic numerals unless the cited block writes them in words: 두배": ((CAP, "## 근거", "상한은 두배다.[^1]\n\n## 근거"),),
+    "write numbers in Arabic numerals unless the cited block writes them in words: 백분의 육십": ((CAP, "## 근거", "비율은 백분의 육십이다.[^1]\n\n## 근거"),),
+    "write numbers in Arabic numerals unless the cited block writes them in words: 두 달": ((CAP, "## 근거", "신고는 두 달 안에 한다.[^1]\n\n## 근거"),),
+    "write numbers in Arabic numerals unless the cited block writes them in words: 오 년": ((CAP, "## 근거", "보존은 오 년이다.[^1]\n\n## 근거"),),
+    "definition: write numbers in Arabic numerals": ((CAP, "definition: 2026-01-01 이후 이직한 사람의 기초일액 상한", "definition: 2026-01-01 이후 이직한 사람의 기초일액 상한으로 두 번 바뀐 금액"),),
 }
 
 
@@ -171,12 +203,28 @@ def test_versions_with_one_date_are_reported(tmp_path):
 
 
 def test_clean_variants_are_not_reported(tmp_path):
-    """Dotted dates and links inside a sentence, table header rows and item labels of a 별표 stay clean."""
+    """Clean notes in forms that lint once misread stay clean.
+
+    Dotted dates and links inside a sentence, table header rows, item labels of a 별표, footnotes that go on over an
+    indented line, external links with numbers in their URL, words such as 이사회 and callout titles that are labels.
+    """
     table_row = "| 구분 | 금액 |\n| --- | --- |\n| 상한 | 11만3500원[^1] |\n\n## 근거"
     problems = run(
         tmp_path,
         (CAP, "2026-01-01 이후 이직한 사람의 기초일액은", "이직일이 2026. 1. 1. 이후인 사람의 [[기초일액|기초일액(2026. 1. 1. 이후)]]은"),
         (CAP, "## 근거", table_row),
         (TABLE, "|고용보험법 별표 1]]", "|고용보험법 별표 1 제1호]]"),
+        (CAP, "[^1]: [[고용보험법 시행령 제68조#^v20260101-p1|고용보험법 시행령 제68조제1항]]",
+         "[^1]:\n    [[고용보험법 시행령 제68조#^v20260101-p1|고용보험법 시행령 제68조제1항]]"),
+        (CAP, "## 근거", "- [법제처](https://www.law.go.kr/lsInfoP.do?lsiSeq=280525)\n\n## 근거"),
+        (CAP, "## 근거", "> [!warning] 출처 불일치\n> 이사회 결의와 무관하게 상한은 11만3500원이다.[^1]\n\n## 근거"),
     )
     assert problems == []
+
+
+def test_numerals_that_the_block_writes_in_words_pass(tmp_path):
+    linter = lint.Linter(FIXTURES)
+    note = linter.notes["기초일액 상한"]
+    linter.check_numerals(note, "두 번 이상 위반하면 다르다", ["2회 이상 위반하거나 두 번 이상 위반한 경우"], "sentence")
+    linter.check_numerals(note, "세 번 위반하면", ["2회 이상"], "sentence")
+    assert linter.problems == ["wiki/Constraint/기초일액 상한.md: sentence: write numbers in Arabic numerals unless the cited block writes them in words: 세 번"]

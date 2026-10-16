@@ -66,9 +66,10 @@ def secrets():
     return found
 
 
-def release():
-    """The reference date and the first day of the transitional window, from ontology/release.yaml."""
-    data = yaml.safe_load((VAULT / "ontology" / "release.yaml").read_text(encoding="utf-8"))
+def release(root=None):
+    """The reference date and the first day of the transitional window, from ontology/release.yaml of a vault, or of this one."""
+    path = Path(root or VAULT) / "ontology" / "release.yaml"
+    data = yaml.safe_load((path if path.exists() else VAULT / "ontology" / "release.yaml").read_text(encoding="utf-8"))
     as_of = data["asOf"] if isinstance(data["asOf"], date) else date.fromisoformat(str(data["asOf"]))
     return as_of, window_start(as_of, data["transitionalWindow"])
 
@@ -218,7 +219,7 @@ CITATION = re.compile(
 )
 NOTES_IN_TEXT = re.compile(r"<[^>]*>|\[[^\]]*\]")
 DATE_TOKEN = re.compile(r"(\d{4})\s*(?:-|\.\s*|년\s*)(\d{1,2})\s*(?:-|\.\s*|월\s*)(\d{1,2})(?:\s*일|\.)?")
-FRACTION_TOKEN = re.compile(r"(\d[\d,]*)\s*분의\s*(\d[\d,]*)")
+FRACTION_TOKEN = re.compile(r"(\d[\d,]*\s*[천만백]?)\s*분의\s*(\d[\d,]*(?:\.\d+)?)")
 PERCENT_TOKEN = re.compile(r"(\d[\d,]*(?:\.\d+)?)\s*(?:퍼센트|%)")
 CODE_TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Z]{1,3}\d{2,}(?![A-Za-z0-9])")
 AMOUNT_TOKEN = re.compile(r"\d[\d,]*\s*[억만천백](?:\s*(?:\d[\d,]*)?\s*[억만천백])*(?:\s*\d[\d,]*)?|\d[\d,]*(?:\.\d+)?")
@@ -261,7 +262,7 @@ def number_tokens(text, notes=True):
         text = pattern.sub(" ", text)
 
     take(DATE_TOKEN, lambda m: ("date", f"{int(m[1]):04d}-{int(m[2]):02d}-{int(m[3]):02d}", None))
-    take(FRACTION_TOKEN, lambda m: ("ratio", Fraction(int(m[2].replace(",", "")), int(m[1].replace(",", ""))), None))
+    take(FRACTION_TOKEN, lambda m: ("ratio", Fraction(m[2].replace(",", "")) / korean_number(m[1]), None))
     take(PERCENT_TOKEN, lambda m: ("ratio", Fraction(m[1].replace(",", "")) / 100, None))
     take(CODE_TOKEN, lambda m: ("code", m.group(0), None))
     for match in AMOUNT_TOKEN.finditer(text):
