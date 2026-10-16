@@ -367,6 +367,7 @@ def profile(graph):
     """The graph as the standards expect it.
 
     dct:title and dct:description come from the name and the definition, names and definitions carry the language tag ko, public organisations get the jurisdiction in ontology/release.yaml as dct:spatial, and the values of the schema's enumerations become SKOS concepts in concept schemes.
+    Statute units also get the types that the alignment gives them, eli:LegalResource and cccev:ReferenceFramework, so that the export validates without the alignment.
     """
     jurisdiction = URIRef(yaml.safe_load((VAULT / "ontology" / "release.yaml").read_text(encoding="utf-8"))["jurisdiction"])
     tagged = language_tagged()
@@ -408,6 +409,9 @@ def profile(graph):
         if cls == M8G.PublicOrganisation:
             out.add((subject, DCT.spatial, jurisdiction))
             out.add((jurisdiction, RDF.type, DCT.Location))
+        for ancestor in lineage(cls) - {cls}:
+            if any(ancestor == parent for _, _, parent in ALIGNMENT):
+                out.add((subject, RDF.type, ancestor))
     view = SchemaView(str(SCHEMA))
     writer = RdfWriter(view)
     for name, enum in view.all_enums().items():

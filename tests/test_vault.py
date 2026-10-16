@@ -70,3 +70,15 @@ def test_deviation_covers_only_the_missing_participant():
     assert vault.standard_problems(graph) == []
     graph.add((participation, vault.M8G.hasParticipant, vault.Literal("사업주")))
     assert any("hasParticipant" in p for p in vault.standard_problems(graph))
+
+
+def test_export_validates_without_the_alignment():
+    """Statute units carry eli:LegalResource and cccev:ReferenceFramework as types, so the official shapes pass on the file alone."""
+    from pyshacl import validate as shacl_validate
+
+    _, graph = vault.check(FIXTURES)
+    for path in sorted(vault.STANDARD_SHAPES.glob("*.ttl")):
+        conforms, _, text = shacl_validate(graph, shacl_graph=vault.Graph().parse(path), inference="none")
+        problems = [line for line in text.splitlines() if "Focus Node" in line]
+        participations = set(graph.subjects(vault.RDF.type, vault.M8G.Participation))
+        assert all(any(graph.qname(p) in line for p in participations) for line in problems), problems[:3]
