@@ -816,7 +816,7 @@ def render_unit(statutes, unit, chosen):
             entry = {
                 "identifier": f"{unit.identifier}-v{version['first']}",
                 "firstDateEntryInForce": iso(version["first"]),
-                "idLocal": law.chosen[version["first"]]["법령일련번호"],
+                "idLocal": (row or law.chosen[version["first"]])["법령일련번호"],
                 "wasDerivedFrom": link(law.notes[version["effective"]].stem),
             }
             if row:
