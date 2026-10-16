@@ -41,7 +41,7 @@ LINE_END = "│┃┤┨┫┐┓┘┛"
 LINE_START = "│┃├┠┣┌┏└┗"
 LINE_BREAK = re.compile(f"(?<=[{LINE_END}])(?=[{LINE_START}])")
 WIDE = re.compile(r"[^\x00-\x7f]")
-LOST_GLYPH = re.compile(r"(?<=[^\x00-\x7f])\?(?=[^\x00-\x7f])")
+LOST_GLYPH = re.compile(r"(?<![\x20-\x7e])\?(?=[^\x00-\x7f])")
 
 
 def env():

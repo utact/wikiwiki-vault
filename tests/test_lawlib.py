@@ -198,3 +198,14 @@ def test_image_links_in_order_of_first_appearance():
         "http://www.law.go.kr/flDownload.do?flSeq=44188166",
     ]
     assert [L.extension(data) for data in (b"GIF89a", b"BM6", b"\x89PNG\r\n")] == [".gif", ".bmp", ".png"]
+
+
+def test_lost_glyph_counts_wide_at_the_start_of_a_line():
+    assert L.width("?민원") == 6
+    assert L.width("가?나") == 6
+    assert L.width("a?나") == 4
+
+
+def test_same_name_ignores_spaces():
+    assert L.same_name("고용보험법시행령", "고용보험법 시행령")
+    assert not L.same_name("고용보험법", "고용보험법 시행령")
