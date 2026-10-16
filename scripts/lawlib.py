@@ -214,14 +214,15 @@ def number_text(text, wrapped=False):
 
 CITATION = re.compile(
     r"제\s*\d+\s*(?:조|항|호|장|절|편|관)(?:의\s*\d+)?|별표\s*\d+(?:의\d+)?|부칙\s*\(?\s*제\d+호\)?|별지\s*제\d+호(?:의\d+)?서식"
-    r"|제\d{4}-\d+호|<[^>]*>|\[[^\]]*\]"
+    r"|제\d{4}-\d+호"
 )
+NOTES_IN_TEXT = re.compile(r"<[^>]*>|\[[^\]]*\]")
 DATE_TOKEN = re.compile(r"(\d{4})\s*(?:-|\.\s*|년\s*)(\d{1,2})\s*(?:-|\.\s*|월\s*)(\d{1,2})(?:\s*일|\.)?")
 FRACTION_TOKEN = re.compile(r"(\d[\d,]*)\s*분의\s*(\d[\d,]*)")
 PERCENT_TOKEN = re.compile(r"(\d[\d,]*(?:\.\d+)?)\s*(?:퍼센트|%)")
 CODE_TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Z]{1,3}\d{2,}(?![A-Za-z0-9])")
 AMOUNT_TOKEN = re.compile(r"\d[\d,]*\s*[억만천백](?:\s*(?:\d[\d,]*)?\s*[억만천백])*(?:\s*\d[\d,]*)?|\d[\d,]*(?:\.\d+)?")
-UNIT = re.compile(r"\s*(원|일|개월|년|세|시간|명|회|배|주)")
+UNIT = re.compile(r"\s*(원|일|개월|년|세|시간|명|회|배|주|달러|유로|엔|위안|분(?!의)|초(?!과)|개(?!월)|건|곳|쪽|점)")
 KOREAN_UNITS = {"억": 10 ** 8, "만": 10 ** 4, "천": 1000, "백": 100}
 
 
@@ -242,12 +243,15 @@ def korean_number(text):
     return total + group
 
 
-def number_tokens(text):
+def number_tokens(text, notes=True):
     """Dates, ratios, codes and amounts in a text, as (kind, value, unit) tuples, leaving out citations such as 제45조제5항.
 
     Ratios join 100분의 60 and 60퍼센트 as one value, and amounts keep their unit, such as 원 or 개월.
+    With notes, it also leaves out the bracketed notes of statute text, such as <개정 2019.1.15> and [본조신설 2020.6.9].
     """
     text = CITATION.sub(" ", text)
+    if notes:
+        text = NOTES_IN_TEXT.sub(" ", text)
     found = []
 
     def take(pattern, make):

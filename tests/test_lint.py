@@ -12,6 +12,8 @@ CAP = "wiki/Constraint/기초일액 상한.md"
 RULE = "wiki/Rule/최저기초일액 산정.md"
 TABLE = "wiki/Rule/소정급여일수 산정.md"
 ARTICLE = "wiki/LegalResourceSubdivision/고용보험법 제45조.md"
+BASE_RULE = "wiki/Rule/기초일액 산정.md"
+NOTICE_RAW = "raw/law/2026년 적용 최저임금 고시/2026년 적용 최저임금 고시 20260101-2100000262710 20261015T1337.md"
 
 
 def run(tmp_path, *edits, schema=False):
@@ -64,7 +66,7 @@ DEFECTS = {
     "date 2026-02-01 is not in the cited blocks": ((CAP, "2026-01-01 이후 이직한 사람의 기초일액은", "2026-02-01 이후 이직한 사람의 기초일액은"),),
     "code A0003 is not in the cited sources": (("wiki/Concept/법률.md", "코드 A0002로 나타내는 법령의 종류다", "코드 A0003으로 나타내는 법령의 종류다"),),
     "calculation `8 * 10320` gives 82560": ((RULE, "8만2560원", "8만2570원"),),
-    "links no Rule": ((RULE, "[^3]: [[최저기초일액 산정]] `8 * 10320`", "[^3]: [[2026년 적용 최저임금 고시#^v20260101-t|2026년 적용 최저임금 고시]] `8 * 10320`"),),
+    "links no Rule": ((RULE, "[^3]: [[최저기초일액 산정]] 예시 `8 * 10320`", "[^3]: [[2026년 적용 최저임금 고시#^v20260101-t|2026년 적용 최저임금 고시]] 예시 `8 * 10320`"),),
     "is not the citation": ((CAP, "|고용보험법 시행령 제68조제1항]]", "|고용보험법 시행령 제68조]]"),),
     "without appliesWhen": (("wiki/InformationConcept/기초일액.md", "[^1]: [[고용보험법 제45조#^v20210701-p1|", "[^1]: [[고용보험법 제45조#^v20280101-p1|"),
                             ("wiki/InformationConcept/기초일액.md", "source:\n- '[[고용보험법 제45조#^v20210701-p1]]'", "source:\n- '[[고용보험법 제45조#^v20280101-p1]]'")),
@@ -83,6 +85,29 @@ DEFECTS = {
     "alias 기초일액 is another note's name": (("wiki/InformationConcept/평균임금.md", "definition:", "aliases:\n- 기초일액\ndefinition:"),),
     "links synthetic note": (("synthetic/합성 이직자.md", None, "---\ntype: InformationConcept\nidentifier: synthetic-person\nsynthetic: true\n---\n"),
                              (CAP, "## 근거", "[[합성 이직자]]\n\n## 근거")),
+    "embeds synthetic note": (("synthetic/합성 이직자.md", None, "---\ntype: InformationConcept\nidentifier: synthetic-person\nsynthetic: true\n---\n"),
+                              (CAP, "## 근거", "![[합성 이직자]]\n\n## 근거")),
+    "links synthetic data": ((CAP, "## 근거", "[합성 데이터](../../synthetic/person.md)\n\n## 근거"),),
+    "has no citation label": ((CAP, "[^1]: [[고용보험법 시행령 제68조#^v20260101-p1|고용보험법 시행령 제68조제1항]]", "[^1]: [[고용보험법 시행령 제68조#^v20260101-p1]]"),),
+    "names the 단서, but the block has no 단서": ((CAP, "|고용보험법 시행령 제68조제1항]]", "|고용보험법 시행령 제68조제1항 단서]]"),),
+    "quote statutory text in “ ”": ((CAP, "## 근거", "기초일액은 ‘해당 임금일액’이다.[^1]\n\n## 근거"),),
+    "number 114500원 is not in the cited blocks: 2026-01-01 이후 이직한 사람의 기초일액은 [11만4500원]": ((CAP, "기초일액은 11만3500원을", "기초일액은 [11만4500원]을"),),
+    "number 113500달러 is not in the cited blocks": ((CAP, "기초일액은 11만3500원을", "기초일액은 11만3500달러를"),),
+    "write numbers in Arabic numerals": ((CAP, "## 근거", "상한은 두 번 바뀌었다.[^1]\n\n## 근거"),),
+    "question callout line is not a question": ((CAP, "## 근거", "> [!question] 확인\n> 상한은 11만4500원이다.\n\n## 근거"),),
+    "outside the dates of its appliesWhen": ((BASE_RULE, "[^2]: [[고용보험법 제45조#^v20210701-p1|", "[^2]: [[고용보험법 제45조#^v20280101-p1|"),
+                                             (BASE_RULE, "- '[[고용보험법 제45조#^v20210701-p1]]'", "- '[[고용보험법 제45조#^v20280101-p1]]'")),
+    "literalExpression does not parse": ((RULE, "literalExpression: 이직 전 1일 소정근로시간 * 시간 단위 최저임금액", "literalExpression: 이직 전 1일 소정근로시간 *"),),
+    "is boolean, but the concept is number": ((RULE, "literalExpression: 이직 전 1일 소정근로시간 * 시간 단위 최저임금액", "literalExpression: 이직 전 1일 소정근로시간 > 시간 단위 최저임금액"),),
+    "literalExpression has number 1.5": ((RULE, "literalExpression: 이직 전 1일 소정근로시간 * 시간 단위 최저임금액", "literalExpression: 이직 전 1일 소정근로시간 * 시간 단위 최저임금액 * 1.5"),),
+    "unaryTests has number 114500": ((CAP, "unaryTests: <= 113500", "unaryTests: <= 114500"),),
+    "definition has date 2026-02-01": ((CAP, "definition: 2026-01-01 이후", "definition: 2026-02-01 이후"),),
+    "rule 2 has number 13": ((TABLE, "'[1..3)'", "'[1..13)'"),),
+    "uses 9, which is not in the cited blocks": ((RULE, "소정근로시간이 8시간이고", "소정근로시간이 9시간이고"),
+                                                 (RULE, "8만2560원", "9만2880원"), (RULE, "예시 `8 * 10320`", "`9 * 10320`")),
+    "number 113500원 is not in the cited blocks": ((CAP, "[^1]: [[고용보험법 시행령 제68조#^v20260101-p1|고용보험법 시행령 제68조제1항]]",
+                                                   "[^1]: [[고용보험법 시행령 20260918-288717 20261015T1940]]"),),
+    "url keeps the credential parameter oc": ((NOTICE_RAW, "ID=2100000262710", "ID=2100000262710&OC=test"),),
 }
 
 
@@ -117,15 +142,41 @@ def test_changed_cited_block_is_reported(tmp_path):
     root = tmp_path / "vault"
     shutil.copytree(FIXTURES, root)
     note = root / CAP
-    note.write_text(note.read_text(encoding="utf-8").replace("status: draft", "status: verified"), encoding="utf-8", newline="\n")
-    entry = {"identifier": "base-daily-wage-cap", "note": L.note_hash(note.read_text(encoding="utf-8")),
-             "blocks": {"고용보험법 시행령 제68조#^v20260101-p1": "0" * 64}, "verifier": "test"}
-    with (root / "ontology" / "verification.jsonl").open("a", encoding="utf-8", newline="\n") as handle:
+    text = note.read_text(encoding="utf-8").replace("status: draft", "status: verified")
+    note.write_text(text, encoding="utf-8", newline="\n")
+    linter = lint.Linter(root)
+    cited = {f"{n.strip()}#^{b}" for _, n, b, _ in lint.LINK.findall(text) if b and linter.notes[n.strip()].statute}
+    hashes = {}
+    for statute in linter.wiki():
+        if statute.statute:
+            hashes.update({f"{statute.stem}#^{b}": d for b, d in linter.ledger[statute.meta["identifier"]]["blocks"].items()})
+    blocks = {key: hashes[key] for key in cited}
+    blocks["고용보험법 시행령 제68조#^v20260101-p1"] = "0" * 64
+    entry = {"identifier": "base-daily-wage-cap", "note": L.note_hash(text), "blocks": blocks, "verifier": "test"}
+    ledger = root / "ontology" / "verification.jsonl"
+    with ledger.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
     problems = lint.Linter(root).run(repository=False, schema=False)
     assert problems == ["wiki/Constraint/기초일액 상한.md: cited block 고용보험법 시행령 제68조#^v20260101-p1 changed since verification"]
+    del blocks["고용보험법 시행령 부칙 제35934호#^v20260101-a1"]
+    with ledger.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    problems = lint.Linter(root).run(repository=False, schema=False)
+    assert "wiki/Constraint/기초일액 상한.md: ledger entry lacks the cited block 고용보험법 시행령 부칙 제35934호#^v20260101-a1" in problems
 
 
 def test_versions_with_one_date_are_reported(tmp_path):
     problems = run(tmp_path, (ARTICLE, "  firstDateEntryInForce: '2028-01-01'", "  firstDateEntryInForce: '2021-07-01'"))
     assert any("two versions with the same date" in p for p in problems)
+
+
+def test_clean_variants_are_not_reported(tmp_path):
+    """Dotted dates and links inside a sentence, table header rows and item labels of a 별표 stay clean."""
+    table_row = "| 구분 | 금액 |\n| --- | --- |\n| 상한 | 11만3500원[^1] |\n\n## 근거"
+    problems = run(
+        tmp_path,
+        (CAP, "2026-01-01 이후 이직한 사람의 기초일액은", "이직일이 2026. 1. 1. 이후인 사람의 [[기초일액|기초일액(2026. 1. 1. 이후)]]은"),
+        (CAP, "## 근거", table_row),
+        (TABLE, "|고용보험법 별표 1]]", "|고용보험법 별표 1 제1호]]"),
+    )
+    assert problems == []
