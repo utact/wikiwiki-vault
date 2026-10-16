@@ -22,6 +22,10 @@ VAULT = Path(__file__).resolve().parents[1]
 SCHEMA = VAULT / "ontology" / "schema.yaml"
 PREFIX = "employment"
 NOTE_SLOTS = ("source", "status", "reviewedBy", "lastReviewed")
+# Links to legal resources, whose ranges in ELI, CPSV-AP and CCCEV are works, never versions.
+WORK_SLOTS = ("cites", "basedOn", "isDerivedFrom", "implements", "hasLegalResource")
+# Properties of the act that gave a unit its text, which a block of the unit does not have.
+ACT_PROPERTIES = ("identifier", "realizes", "datePublication", "idLocal", "number")
 WIKILINK = re.compile(r"^\[\[([^\]|#]+)(?:#\^([a-z0-9-]+))?(?:\|[^\]]*)?\]\]$")
 IDENTIFIER = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
@@ -91,8 +95,12 @@ class Vault:
     def curie(self, identifier):
         return f"{PREFIX}:{identifier}"
 
-    def resolve(self, value, where, curie=False):
-        """Return the identifier a wikilink points to, as a CURIE for uriorcurie slots."""
+    def resolve(self, value, where, curie=False, work=False):
+        """Return the identifier a wikilink points to, as a CURIE for uriorcurie slots.
+
+        A link to a statute block names a version of the block, such as law-001761-art-45-v20210701-p5.
+        With work, it names the block itself, such as law-001761-art-45-p5, and a whole-text block names the unit.
+        """
         wrap = self.curie if curie else (lambda identifier: identifier)
         if where.startswith("raw/") and isinstance(value, str) and IDENTIFIER.match(value):
             if value in self.ids.values():
@@ -113,7 +121,11 @@ class Vault:
             if block not in self.blocks.get(stem, []):
                 self.errors.append(f"{where}: undeclared block: {value}")
                 return None
-            identifier = f"{identifier}-{block.removesuffix('-t')}"
+            versioned = re.fullmatch(r"v\d{8}-([a-z0-9-]+)", block)
+            if work and versioned:
+                identifier += "" if versioned.group(1) == "t" else f"-{versioned.group(1)}"
+            else:
+                identifier = f"{identifier}-{block.removesuffix('-t')}"
         return wrap(identifier)
 
     def is_link_slot(self, slot):
@@ -144,7 +156,7 @@ class Vault:
                 ]
             elif self.is_link_slot(slot):
                 values = value if isinstance(value, list) else [value]
-                resolved = [self.resolve(v, where, curie=slot.range == "uriorcurie") for v in values]
+                resolved = [self.resolve(v, where, curie=slot.range == "uriorcurie", work=key in WORK_SLOTS) for v in values]
                 out[key] = resolved if slot.multivalued else resolved[0]
             elif slot.range in self.view.all_classes():
                 rng = slot.range
@@ -207,7 +219,7 @@ class Vault:
                 "typeSubdivision": BLOCK_TYPES[kind],
                 "isRealizedBy": [],
             })
-            expression = {k: v for k, v in version.items() if k not in ("identifier", "realizes")}
+            expression = {k: v for k, v in version.items() if k not in ACT_PROPERTIES}
             work["isRealizedBy"].append({"identifier": f"{thing['identifier']}-{block}", "realizes": identifier, **expression})
         return list(works.values())
 
@@ -345,11 +357,10 @@ STANDARD_SHAPES = VAULT / "ontology" / "shapes"
 ALIGNMENT = [
     (ELI.LegalResourceSubdivision, RDFS.subClassOf, ELI.LegalResource),
     (ELI.LegalResource, RDFS.subClassOf, M8G.ReferenceFramework),
-    (ELI.LegalExpression, RDFS.subClassOf, M8G.ReferenceFramework),
 ]
 DESCRIBED = {CPSV.PublicService, CPSV.Rule, M8G.Criterion, M8G.Constraint, M8G.Participation, M8G.PublicOrganisation,
              M8G.Channel, M8G.Output, M8G.LifeEvent, M8G.BusinessEvent, M8G.EvidenceType, M8G.InformationConcept}
-DEVIATIONS = {(M8G.Participation, M8G.hasParticipant)}
+DEVIATIONS = {(M8G.Participation, M8G.hasParticipant, SH.MinCountConstraintComponent)}
 
 
 def profile(graph):
@@ -437,7 +448,8 @@ def standard_problems(graph):
         _, report, _ = shacl_validate(graph, shacl_graph=Graph().parse(path), ont_graph=ontology, inference="none")
         for result in report.subjects(SH.resultSeverity, SH.Violation):
             focus, predicate = report.value(result, SH.focusNode), report.value(result, SH.resultPath)
-            if any((focus, RDF.type, cls) in graph and predicate == prop for cls, prop in DEVIATIONS):
+            component = report.value(result, SH.sourceConstraintComponent)
+            if any((focus, RDF.type, cls) in graph and (predicate, component) == (prop, kind) for cls, prop, kind in DEVIATIONS):
                 continue
             found.append(f"{path.name}: {graph.qname(focus) if isinstance(focus, URIRef) else focus} "
                          f"{graph.qname(predicate) if isinstance(predicate, URIRef) else predicate}: {report.value(result, SH.resultMessage)}")

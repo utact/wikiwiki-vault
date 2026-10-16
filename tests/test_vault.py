@@ -41,3 +41,32 @@ def test_official_shapes_report_a_missing_title():
     assert vault.standard_problems(graph) == []
     graph.remove((service, vault.DCT.title, None))
     assert any("dct:title" in p for p in vault.standard_problems(graph))
+
+
+def test_links_to_legal_resources_name_works():
+    """ELI, CPSV-AP and CCCEV give these properties works as range, so block links name the block, not its version."""
+    _, graph = vault.check(FIXTURES)
+    works = {vault.ELI.LegalResource, vault.ELI.LegalResourceSubdivision}
+    predicates = [vault.ELI.cites, vault.ELI.based_on, vault.CPSV.implements,
+                  vault.URIRef("http://data.europa.eu/m8g/isDerivedFrom"), vault.URIRef("http://data.europa.eu/m8g/hasLegalResource")]
+    targets = [o for p in predicates for o in graph.objects(None, p)]
+    assert targets
+    assert all(set(graph.objects(o, vault.RDF.type)) & works for o in targets)
+    sources = list(graph.objects(None, vault.DCT.source))
+    assert any((s, vault.RDF.type, vault.ELI.LegalExpression) in graph for s in sources)
+
+
+def test_block_versions_leave_out_act_properties():
+    _, graph = vault.check(FIXTURES)
+    blocks = [s for s in graph.subjects(vault.RDF.type, vault.ELI.LegalExpression) if "-p" in str(s).rsplit("-v", 1)[-1]]
+    assert blocks
+    for predicate in (vault.ELI.date_publication, vault.ELI.number, vault.ELI.id_local):
+        assert not any(graph.value(s, predicate) for s in blocks)
+
+
+def test_deviation_covers_only_the_missing_participant():
+    _, graph = vault.check(FIXTURES)
+    participation = next(graph.subjects(vault.RDF.type, vault.M8G.Participation))
+    assert vault.standard_problems(graph) == []
+    graph.add((participation, vault.M8G.hasParticipant, vault.Literal("사업주")))
+    assert any("hasParticipant" in p for p in vault.standard_problems(graph))
