@@ -184,8 +184,8 @@ class Linter:
             if target is None or embed:
                 continue
             if block and block in target.blocks:
-                text, table = target.blocks[block]
-                found.append((text, table, target, block))
+                parts = [target.blocks[b] for b in target.blocks if b == block or b.startswith(block + "-")]
+                found.append(("\n".join(text for text, _ in parts), any(table for _, table in parts), target, block))
             elif target.folder == "raw" and not block:
                 payload = target.path.with_suffix(".json")
                 found.append((payload.read_text(encoding="utf-8") if payload.exists() else target.body, False, target, None))
