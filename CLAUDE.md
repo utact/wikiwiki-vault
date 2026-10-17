@@ -153,7 +153,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".
   - Resolve 법, 영 and 규칙 against the law family, and short names defined in the text, such as 고용산재보험료징수법.
   - Resolve 같은 조, 같은 항 and 같은 호 against the article, 항 and 호 cited just before in the line, or the current article when none is.
-  - Resolve 같은 법, 같은 영 and 같은 규칙 against the law named just before in the line, and drop the reference when that law is out of scope, as 같은 법 제49조 after 「부가가치세법」 제32조.
+  - Resolve 같은 법, 같은 영 and 같은 규칙 against the law named just before in the line, by any 「…」 name, and drop the reference when that law is out of scope, as 같은 법 제49조 after 「부가가치세법」 제32조.
+  - Drop a 같은 조, 같은 항 or 같은 호 that follows a reference to a law out of scope.
   - A reference after 부터, 까지, ㆍ, 및, 또는 or a comma belongs to the law of the reference before it, as 제132조 in "「형법」 제129조부터 제132조까지".
   - A bare 항, 호 or 목 after such a word continues the article before it, as 제3항 in "제11조제2항ㆍ제3항" and 다목 in "제58조제1호나목 및 다목".
   - A range such as "제56조부터 제58조까지" or "제1항부터 제3항까지" cites every unit in it.
@@ -162,7 +163,9 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Skip the 부칙 articles titled 다른 법률의 개정 or 다른 법령의 개정, because their references belong to another law.
   - Link the 개정규정 that a 부칙 names to the version of the 부칙's promulgation, as 제45조제1항 in 고용보험법 부칙 제21473호 to the version of 2028-01-01.
   - When the note of the cited unit does not show that version, link the unit and list it for review.
-  - Count a reference as a delegation only when it is followed by 에 따라, 에 따른 or 에서, stands outside parentheses, and the cited provision delegates to the citing kind of law.
+  - Count a reference as a delegation only when it is followed by 에 따라, 에 따른 or 에서, stands outside parentheses, opens its 항 or article, and the cited provision delegates to the citing kind of law.
+    - A reference opens its provision when nothing precedes it there, or only a topic, as in "사업주나 하수급인은 법 제15조에 따라". One inside a 호 or in the middle of a sentence describes, as in "법 제48조에 따른 수급기간이 종료된 경우", and so does "에 따라" before a participle, as in "법 제75조에 따라 지급된".
+    - This misses some real delegations in the middle of a sentence, such as 고용보험법 시행규칙 제82조의2 on 법 제42조제3항, which are listed for review.
     - The cited provision is the text of the cited block without its children, the part the reference names, such as 단서 or 후단, or any 항 or 호 of a whole article.
     - It delegates when a sentence of it says "대통령령으로 정하는" for a 시행령 or "고용노동부령으로 정하는" for a 시행규칙, in any form such as 정한다, or when the reference quotes such a phrase of it, as in "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란".
     - After 에 따른 or 에서, the word that follows names the matter, and its first two syllables must appear in that sentence, as 추가 for "법 제62조제2항 본문에 따른 추가징수액". "법 제40조제2항제1호에 따른 기준기간" is not a delegation, because the delegating sentence of that 호 is about a 사유. Such references are listed for review.
@@ -238,16 +241,17 @@ decisionTable:
   - Statute text itself uses ASCII double quotes, as in `[이하 "기초일액(基礎日額)"이라 한다]`.
   - Use no other quotation marks in prose, such as ‘ ’ or ASCII double quotes.
   - Keep source text and interpretation in separate sentences.
-- Write numbers in Arabic numerals, so that they can be checked: 2배, not 두 배. Keep the words only where the cited block writes them so, as 두 번 이상 in some statutes.
+- Write numbers in Arabic numerals, so that they can be checked: 2배, not 두 배, and 10일, not 열흘. Keep the words only where the cited block writes them so, as 두 번 이상 in some statutes.
 - Every number, amount and date in a footnoted sentence must appear in a cited block, with the same unit.
   - Numbers inside citations, such as 제45조제5항, 별표 1 and 부칙 제21473호, are exempt.
   - Numbers inside the names of wiki notes, such as 이직 전 1일 소정근로시간, are exempt, because the note they name carries its own sources.
   - Give a calculated number a footnote that links its `Rule` and states the calculation in inline code, such as `113500 * 60 / 100`; the checker evaluates it.
   - The operands of a calculation must appear in a cited block, as a number or as a ratio such as 100분의 60 for `60 / 100`.
   - Mark a calculation on example inputs with 예시 in its footnote, as in `` [^3]: [[최저기초일액 산정]] 예시 `8 * 10320` ``. Its operands may then appear in the sentence instead.
-  - Numbers in the labels of wikilinks, as in `[[기초일액|11만3500원]]`, count as part of the sentence.
+  - Numbers in the labels of wikilinks, as in `[[기초일액|11만3500원]]`, count as part of the sentence, except the 공포일자 or 시행일자 of the statute note the link names, as in `[[고용보험법 시행령 부칙 제35934호|부칙 제35934호(2025. 12. 23.)]]`.
 - Numbers and dates in `definition`, `unaryTests`, decision table cells and `literalExpression` must appear in the blocks of `source` or `isDerivedFrom`.
   - A number in a test or cell carries the unit of its concept's `unitCode` or `currency`, such as 일 for `DAY` and 원 for `KRW`, and a part of a duration its own unit, such as 개월 for `M`.
+  - An operand of `*` or `/` carries no unit, because it states a ratio, as 60 and 100 in `기초일액 * 60 / 100`.
   - 0 and 1 in FEEL are exempt, because they often encode structure, as `duration("P1M")` for 다음 달.
 - Rank sources in this order.
   1. 법률
@@ -397,7 +401,7 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
   - Decision table inputs missing from `requiredInput`, and outputs other than `variable`
   - `UNIQUE` decision tables with overlapping rows, where the tests have literal bounds
 - Sources
-  - Factual sentences, callout titles stating a fact included, whose footnotes cite no statute block, quotation or raw note
+  - Factual sentences, callout titles that end like a sentence included, whose footnotes cite no statute block, quotation or raw note
   - Quotes or numbers that do not match the cited block, numbers in other units, and numbers written in Korean numerals
   - Quotes in marks other than “ ”, and lines of question callouts that are not questions
   - Footnote links to statute blocks without the citation label, or with a part that the block lacks
@@ -413,7 +417,7 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
   - `.env` values in tracked files
   - Credential parameters in raw URLs
 - Synthetic data
-  - Links, embeds and Markdown links from `wiki/` to `synthetic/`
+  - Links, embeds and Markdown links from `wiki/` to `synthetic/`, by path or by file name
 
 Lint compares each number with the cited blocks, not the claim it makes. A sentence that puts two numbers of a block together wrongly passes, and so does `duration("P15D")` for "다음 달 15일까지", whose 15일 is in the block. The verifier agent compares the meaning.
 
