@@ -300,3 +300,14 @@ def test_a_one_syllable_matter_is_left_for_review():
     ref = S.Ref("시험법", "art-13", "p1", None, True, None, None, "경", True)
     lines = {"p1": "① 기초일액을 산정한다. 이 경우 소정근로시간은 고용노동부령으로 정하는 방법에 따라 산정한다."}
     assert S.delegated(ref, lines, True, family().laws["시험법 시행규칙"]) == "review"
+
+
+def test_a_law_name_with_its_short_name_in_parentheses_prefixes_the_reference():
+    statutes = family([article(5, "범위", [("「시험법」(이하 \"시험법률\"이라 한다) 제11조제1항에 따른다.", [])])])
+    statutes.laws["시험법 시행령"].aliases = {"시험법률": "시험법"}
+    assert [(r.law, r.key, r.block) for r in refs(statutes, "시험법 시행령", "art-5")] == [("시험법", "art-11", "p1")]
+
+
+def test_a_law_out_of_scope_with_its_short_name_takes_its_references_along():
+    statutes = family([article(5, "범위", [("「다른법」(이하 \"다른법률\"이라 한다) 제11조제1항에 따른다.", [])])])
+    assert refs(statutes, "시험법 시행령", "art-5") == []

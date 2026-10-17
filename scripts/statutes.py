@@ -34,7 +34,7 @@ KIND_NOTES = {"A0002": "법률", "A0007": "대통령령", "A0097": "고용노동
 SUBDIVISIONS = {"heading-ch": "chapter", "heading-sec": "section", "article": "article", "annex": "annex", "form": "form", "addendum": "addendum"}
 FAMILY = {"법": "", "영": " 시행령", "규칙": " 시행규칙"}
 REFERENCE = re.compile(
-    r"(?:「(?P<quoted>[^」]+)」\s*|같은\s*(?P<same_law>법(?:\s*시행령|\s*시행규칙)?|영|규칙)\s+|(?P<short>법|영|규칙)\s+|(?P<alias>[가-힣]+법)\s+)?"
+    r"(?:「(?P<quoted>[^」]+)」\s*(?:\(이하\s*\"[^\"]+\"(?:이)?라\s*한다\)\s*)?|같은\s*(?P<same_law>법(?:\s*시행령|\s*시행규칙)?|영|규칙)\s+|(?P<short>법|영|규칙)\s+|(?P<alias>[가-힣]+법)\s+)?"
     r"(?:"
     r"같은\s*조\s*제(?P<same_p>\d+)항(?:\s*제(?P<same_i>\d+)호(?:의(?P<same_ib>\d+))?)?"
     r"|같은\s*항\s*제(?P<same_item>\d+)호(?:의(?P<same_item_b>\d+))?"
