@@ -272,3 +272,14 @@
   - 한글 수사는 인용 block이 같은 말로 쓴 경우에만 허용한다.
   - appliesWhen의 조건은 모두 만족해야 하며, 날짜 조건이 없으면 이전 버전 인용을 보고한다.
   - frontmatter 숫자는 개념의 단위까지 대조한다.
+
+## 2026-10-17 14:39 schema
+
+- 대상: 검토 상태 보호
+- 추가: `.claude/settings.json`, `scripts/review_guard.py`
+- 수정: `CLAUDE.md`, `docs/roadmap.md`
+- 내용:
+  - Claude Code가 파일을 고치거나 shell 명령을 실행하기 전에 hook이 검사한다.
+  - `wiki/`와 `synthetic/` 노트에 `status: reviewed`, `reviewedBy`, `lastReviewed`를 쓰는 편집과 명령을 막는다.
+  - reviewed 노트를 고칠 때는 같은 편집에서 status를 draft로 바꿔야 한다.
+  - shell 검사는 명령 문자열만 보므로, 스크립트가 자기 코드로 쓰는 경우는 막지 못한다.

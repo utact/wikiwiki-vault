@@ -81,7 +81,7 @@
   - 검증 원장(`ontology/verification.jsonl`)
     - 생성 스크립트의 commit을 함께 기록해, 읽기 규칙이 바뀐 것과 원문이 바뀐 것을 구분
   - vault 노트용 markdownlint 설정
-  - `reviewed` 보호 hook은 사용자 승인 후 설치
+  - `reviewed` 보호 hook
 - 완료 조건
   - 결함을 심은 시험 노트에서 결함 100% 검출, 오탐 0건
 
