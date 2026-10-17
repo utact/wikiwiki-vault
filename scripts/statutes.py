@@ -61,7 +61,7 @@ PART = re.compile(r"\s*(본문|단서|전단|후단|각\s*호\s*외의\s*부분)
 Ref = namedtuple("Ref", "law key block part delegation phrase amended follow lead")
 LAW_NAME = re.compile(r"(?:「|(?<![\w가-힣])\?)([^」「?]+)」")
 BODY_MARK = re.compile(r"\s*(?:[①-⑳]|\d+(?:의\d+)?\.|[가-하]\.)?\s*")
-TOPIC = re.compile(r"[^,.]{0,60}?(?:은|는)\s+")
+TOPIC = re.compile(r"(?:[^,.]{0,60}?에도\s*불구하고,?\s+)?(?:[^,.]{0,60}?(?:은|는)\s+)?")
 DESCRIPTIVE = re.compile(r"\s*(?:지급된|지급받은|지급받을|지급한|받은|받을|된|부과된|산정된|납부한|납부된)(?![가-힣])")
 PARTICLE = re.compile(r"(?:에게|에서|으로|까지|부터|이나|은|는|이|가|을|를|의|에|로|과|와|도|만|나)$")
 
@@ -667,8 +667,10 @@ class Statutes:
                         follow = "" if joint == "에따라" else following_word(rest[delegation.end():])
                         if joint == "에따라" and DESCRIPTIVE.match(rest, delegation.end()):
                             follow = None
-                    opening = text[body: match.start()]
-                    lead = opens and (not opening.strip() or bool(TOPIC.fullmatch(opening)))
+                    if not chain:
+                        opening = text[body: match.start()]
+                        chain_lead = opens and (not opening.strip() or bool(TOPIC.fullmatch(opening)))
+                    lead = chain_lead
                     part = PART.match(rest)
                     phrase = QUOTED_PHRASE.match(rest)
                     amended = unit.key.split("-")[1] if unit.kind == "addendum" and AMENDED.match(rest) else None
@@ -807,7 +809,8 @@ def delegated(ref, lines, found, law):
 
     "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란" counts when the quoted phrase is in the 본문 of 제61조제2항.
     "법 제45조제5항에 따라" counts when a sentence of 제45조제5항 says "대통령령으로 정하는" and the reference opens its 항 or article.
-    It may open it alone or after a topic, as in "사업주나 하수급인은 법 제15조에 따라".
+    It may open it alone, after a topic, as in "사업주나 하수급인은 법 제15조에 따라", or after a clause such as "제2항에도 불구하고".
+    Every member of a list such as "법 제21조제1항 및 제2항에 따라" opens it when the first one does.
     A reference inside a 호 or in the middle of a sentence describes, as in "법 제48조에 따른 수급기간이 종료된 경우".
     So does "에 따라" before a participle, as in "법 제75조에 따라 지급된".
     "법 제62조제2항 본문에 따른 추가징수액" counts when such a sentence of the 본문 also has 추가, the start of the word after 에 따른.
@@ -830,7 +833,7 @@ def delegated(ref, lines, found, law):
     sentences = [s for s in re.split(r"(?<=다\.)\s+", cited) if pattern.search(s)]
     if not sentences:
         return False
-    if not ref.lead or ref.follow is None:
+    if not ref.lead or ref.follow is None or (ref.follow and len(ref.follow) < 2):
         return "review"
     if ref.follow == "" or ref.follow == "위임" or any(ref.follow[:2] in s for s in sentences):
         return True
@@ -899,7 +902,14 @@ def render_unit(statutes, unit, chosen):
             cites.append(text)
             delegation = delegated(ref, lines, found, law)
             if delegation == "review":
-                why = "it does not open its provision" if not ref.lead or ref.follow is None else f"the delegating sentence does not name {ref.follow!r}"
+                if not ref.lead:
+                    why = "it does not open its provision"
+                elif ref.follow is None:
+                    why = "it describes what the provision did, as in 에 따라 지급된"
+                elif len(ref.follow) < 2:
+                    why = f"the word after it, {ref.follow!r}, is too short to name the matter"
+                else:
+                    why = f"the delegating sentence does not name {ref.follow!r}"
                 statutes.review.append(f"{unit.name}: cites {text}, which delegates, but {why}; no basedOn is written")
             elif delegation:
                 based.append(text)

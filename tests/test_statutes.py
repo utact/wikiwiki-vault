@@ -282,3 +282,21 @@ def test_a_delegation_opens_its_provision():
         statutes = family([article(5, "범위", [(content, items)])])
         found = [r for r in refs(statutes, "시험법 시행령", "art-5") if r.key == "art-10"]
         assert [is_delegation(statutes, "시험법 시행령", r) for r in found] == [expected], content
+
+
+def test_every_member_of_a_list_opens_the_provision():
+    statutes = family(rule_articles=[article(7, "범위", [("법 제10조제1항 및 제2항에 따라 적용 제외를 정한다.", [])])])
+    second = next(r for r in refs(statutes, "시험법 시행규칙", "art-7") if r.block == "p2")
+    assert second.lead and is_delegation(statutes, "시험법 시행규칙", second) is True
+
+
+def test_a_clause_of_불구하고_may_precede_the_delegation():
+    statutes = family([article(5, "범위", [("제2항에도 불구하고 법 제10조제1항에 따라 적용 범위를 정한다.", [])])])
+    [ref] = [r for r in refs(statutes, "시험법 시행령", "art-5") if r.key == "art-10"]
+    assert is_delegation(statutes, "시험법 시행령", ref) is True
+
+
+def test_a_one_syllable_matter_is_left_for_review():
+    ref = S.Ref("시험법", "art-13", "p1", None, True, None, None, "경", True)
+    lines = {"p1": "① 기초일액을 산정한다. 이 경우 소정근로시간은 고용노동부령으로 정하는 방법에 따라 산정한다."}
+    assert S.delegated(ref, lines, True, family().laws["시험법 시행규칙"]) == "review"
