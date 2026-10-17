@@ -164,11 +164,12 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Link the 개정규정 that a 부칙 names to the version of the 부칙's promulgation, as 제45조제1항 in 고용보험법 부칙 제21473호 to the version of 2028-01-01.
   - When the note of the cited unit does not show that version, link the unit and list it for review.
   - Count a reference as a delegation only when it is followed by 에 따라, 에 따른 or 에서, stands outside parentheses, opens its 항 or article, and the cited provision delegates to the citing kind of law.
-    - A reference opens its provision when nothing precedes it there, or only a topic, as in "사업주나 하수급인은 법 제15조에 따라". One inside a 호 or in the middle of a sentence describes, as in "법 제48조에 따른 수급기간이 종료된 경우", and so does "에 따라" before a participle, as in "법 제75조에 따라 지급된".
+    - A reference opens its provision when nothing precedes it there, or only a topic or a clause of 불구하고, as in "사업주나 하수급인은 법 제15조에 따라" and "제2항에도 불구하고 법 제45조제5항에 따라". Every member of a list such as "법 제21조제1항 및 제2항에 따라" opens it when the first one does.
+    - One inside a 호 or in the middle of a sentence describes, as in "법 제48조에 따른 수급기간이 종료된 경우", and so does "에 따라" before a participle, as in "법 제75조에 따라 지급된".
     - This misses some real delegations in the middle of a sentence, such as 고용보험법 시행규칙 제82조의2 on 법 제42조제3항, which are listed for review.
     - The cited provision is the text of the cited block without its children, the part the reference names, such as 단서 or 후단, or any 항 or 호 of a whole article.
     - It delegates when a sentence of it says "대통령령으로 정하는" for a 시행령 or "고용노동부령으로 정하는" for a 시행규칙, in any form such as 정한다, or when the reference quotes such a phrase of it, as in "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란".
-    - After 에 따른 or 에서, the word that follows names the matter, and its first two syllables must appear in that sentence, as 추가 for "법 제62조제2항 본문에 따른 추가징수액". "법 제40조제2항제1호에 따른 기준기간" is not a delegation, because the delegating sentence of that 호 is about a 사유. Such references are listed for review.
+    - After 에 따른 or 에서, the word that follows names the matter, and its first two syllables must appear in that sentence, as 추가 for "법 제62조제2항 본문에 따른 추가징수액". "법 제40조제2항제1호에 따른 기준기간" is not a delegation, because the delegating sentence of that 호 is about a 사유. A word of one syllable, such as 월, names no matter. Such references are listed for review.
     - A reference in parentheses qualifies the provision, as "(법 제63조에 따라 상병급여를 받은 경우의 질병이나 부상은 제외한다)".
   - Link only units that have statute notes, and a block only when the cited version declares it.
 
