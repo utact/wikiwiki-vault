@@ -259,3 +259,26 @@ def test_same_item_is_the_item_cited_just_before():
     finally:
         ACT.remove(subitems)
     assert found == [("art-20", "i1-m2"), ("art-20", "i1-m1")]
+
+
+def test_same_article_after_an_out_of_scope_law_is_dropped():
+    statutes = family([article(5, "범위", [("「근로기준법」 제74조제1항에 따른 휴가와 같은 조 제3항에 따른 휴가를 말한다.", [])])])
+    assert refs(statutes, "시험법 시행령", "art-5") == []
+
+
+def test_same_law_follows_every_law_name_in_the_line():
+    statutes = family([article(5, "범위", [("법 제10조제1항, 「근로기준법」에 따른 휴업수당과 같은 법 제11조에 따른 금액을 말한다.", [])])])
+    assert [(r.law, r.key) for r in refs(statutes, "시험법 시행령", "art-5")] == [("시험법", "art-10")]
+
+
+def test_a_delegation_opens_its_provision():
+    cases = [
+        ("법 제10조제1항에 따라 적용 범위를 정한다.", [], True),
+        ("사업주는 법 제10조제1항에 따라 적용 범위를 신고한다.", [], True),
+        ("직업안정기관의 장은 법 제10조제1항에 따라 지급된 금액을 확인한다.", [], "review"),
+        ("다음 각 호의 경우를 말한다.", ["법 제10조제1항에 따라 적용 범위를 정한 경우"], "review"),
+    ]
+    for content, items, expected in cases:
+        statutes = family([article(5, "범위", [(content, items)])])
+        found = [r for r in refs(statutes, "시험법 시행령", "art-5") if r.key == "art-10"]
+        assert [is_delegation(statutes, "시험법 시행령", r) for r in found] == [expected], content

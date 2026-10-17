@@ -58,7 +58,11 @@ DELEGATION = re.compile(PART_WORDS + r"\s*(?P<joint>에\s*따라|에\s*따른|�
 QUOTED_PHRASE = re.compile(PART_WORDS + r'\s*에서\s*"([^"]+)"')
 AMENDED = re.compile(PART_WORDS + r"\s*(?:의)?\s*개정\s*규정")
 PART = re.compile(r"\s*(본문|단서|전단|후단|각\s*호\s*외의\s*부분)")
-Ref = namedtuple("Ref", "law key block part delegation phrase amended follow")
+Ref = namedtuple("Ref", "law key block part delegation phrase amended follow lead")
+LAW_NAME = re.compile(r"(?:「|(?<![\w가-힣])\?)([^」「?]+)」")
+BODY_MARK = re.compile(r"\s*(?:[①-⑳]|\d+(?:의\d+)?\.|[가-하]\.)?\s*")
+TOPIC = re.compile(r"[^,.]{0,60}?(?:은|는)\s+")
+DESCRIPTIVE = re.compile(r"\s*(?:지급된|지급받은|지급받을|지급한|받은|받을|된|부과된|산정된|납부한|납부된)(?![가-힣])")
 PARTICLE = re.compile(r"(?:에게|에서|으로|까지|부터|이나|은|는|이|가|을|를|의|에|로|과|와|도|만|나)$")
 
 
@@ -557,6 +561,11 @@ class Statutes:
                 block += f"-m{LETTERS.index(match['m']) + 1}"
         return target, L.article_key(match["art"], match["art_b"]), block
 
+    def law_named(self, name):
+        """The law in scope with this name, ignoring spaces, or None."""
+        compact = re.sub(r"\s+", "", name)
+        return next((law for law_name, law in self.laws.items() if re.sub(r"\s+", "", law_name) == compact), None)
+
     def range_inside(self, target, previous_law, previous, previous_block, key, block):
         """Units strictly inside a range such as 제56조부터 제58조까지 or 제1항부터 제3항까지, as (key, block) pairs."""
         if previous_law is not target:
@@ -608,9 +617,14 @@ class Statutes:
                 if other_law:
                     continue
                 head = ARTICLE_HEAD.match(text)
+                body = BODY_MARK.match(text, head.end() if head else 0).end()
+                opens = bool(re.fullmatch(r"t|lead|p\d+|a\d+(?:-\d+)?(?:-p\d+)?", suffix))
+                names = [(m.end(), self.law_named(m.group(1))) for m in LAW_NAME.finditer(text)]
                 state = {"law": unit.law, "key": unit.key if unit.kind == "article" else None, "p": None, "end": None, "continued": False}
                 chain = []
                 for match in REFERENCE.finditer(text, head.end() if head else 0):
+                    while names and names[0][0] <= match.start():
+                        state["named"] = names.pop(0)[1]
                     prefixed = match["quoted"] or match["short"] or match["alias"] or match["same_law"]
                     preceding = text[max(0, match.start() - 3): match.start()]
                     if not prefixed and preceding.endswith(("이 ", "부칙 ", "부칙")):
@@ -627,7 +641,7 @@ class Statutes:
                     resolved = self.resolve(origin, match, state) if origin else None
                     if not resolved:
                         if prefixed or state["continued"]:
-                            state["law"] = None
+                            state.update(law=None, key=None, p=None, block=None)
                         if match["quoted"] or match["short"] or match["alias"]:
                             state["named"] = None
                         continue
@@ -641,7 +655,7 @@ class Statutes:
                     if previous and RANGE_START.fullmatch(gap or "") and RANGE_END.match(text, match.end()):
                         for inner_key, inner_block in self.range_inside(target, previous_law, previous, previous_block, key, block):
                             chain.append(len(found))
-                            found.append(Ref(target.name, inner_key, inner_block, None, False, None, None, None))
+                            found.append(Ref(target.name, inner_key, inner_block, None, False, None, None, None, False))
                     rest = text[match.end():]
                     before_match = text[:match.start()]
                     enclosed = before_match.count("(") > before_match.count(")") or before_match.count("[") > before_match.count("]")
@@ -649,17 +663,22 @@ class Statutes:
                     delegation = bool(target is not unit.law and self.delegates(unit.law, target) and delegation and not enclosed) and delegation
                     follow = None
                     if delegation:
-                        follow = "" if re.sub(r"\s+", "", delegation["joint"]) == "에따라" else following_word(rest[delegation.end():])
+                        joint = re.sub(r"\s+", "", delegation["joint"])
+                        follow = "" if joint == "에따라" else following_word(rest[delegation.end():])
+                        if joint == "에따라" and DESCRIPTIVE.match(rest, delegation.end()):
+                            follow = None
+                    opening = text[body: match.start()]
+                    lead = opens and (not opening.strip() or bool(TOPIC.fullmatch(opening)))
                     part = PART.match(rest)
                     phrase = QUOTED_PHRASE.match(rest)
                     amended = unit.key.split("-")[1] if unit.kind == "addendum" and AMENDED.match(rest) else None
                     chain.append(len(found))
                     found.append(Ref(target.name, key, block, re.sub(r"\s+", " ", part.group(1)) if part else None, bool(delegation),
-                                     phrase.group(1) if phrase else None, amended, follow))
+                                     phrase.group(1) if phrase else None, amended, follow, lead))
                     if delegation or amended:
                         for index in chain:
                             ref = found[index]
-                            found[index] = ref._replace(delegation=ref.delegation or bool(delegation),
+                            found[index] = ref._replace(delegation=ref.delegation or bool(delegation), lead=ref.lead or lead,
                                                         follow=ref.follow if ref.follow is not None else follow, amended=amended or ref.amended)
         return list(dict.fromkeys(found))
 
@@ -787,7 +806,10 @@ def delegated(ref, lines, found, law):
     """Whether a reference is a delegation, as True, False or "review" when the cited provision delegates but the matter may differ.
 
     "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란" counts when the quoted phrase is in the 본문 of 제61조제2항.
-    "법 제45조제5항에 따라" counts when a sentence of 제45조제5항 says "대통령령으로 정하는".
+    "법 제45조제5항에 따라" counts when a sentence of 제45조제5항 says "대통령령으로 정하는" and the reference opens its 항 or article.
+    It may open it alone or after a topic, as in "사업주나 하수급인은 법 제15조에 따라".
+    A reference inside a 호 or in the middle of a sentence describes, as in "법 제48조에 따른 수급기간이 종료된 경우".
+    So does "에 따라" before a participle, as in "법 제75조에 따라 지급된".
     "법 제62조제2항 본문에 따른 추가징수액" counts when such a sentence of the 본문 also has 추가, the start of the word after 에 따른.
     "법 제40조제2항제1호에 따른 기준기간" does not, when the delegating sentence of that 호 lacks 기준.
     The cited provision is the text of the block itself, without its 호, or the part named, or every 항 and 호 of a whole article.
@@ -808,7 +830,9 @@ def delegated(ref, lines, found, law):
     sentences = [s for s in re.split(r"(?<=다\.)\s+", cited) if pattern.search(s)]
     if not sentences:
         return False
-    if ref.follow == "" or (ref.follow and (ref.follow == "위임" or any(ref.follow[:2] in s for s in sentences))):
+    if not ref.lead or ref.follow is None:
+        return "review"
+    if ref.follow == "" or ref.follow == "위임" or any(ref.follow[:2] in s for s in sentences):
         return True
     return "review"
 
@@ -875,8 +899,8 @@ def render_unit(statutes, unit, chosen):
             cites.append(text)
             delegation = delegated(ref, lines, found, law)
             if delegation == "review":
-                statutes.review.append(f"{unit.name}: cites {text} before {ref.follow!r}, which the delegating sentence does not name; "
-                                       "no basedOn is written")
+                why = "it does not open its provision" if not ref.lead or ref.follow is None else f"the delegating sentence does not name {ref.follow!r}"
+                statutes.review.append(f"{unit.name}: cites {text}, which delegates, but {why}; no basedOn is written")
             elif delegation:
                 based.append(text)
     if based:
