@@ -139,6 +139,13 @@ DEFECTS = {
     "write numbers in Arabic numerals unless the cited block writes them in words: 백분의 육십": ((CAP, "## 근거", "비율은 백분의 육십이다.[^1]\n\n## 근거"),),
     "write numbers in Arabic numerals unless the cited block writes them in words: 두 달": ((CAP, "## 근거", "신고는 두 달 안에 한다.[^1]\n\n## 근거"),),
     "write numbers in Arabic numerals unless the cited block writes them in words: 오 년": ((CAP, "## 근거", "보존은 오 년이다.[^1]\n\n## 근거"),),
+    "in words: 두 달": ((CAP, "## 근거", "신고는 두 달마다 한다.[^1]\n\n## 근거"),),
+    "in words: 오 년": ((CAP, "## 근거", "보존은 오 년마다 한다.[^1]\n\n## 근거"),),
+    "in words: 열흘": ((CAP, "## 근거", "신고는 열흘 안에 한다.[^1]\n\n## 근거"),),
+    "in words: 두 번": ((CAP, "## 근거", "두 번째 신고다.[^1]\n\n## 근거"),),
+    "sentence without a source: 기초일액에는 상한이 없다": ((CAP, "## 근거", "> [!info] 기초일액에는 상한이 없다\n\n## 근거"),),
+    "links synthetic data: 합성 이직자.md": (("synthetic/합성 이직자.md", None, "---\ntype: InformationConcept\nidentifier: synthetic-person\nsynthetic: true\n---\n"),
+                                        (CAP, "## 근거", "[합성](합성%20이직자.md)\n\n## 근거")),
     "definition: write numbers in Arabic numerals": ((CAP, "definition: 2026-01-01 이후 이직한 사람의 기초일액 상한", "definition: 2026-01-01 이후 이직한 사람의 기초일액 상한으로 두 번 바뀐 금액"),),
 }
 
@@ -218,6 +225,9 @@ def test_clean_variants_are_not_reported(tmp_path):
          "[^1]:\n    [[고용보험법 시행령 제68조#^v20260101-p1|고용보험법 시행령 제68조제1항]]"),
         (CAP, "## 근거", "- [법제처](https://www.law.go.kr/lsInfoP.do?lsiSeq=280525)\n\n## 근거"),
         (CAP, "## 근거", "> [!warning] 출처 불일치\n> 이사회 결의와 무관하게 상한은 11만3500원이다.[^1]\n\n## 근거"),
+        (CAP, "## 근거", "근무를 한 시간과 이직을 한 달은 이 시간 동안 따지지 않는다.[^1]\n\n## 근거"),
+        (CAP, "## 근거", "> [!note] 2026-01-01 시행 개정\n> 상한은 11만3500원이다.[^1]\n\n> [!question] 2028년 개정 이후\n> 상한이 바뀌는가?\n\n## 근거"),
+        (CAP, "## 근거", "[[고용보험법 시행령 부칙 제35934호|부칙 제35934호(2025. 12. 23.)]]에 따라 상한은 11만3500원이다.[^1]\n\n## 근거"),
     )
     assert problems == []
 
@@ -228,3 +238,10 @@ def test_numerals_that_the_block_writes_in_words_pass(tmp_path):
     linter.check_numerals(note, "두 번 이상 위반하면 다르다", ["2회 이상 위반하거나 두 번 이상 위반한 경우"], "sentence")
     linter.check_numerals(note, "세 번 위반하면", ["2회 이상"], "sentence")
     assert linter.problems == ["wiki/Constraint/기초일액 상한.md: sentence: write numbers in Arabic numerals unless the cited block writes them in words: 세 번"]
+
+
+def test_operands_of_a_calculation_carry_no_unit():
+    """In "<= 기초일액 * 60 / 100", 60 and 100 state a ratio such as 100분의 60, not an amount in 원."""
+    found = lint.feel_numbers("<= 기초일액 * 60 / 100")
+    assert [(value, unit) for _, value, _, unit in found] == [(60, "operand"), (100, "operand")]
+    assert lint.feel_numbers("<= 113500")[0][3] is None

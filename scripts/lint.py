@@ -34,13 +34,16 @@ OTHER_QUOTE = re.compile(r"‘[^’]*’|\"[^\"]*\"")
 SENTENCE_END = re.compile(r"(?:다\.|[.?!])((?:\[\^[^\]]+\])*)(?=\s|$)")
 DOTTED_DATE = re.compile(r"\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.")
 MARKDOWN_LINK = re.compile(r"(!?)\[([^\]]*)\]\((?:<([^>]*)>|([^)\s]+))[^)]*\)")
+SINO = "[일이삼사오육칠팔구십백천만억]*(?:[일이삼사오육칠팔구][십백천만억]|[십백천만억][일이삼사오육칠팔구십백천만억])[일이삼사오육칠팔구십백천만억]*"
+NATIVE = "(?:(?:열|스물|스무)\\s?)?(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉)|열|스무|서른|마흔|쉰|예순|일흔|여든|아흔"
 KOREAN_NUMERAL = re.compile(
     r"(?<![가-힣\d])(?:"
-    r"[일이삼사오육칠팔구]?[십백천만억][일이삼사오육칠팔구십백천만억]*\s?(?:원|개월|년|세|시간|명|회|배|주|번)"
-    r"|[일이삼사오육칠팔구]\s(?:년|개월|세|시간|명|회|배|번)"
-    r"|(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|스무|서른|마흔|쉰|예순|일흔|여든|아흔)\s?(?:번|회|배|명|달|해|개월|시간|살|가지|차례)"
+    + SINO + r"\s?(?:원|개월|년|세|시간|명|회|배|주|번|일)"
+    r"|[일삼사오육칠팔구]\s(?:년|개월|세|시간|명|회|배|번|일)"
+    r"|(?<![을를]\s)(?:" + NATIVE + r")\s?(?:번|회|배|명|달|해|개월|시간|살|가지|차례|날)"
+    r"|하루|이틀|사흘|나흘|닷새|엿새|이레|여드레|아흐레|열흘|보름"
     r"|[일이삼사오육칠팔구십백천만]+분의\s?[일이삼사오육칠팔구십백천만]+"
-    r")(?=$|[^가-힣]|[은는이가을를의에과와도만로으까부보간다인씩쯤])"
+    r")(?=$|[^가-힣]|[은는이가을를의에과와도만로으까부보간다인씩쯤마째분안])"
 )
 UNITS = {"DAY": {"일"}, "WEE": {"주"}, "MON": {"개월", "달"}, "ANN": {"년", "세"}, "HUR": {"시간"}, "KRW": {"원"}}
 DURATION_UNITS = {"D": "DAY", "W": "WEE", "M": "MON", "Y": "ANN", "H": "HUR"}
@@ -128,7 +131,9 @@ def feel_numbers(text):
         found += [("number", Fraction(n), pairs, DURATION_UNITS.get(u)) for n, u in re.findall(r"(\d+)([YMWD])", date_part)]
         found += [("number", Fraction(n), pairs, "HUR" if u == "H" else None) for n, u in re.findall(r"(\d+)([HMS])", time_part)]
     text = re.sub(r'"-?P[0-9YMWDTHS]+"', " ", text)
-    found += [("number", Fraction(n), pairs, None) for n in re.findall(r"(?<![\w가-힣])(?<!\d\.)\d+(?:\.\d+)?(?![\w가-힣])", text)]
+    for match in re.finditer(r"(?<![\w가-힣])(?<!\d\.)\d+(?:\.\d+)?(?![\w가-힣])", text):
+        operand = text[: match.start()].rstrip().endswith(("*", "/")) or text[match.end():].lstrip().startswith(("*", "/"))
+        found.append(("number", Fraction(match.group(0)), pairs, "operand" if operand else None))
     return found
 
 
@@ -193,7 +198,8 @@ class Linter:
             if note.folder == "wiki":
                 for _, _, angled, plain in MARKDOWN_LINK.findall(note.text):
                     target_path = urllib.parse.unquote(angled or plain).replace("\\", "/")
-                    if "synthetic/" in target_path:
+                    target = self.notes.get(Path(target_path.split("#")[0]).stem)
+                    if "synthetic/" in target_path or (target and target.folder == "synthetic"):
                         self.problem(note, f"links synthetic data: {target_path}")
             for embed, name, anchor, _ in ANY_LINK.findall(note.text):
                 name = name.strip().split("/")[-1]
@@ -321,7 +327,7 @@ class Linter:
                 if callout:
                     in_question = callout.group(1) == "question"
                     title = callout.group(2).strip()
-                    if title and re.search(r"(?:다\.|[.?])$|\d", title):
+                    if title and re.search(r"(?:다\.?|[.?!])$", title):
                         (asked if in_question else facts).append(title)
                     continue
                 if inner:
@@ -414,7 +420,7 @@ class Linter:
             expressions += [(f"rule {number}", str(cell), unit) for cell, unit in zip(row, columns + [None] * len(row))]
         for where, text, column_unit in expressions:
             for kind, value, pairs, unit in feel_numbers(text):
-                units = UNITS.get(unit or column_unit)
+                units = None if unit == "operand" else UNITS.get(unit or column_unit)
                 if kind == "date" and value not in dates:
                     report(where, kind, value)
                 elif kind == "number" and value not in (0, 1) and units and not any(("number", value, u) in pool for u in units):
@@ -429,6 +435,16 @@ class Linter:
         match = LINK.fullmatch(str(value or "").strip())
         target = self.notes.get(match.group(2).strip()) if match else None
         return (target.meta.get("unitCode") or target.meta.get("currency")) if target else None
+
+    def label_text(self, name, label):
+        """The label of a wikilink, without the 공포일자 or 시행일자 of the statute note it names, as in 부칙 제35934호(2025. 12. 23.)."""
+        target = self.notes.get(name.strip())
+        if not (target and target.statute):
+            return label
+        dates = {f"{d[:4]}-{d[4:6]}-{d[6:]}" for d in re.findall(r"sup-(\d{8})-", str(target.meta.get("identifier") or ""))}
+        for entry in target.meta.get("isRealizedBy") or []:
+            dates.update(str(entry.get(key)) for key in ("datePublication", "firstDateEntryInForce") if entry.get(key))
+        return L.DATE_TOKEN.sub(lambda m: " " if f"{int(m[1]):04d}-{int(m[2]):02d}-{int(m[3]):02d}" in dates else m.group(0), label)
 
     def check_numerals(self, note, text, cited, where):
         """Numbers written in Korean words, such as 두 배, unless a cited block writes them the same way, as 두 번 이상."""
@@ -475,7 +491,8 @@ class Linter:
     def check_sentence(self, note, sentence, quotes, piece, notes, periods):
         unlinked = FOOTNOTE_REF.sub("", sentence)
         skeleton = ANY_LINK.sub(" ", MARKDOWN_LINK.sub(" ", unlinked))
-        bare = ANY_LINK.sub(lambda m: f" {m.group(4)} " if m.group(4) else " ", MARKDOWN_LINK.sub(lambda m: f" {m.group(2)} ", unlinked))
+        bare = ANY_LINK.sub(lambda m: f" {self.label_text(m.group(2), m.group(4))} " if m.group(4) else " ",
+                            MARKDOWN_LINK.sub(lambda m: f" {m.group(2)} ", unlinked))
         for name in self.terms:
             bare = bare.replace(name, " ")
             skeleton = skeleton.replace(name, " ")
