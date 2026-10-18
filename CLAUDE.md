@@ -347,7 +347,7 @@ Notes written by the LLM move through three statuses in order.
 2. `verified`: checked by a separate agent
    - The verifier did not write the note and works in a fresh context.
    - Run it as a subagent with model `opus` and effort `xhigh`.
-   - Give it the note, the cited blocks and the notes that link to or from the note.
+   - Give it the note, the cited blocks and the notes that link to or from the note, which `uv run python -X utf8 scripts/verify.py context <note>...` prints.
    - It compares every factual sentence with the cited blocks, checks schema conformance and looks for contradictions with the linked notes.
    - On any mismatch, the note stays `draft` and the required fixes go to `log.md`.
 3. `reviewed`: approved by the human owner
@@ -361,6 +361,7 @@ Notes written by the LLM move through three statuses in order.
   - Key it by `identifier`.
   - Record the hash of the note without `status`, `reviewedBy` and `lastReviewed`, and the hashes of the cited blocks.
   - Record the generator and its commit, or the verifier's model, effort and session.
+  - For a note the verifier passed, `uv run python -X utf8 scripts/verify.py record --model opus --effort xhigh --session <id> <note>...` writes the line and sets `verified`.
 - Retired or superseded instances are never deleted.
   - Set `validThrough` and link the successor with `isReplacedBy`.
 
