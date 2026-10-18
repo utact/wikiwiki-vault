@@ -8,6 +8,7 @@ scripts/vault.py exports and returns ?item and ?source rows: the parts of the an
 statute units or blocks they rest on. Every provision that the expected answer in
 docs/competency-questions.md cites must be among the sources, or contain one of them.
 Citations under 범위 밖, 관련 사항 and 검사 항목 are not part of the expected answer.
+An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks; the verifier compares the items themselves.
 """
 
 import re

@@ -1,0 +1,18 @@
+# cq-05: 어떤 이직 사유가 있으면 수급자격이 없는 것으로 보는가?
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?label ?source WHERE {
+  {
+    BIND(employment:disqualifying-separation-reasons AS ?item)
+  } UNION {
+    ?item skos:inScheme employment:disqualifying-separation-reasons .
+  }
+  ?item skos:prefLabel ?label .
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
