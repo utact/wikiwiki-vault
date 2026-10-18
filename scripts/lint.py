@@ -697,8 +697,9 @@ class Linter:
             for cell, type_ref in zip(row[len(names):], out_types):
                 try:
                     kind, _ = feel.value(str(cell))
-                except feel.FeelError as error:
-                    self.problem(note, f"rule {number} output does not parse: {error}")
+                except feel.FeelError:
+                    self.check_expression(note, str(cell), {n: self.concept_type(f"[[{n}]]") for n in inputs}, type_ref,
+                                          f"rule {number} output", "in requiredInput")
                     continue
                 if type_ref and kind != type_ref:
                     self.problem(note, f"rule {number} output {cell!r} is {kind}, but the concept is {type_ref}")

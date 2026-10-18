@@ -245,3 +245,11 @@ def test_operands_of_a_calculation_carry_no_unit():
     found = lint.feel_numbers("<= 기초일액 * 60 / 100")
     assert [(value, unit) for _, value, _, unit in found] == [(60, "operand"), (100, "operand")]
     assert lint.feel_numbers("<= 113500")[0][3] is None
+
+
+def test_decision_table_outputs_may_be_expressions(tmp_path):
+    """A DMN output entry is a FEEL expression, so a cell may compute its value from the inputs."""
+    problems = run(tmp_path, (TABLE, "    - '120'\n  - - < 50\n    - '[1..3)'", "    - 피보험기간 * 120\n  - - < 50\n    - '[1..3)'"))
+    assert not any("rule 1 output" in p for p in problems), problems
+    problems = run(tmp_path / "bad", (TABLE, "    - '120'\n  - - < 50\n    - '[1..3)'", "    - 근속기간 * 120\n  - - < 50\n    - '[1..3)'"))
+    assert any("rule 1 output uses '근속기간'" in p for p in problems), problems
