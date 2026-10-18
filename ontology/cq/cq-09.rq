@@ -1,0 +1,28 @@
+# cq-09: 2026년에 이직한 근로자의 기초일액과 구직급여일액의 상한과 하한은 얼마인가?
+PREFIX cpsv: <http://purl.org/vocab/cpsv#>
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    ?item cv:constrains ?concept .
+    VALUES ?concept { employment:base-daily-wage employment:hourly-minimum-wage }
+  }
+  UNION
+  {
+    ?constraint cv:constrains employment:base-daily-wage ;
+                employment:appliesWhen ?item .
+  }
+  UNION
+  {
+    employment:job-seeking-benefit cpsv:follows ?item .
+    ?item employment:variable ?variable .
+    VALUES ?variable { employment:minimum-base-daily-wage employment:daily-prescribed-hours-before-separation employment:daily-job-seeking-benefit }
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}

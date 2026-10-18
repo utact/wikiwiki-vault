@@ -1,0 +1,14 @@
+# cq-15: 2028-01-01 전에 이직한 근로자의 기초일액은 어느 규정으로 산정하는가?
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  ?rule employment:variable employment:base-daily-wage ;
+        employment:appliesWhen employment:separation-before-2028-01-01 .
+  { BIND(?rule AS ?item) } UNION { BIND(employment:separation-before-2028-01-01 AS ?item) }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
