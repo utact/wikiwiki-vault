@@ -9,13 +9,16 @@ statute units or blocks they rest on. Every provision that the expected answer i
 docs/competency-questions.md cites must be among the sources, or contain one of them.
 Citations under 범위 밖, 관련 사항 and 검사 항목 are not part of the expected answer.
 An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks; the verifier compares the items themselves.
+A query fails when a BIND or FILTER uses a variable that its own group does not bind. SPARQL evaluates such a group before the outer pattern, so the variable is unbound there, and a later triple pattern then matches every note.
 """
 
 import re
 import sys
 from pathlib import Path
 
-from rdflib import URIRef
+from rdflib import URIRef, Variable
+from rdflib.plugins.sparql import prepareQuery
+from rdflib.plugins.sparql.parserutils import CompValue
 
 import lawlib as L
 import vault as V
@@ -93,15 +96,16 @@ class Resolver:
                 continue
             for match in CITATION.finditer(group):
                 if match["short"]:
-                    law = ROOT_LAW + FAMILY[match["short"]]
+                    law, sup = ROOT_LAW + FAMILY[match["short"]], None
                 if match["sup"] or match["annex"] or match["form"]:
-                    article = None
+                    article, sup = None, None
                 if match["sup"]:
                     name = next((n for n in self.notes if re.fullmatch(rf"{re.escape(law)} 부칙 제{match['sup']}호(?: \(.*\))?", n)), None)
-                    unit = self.unit(name) if name else None
-                    for number in re.findall(r"제(\d+)조", match["sup_arts"]):
-                        block = self.block(unit, [f"a{number}"]) if unit else None
-                        found.append((f"{law} 부칙 제{match['sup']}호 제{number}조", self.iri(block) if block else None))
+                    sup = (law, match["sup"], self.unit(name) if name else None)
+                    found += [self.addendum(sup, number) for number in re.findall(r"제(\d+)조", match["sup_arts"])]
+                    continue
+                if match["art"] and sup:
+                    found.append(self.addendum(sup, match["art"]))
                     continue
                 if match["annex"]:
                     name = f"{law} 별표 {match['annex']}" + (f"의{match['annex_b']}" if match["annex_b"] else "")
@@ -124,6 +128,12 @@ class Resolver:
                     found.append(self.article(article, None, (match["item"], match["item_b"])))
         return found
 
+    def addendum(self, sup, number):
+        """An article of a 부칙, which a bare 제N조 after the 부칙 in the same group continues."""
+        law, act, unit = sup
+        block = self.block(unit, [f"a{number}"]) if unit else None
+        return f"{law} 부칙 제{act}호 제{number}조", self.iri(block) if block else None
+
     def article(self, article, p, item, m=None, word=None):
         law, number, branch = article
         name = f"{law} 제{number}조" + (f"의{branch}" if branch else "")
@@ -144,6 +154,37 @@ class Resolver:
         else:
             block = self.block(unit, ["-".join(parts)])
         return label, self.iri(block) if block else None
+
+
+def variables(node):
+    """Variables used in an algebra expression, without the bookkeeping keys that rdflib adds."""
+    if isinstance(node, Variable):
+        return {node}
+    if isinstance(node, CompValue):
+        return set().union(set(), *(variables(value) for key, value in node.items() if not key.startswith("_")))
+    if isinstance(node, (list, tuple)):
+        return set().union(set(), *(variables(value) for value in node))
+    return set()
+
+
+def unscoped(text):
+    """Variables that a BIND or FILTER of the query uses but its own group does not bind."""
+    found = []
+
+    def visit(node):
+        if isinstance(node, CompValue):
+            if node.name in ("Extend", "Filter"):
+                bound = node.p.get("_vars") or set()
+                found.extend(sorted(str(variable) for variable in variables(node.expr) - bound))
+            for key, value in node.items():
+                if not key.startswith("_"):
+                    visit(value)
+        elif isinstance(node, (list, tuple)):
+            for value in node:
+                visit(value)
+
+    visit(prepareQuery(text).algebra)
+    return found
 
 
 def within(source, cited, graph):
@@ -171,7 +212,9 @@ def check(root):
         query = QUERIES / f"{identifier}.rq"
         if not query.exists():
             continue
-        rows = list(graph.query(query.read_text(encoding="utf-8")))
+        text = query.read_text(encoding="utf-8")
+        found += [f"{identifier}: a BIND or FILTER uses ?{variable}, which its own group does not bind" for variable in unscoped(text)]
+        rows = list(graph.query(text))
         sources = {row.source for row in rows if isinstance(row.source, URIRef)}
         report[identifier] = rows
         for citation, iri in resolver.citations("\n".join(lines)):

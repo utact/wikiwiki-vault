@@ -6,11 +6,14 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX employment: <https://w3id.org/kr-employment/>
 
 SELECT ?item ?source WHERE {
-  employment:job-seeking-benefit cpsv:follows ?rule .
-  ?rule employment:variable employment:prescribed-benefit-days .
-  { BIND(?rule AS ?item) }
-  UNION
-  { ?rule employment:requiredInput ?item }
+  {
+    employment:job-seeking-benefit cpsv:follows ?item .
+    ?item employment:variable employment:prescribed-benefit-days .
+  } UNION {
+    employment:job-seeking-benefit cpsv:follows ?rule .
+    ?rule employment:variable employment:prescribed-benefit-days ;
+          employment:requiredInput ?item .
+  }
   ?note foaf:primaryTopic ?item ;
         dct:source ?expression .
   ?expression eli:realizes ?source .

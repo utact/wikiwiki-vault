@@ -5,9 +5,12 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX employment: <https://w3id.org/kr-employment/>
 
 SELECT ?item ?source WHERE {
-  ?rule employment:variable employment:base-daily-wage ;
-        employment:appliesWhen employment:separation-before-2028-01-01 .
-  { BIND(?rule AS ?item) } UNION { BIND(employment:separation-before-2028-01-01 AS ?item) }
+  {
+    ?item employment:variable employment:base-daily-wage ;
+          employment:appliesWhen employment:separation-before-2028-01-01 .
+  } UNION {
+    BIND(employment:separation-before-2028-01-01 AS ?item)
+  }
   ?note foaf:primaryTopic ?item ;
         dct:source ?expression .
   ?expression eli:realizes ?source .

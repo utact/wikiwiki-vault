@@ -17,6 +17,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 | `ontology/release.yaml` | Schema | Reference date, transitional window and jurisdiction of the wiki |
 | `ontology/shapes/` | Schema | Official SHACL shapes of CPSV-AP and CCCEV |
 | `ontology/verification.jsonl` | — | Verification ledger |
+| `ontology/cq/` | — | SPARQL queries of the competency questions |
 | `synthetic/` | — | Synthetic data |
 | `scripts/` | — | Collection, generation and validation scripts |
 | `tests/` | — | Fixture notes and tests for the scripts |
@@ -421,6 +422,19 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
   - Links, embeds and Markdown links from `wiki/` to `synthetic/`, by path or by file name
 
 Lint compares each number with the cited blocks, not the claim it makes. A sentence that puts two numbers of a block together wrongly passes, and so does `duration("P15D")` for "다음 달 15일까지", whose 15일 is in the block. The verifier agent compares the meaning.
+
+### Competency questions
+
+`docs/competency-questions.md` lists the questions the ontology must answer, with expected answers that cite the provisions they rest on.
+
+- Check them with `uv run python -X utf8 scripts/cq.py`.
+- A question is checked when `ontology/cq/<id>.rq` holds its query.
+  - The query runs on the export and returns `?item` and `?source` rows: the parts of the answer and the statute units or blocks they rest on.
+- Every provision the expected answer cites must be among the sources, or contain one of them.
+  - Citations under 범위 밖, 관련 사항 and 검사 항목 are not part of the expected answer.
+  - An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks, so the verifier compares the items.
+- A query fails when a BIND or FILTER uses a variable that its own group does not bind.
+  - SPARQL evaluates the group before the outer pattern, so the variable is unbound there and a later triple pattern matches every note, as `{ BIND(?rule AS ?item) } UNION { … }` did.
 
 ## Log
 
