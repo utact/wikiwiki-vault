@@ -1,0 +1,29 @@
+# cq-12: 근로자가 이직하면 사업주는 무엇을 언제까지 해야 하는가?
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    ?item cv:isGroupedBy employment:employee-separation .
+  } UNION {
+    ?service cv:isGroupedBy employment:employee-separation ;
+             cv:hasParticipation ?item .
+  } UNION {
+    ?service cv:isGroupedBy employment:employee-separation ;
+             cv:hasParticipation/cv:holdsRequirement ?item .
+  } UNION {
+    ?service cv:isGroupedBy employment:employee-separation ;
+             cv:hasInputType ?item .
+  }
+  {
+    ?note foaf:primaryTopic ?item ;
+          dct:source ?expression .
+    ?expression eli:realizes ?source .
+  } UNION {
+    ?item rdfs:isDefinedBy ?source .
+  }
+}
