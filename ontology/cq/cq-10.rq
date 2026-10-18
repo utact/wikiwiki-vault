@@ -1,0 +1,17 @@
+# cq-10: 구직급여를 받을 수 있는 날수는 며칠인가?
+PREFIX cpsv: <http://purl.org/vocab/cpsv#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  employment:job-seeking-benefit cpsv:follows ?rule .
+  ?rule employment:variable employment:prescribed-benefit-days .
+  { BIND(?rule AS ?item) }
+  UNION
+  { ?rule employment:requiredInput ?item }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
