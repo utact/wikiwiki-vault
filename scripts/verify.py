@@ -51,21 +51,30 @@ def fenced(text, language):
 
 
 def context(linter, names):
-    """The verifier's reading for a set of notes, as Markdown."""
-    out, linked = [], set()
+    """The verifier's reading for a set of notes, as Markdown: the notes, then each cited block, raw note and linked note once."""
+    out, blocks, raw, linked = [], {}, {}, set()
     for name in names:
         note = linter.notes[name]
+        cited = cited_blocks(linter, note)
         out += [f"# {name}", "", f"File: `{note.where}`", ""] + fenced(note.text, "markdown")
-        for target, block in cited_blocks(linter, note):
-            text = linter.notes[target].blocks.get(block)
-            out += [f"## Cited block {target}#^{block}", ""] + fenced(text[0] if text else "(the note declares no such block)", "text")
+        out += ["Cited blocks: " + (", ".join(f"{target}#^{block}" for target, block in cited) or "none"), ""]
+        blocks.update(dict.fromkeys(cited))
         for target in dict.fromkeys(n for n, _ in links(note)):
             other = linter.notes.get(target)
             if other and other.folder == "raw":
-                out += [f"## Linked raw note {target}", ""] + fenced(other.text, "markdown")
+                raw[target] = other
             elif other and other.folder == "wiki" and not other.statute and target not in names:
                 linked.add(target)
         linked |= {other.stem for other in linter.authored() if other.stem not in names and any(n == name for n, _ in links(other))}
+    if blocks:
+        out += ["# Cited statute blocks", ""]
+        for target, block in blocks:
+            text = linter.notes[target].blocks.get(block)
+            out += [f"## Cited block {target}#^{block}", ""] + fenced(text[0] if text else "(the note declares no such block)", "text")
+    if raw:
+        out += ["# Linked raw notes", ""]
+        for target, other in raw.items():
+            out += [f"## {target}", ""] + fenced(other.text, "markdown")
     if linked:
         out += ["# Notes that link to or from these notes", ""]
         for target in sorted(linked):
