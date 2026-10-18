@@ -253,3 +253,56 @@ def test_decision_table_outputs_may_be_expressions(tmp_path):
     assert not any("rule 1 output" in p for p in problems), problems
     problems = run(tmp_path / "bad", (TABLE, "    - '120'\n  - - < 50\n    - '[1..3)'", "    - 근속기간 * 120\n  - - < 50\n    - '[1..3)'"))
     assert any("rule 1 output uses '근속기간'" in p for p in problems), problems
+
+
+FORM = """---
+type: LegalResourceSubdivision
+identifier: law-006288-form-6
+title: 시험 서식
+isPartOf: '[[고용보험법]]'
+typeSubdivision: form
+number: 별지 제6호서식
+status: verified
+---
+
+## 2023-07-01 시행 (현행)
+
+```text
+  작성방법
+───┬──────────────────────
+  고용│1. 상실 연월일란에는 다음 날을 적습니다.
+  보험│2. 상실사유란에는 구분코드를 함께 적습니다.
+  산재│
+  보험│
+```
+
+^v20230701-t
+"""
+
+FORM_CITER = """---
+type: Concept
+identifier: test-loss-code
+definition: 시험 코드
+inScheme: '[[법령 종류]]'
+source:
+- '[[고용보험법 시행규칙 별지 제6호서식#^v20230701-t]]'
+status: draft
+---
+
+이 코드는 상실사유란에 구분코드와 함께 적는다.[^1]
+
+[^1]: [[고용보험법 시행규칙 별지 제6호서식#^v20230701-t|LABEL]]
+"""
+
+
+@pytest.mark.parametrize("label, problem", [
+    ("고용보험법 시행규칙 별지 제6호서식", None),
+    ("고용보험법 시행규칙 별지 제6호서식 고용보험·산재보험 작성방법 제2호", None),
+    ("고용보험법 시행규칙 별지 제6호서식 국민연금 작성방법 제2호", "names 국민연금, which the form does not contain"),
+    ("고용보험법 시행규칙 별지 제6호서식 작성방법", "is not the citation"),
+])
+def test_form_item_labels(tmp_path, label, problem):
+    found = run(tmp_path, ("wiki/LegalResourceSubdivision/고용보험법 시행규칙 별지 제6호서식.md", None, FORM),
+                ("wiki/Concept/시험 코드.md", None, FORM_CITER.replace("LABEL", label)))
+    labels = [p for p in found if "시험 코드" in p and "footnote label" in p]
+    assert labels == [] if problem is None else any(problem in p for p in labels), labels

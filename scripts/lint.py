@@ -596,6 +596,7 @@ class Linter:
         """A footnote link to a statute block carries the official citation as its label.
 
         The label may add 본문, 단서, 전단, 후단 or 각 호 외의 부분 when the block has that part, and an item of a 별표 or 서식, such as 제1호나목.
+        A 서식 item may follow the words of the section that holds it, such as 고용보험·산재보험 작성방법 제2호, and each word must appear in the form.
         """
         for embed, name, block, label in links:
             target = self.notes.get(name.strip())
@@ -606,16 +607,22 @@ class Linter:
             if not label:
                 self.problem(note, f"footnote link [[{target.stem}#^{block}]] has no citation label")
                 continue
-            items = ""
-            if suffix in ("t", "remarks") and target.meta.get("typeSubdivision") in ("annex", "form"):
+            items, kind = "", target.meta.get("typeSubdivision")
+            if suffix in ("t", "remarks") and kind == "annex":
                 items = r"(?: ?제\d+호(?:의\d+)?(?:[가-하]목)?)?"
+            elif suffix == "t" and kind == "form":
+                items = r"(?: (?P<words>(?:[^\s제]\S* )*)제\d+호(?:의\d+)?(?:[가-하]목)?)?"
             parts = "|".join(re.escape(p) for p in PARTS if p)
-            match = re.fullmatch(re.escape(expected) + items + f"({parts})?", label.strip())
+            match = re.fullmatch(re.escape(expected) + items + f"(?P<part>{parts})?", label.strip())
             if not match:
                 self.problem(note, f"footnote label {label!r} is not the citation {expected!r}")
                 continue
-            part = (match.group(1) or "").strip()
+            part = (match.group("part") or "").strip()
             own = target.blocks.get(block, ("", False))[0]
+            words = match.groupdict().get("words") or ""
+            missing = [w for w in words.split() if re.sub(r"[·ㆍ]", "", w) not in L.canonical(own)]
+            if missing:
+                self.problem(note, f"footnote label {label!r} names {' '.join(missing)}, which the form does not contain")
             if part in ("본문", "단서") and "다만" not in own:
                 self.problem(note, f"footnote label {label!r} names the {part}, but the block has no 단서")
             elif part in ("전단", "후단") and "이 경우" not in own:
