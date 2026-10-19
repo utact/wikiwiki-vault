@@ -304,3 +304,38 @@ def test_only_the_latest_retrieval_needs_every_image(tmp_path, monkeypatch):
     problems = []
     C.check_notes(problems)
     assert [p for p in problems if "attachments missing" in p] == [f"{(folder / '시험법 20260918-1 20261015T1940.md').relative_to(tmp_path)}: attachments missing"]
+
+
+def delegation_vault(tmp_path, monkeypatch, named, answered):
+    """A raw note of the 위임조문 data of 시험법, named after one version and answering for another."""
+    import json
+
+    import lawlib as L
+
+    monkeypatch.setattr(L, "RAW", tmp_path / "raw")
+    monkeypatch.setattr(L, "release", lambda: (AS_OF, WINDOW))
+    monkeypatch.setattr(L, "stored_versions", lambda name: ({}, ROWS, {}, {}))
+    folder = tmp_path / "raw" / "law" / "시험법 위임조문"
+    folder.mkdir(parents=True)
+    stem = f"시험법 위임조문 {named} 20261019T2013"
+    date, serial = answered.split("-")
+    response = {"lsDelegated": {"법령": {"법령정보": {"시행일자": date, "법령일련번호": serial}, "위임조문정보": []}}}
+    (folder / f"{stem}.json").write_text(json.dumps(response, ensure_ascii=False), encoding="utf-8")
+    (folder / f"{stem}.md").write_text("---\ntitle: 시험법 위임조문\n---\n", encoding="utf-8")
+    problems = []
+    C.check_delegations("시험법", problems)
+    return problems
+
+
+def test_delegation_data_of_the_current_version_passes(tmp_path, monkeypatch):
+    assert delegation_vault(tmp_path, monkeypatch, "20210101-2", "20210101-2") == []
+
+
+def test_delegation_data_of_an_earlier_version_fails(tmp_path, monkeypatch):
+    problems = delegation_vault(tmp_path, monkeypatch, "20200101-1", "20200101-1")
+    assert any("current version 20210101-2 not collected" in p for p in problems)
+
+
+def test_delegation_data_must_answer_for_the_version_it_is_named_after(tmp_path, monkeypatch):
+    problems = delegation_vault(tmp_path, monkeypatch, "20210101-2", "20200101-1")
+    assert any("response is of 20200101-1" in p for p in problems)

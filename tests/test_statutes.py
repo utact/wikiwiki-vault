@@ -324,3 +324,39 @@ def test_a_bare_article_opening_a_parenthesis_after_a_law_out_of_scope_is_droppe
     statutes = family([article(5, "범위", [("「다른법」 제11조(제12조에서 준용하는 경우를 포함한다)에 따른다.", [])]),
                        article(12, "준용", text="준용한다.")])
     assert refs(statutes, "시험법 시행령", "art-5") == []
+
+
+def test_provisions_of_the_delegation_data_name_blocks():
+    assert S.provision_block("제10조제1항제3호") == ("art-10", "p1-i3")
+    assert S.provision_block("제2조제5호") == ("art-2", "i5")
+    assert S.provision_block("제58조제1호나목") == ("art-58", "i1-m2")
+    assert S.provision_block("제77조의8제2항") == ("art-77-8", "p2")
+    assert S.provision_block("제23조") == ("art-23", None)
+
+
+def test_delegation_data_keeps_delegations_to_lower_laws_only():
+    response = {"lsDelegated": {"법령": {"위임조문정보": [
+        {"조정보": {"조문번호": "43"}, "위임정보": [
+            {"위임구분": "시행규칙", "위임법령제목": "시험법 시행규칙", "위임법령조문정보": [
+                {"위임법령조문번호": "82", "위임법령조문가지번호": "2", "조항호목": "제43조제4항"},
+                {"위임법령조문번호": "82", "위임법령조문가지번호": "2", "조항호목": "제43조제4항"}]},
+            {"위임구분": "위임행정규칙", "위임행정규칙조문정보": {"조항호목": "제43조제1항"}},
+            {"위임구분": ["인용법령", "인용법령"], "위임법령제목": ["가법", "나법"], "위임법령조문정보": [{"위임법령조문번호": "1", "조항호목": "제43조"}]}]},
+        {"조정보": {"조문번호": "23"}, "위임정보": {"위임구분": "시행령", "위임법령제목": "시험법 시행령",
+                                               "위임법령조문정보": {"위임법령조문번호": "29", "조항호목": "제23조"}}}]}}}
+    assert S.official_delegations(response) == [("시험법 시행규칙", "art-82-2", "제43조제4항"), ("시험법 시행령", "art-29", "제23조")]
+
+
+def test_a_reference_after_a_provision_that_applies_it_is_applied():
+    statutes = family([article(5, "범위", [("법 제12조제1항에서 준용하는 법 제11조제3항 및 제2항에 따라 신고한다.", [])])])
+    found = [(r.key, r.block, r.applied) for r in refs(statutes, "시험법 시행령", "art-5")]
+    assert found == [("art-12", "p1", False), ("art-11", "p3", True), ("art-11", "p2", True)]
+
+
+def test_delegation_data_decides_for_articles_of_the_current_version():
+    statutes = family([article(5, "범위", [("신고한다.", [])])])
+    statutes.covered, statutes.delegations = {"시험법": None}, {}
+    unit = S.Unit(statutes.laws["시험법 시행령"], "art-5")
+    assert statutes.decides(unit, "시험법")
+    assert not statutes.decides(unit, "시험법 시행규칙")
+    assert not statutes.decides(S.Unit(statutes.laws["시험법"], "art-10"), "시험법")

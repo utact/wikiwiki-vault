@@ -9,6 +9,7 @@ The units to generate are those that docs/competency-questions.md cites, their p
 and the units those units cite directly.
 """
 
+import glob
 import json
 import re
 import subprocess
@@ -59,7 +60,9 @@ DELEGATION = re.compile(PART_WORDS + r"\s*(?P<joint>에\s*따라|에\s*따른|�
 QUOTED_PHRASE = re.compile(PART_WORDS + r'\s*에서\s*"([^"]+)"')
 AMENDED = re.compile(PART_WORDS + r"\s*(?:의)?\s*개정\s*규정")
 PART = re.compile(r"\s*(본문|단서|전단|후단|각\s*호\s*외의\s*부분)")
-Ref = namedtuple("Ref", "law key block part delegation phrase amended follow lead")
+Ref = namedtuple("Ref", "law key block part delegation phrase amended follow lead applied", defaults=(False,))
+APPLIED = re.compile(r"에서\s*준용하는\s*$")
+PROVISION = re.compile(r"제(\d+)조(?:의(\d+))?(?:제(\d+)항)?(?:제(\d+)호(?:의(\d+))?)?(?:([가-하])목)?")
 LAW_NAME = re.compile(r"(?:「|(?<![\w가-힣])\?)([^」「?]+)」")
 BODY_MARK = re.compile(r"\s*(?:[①-⑳]|\d+(?:의\d+)?\.|[가-하]\.)?\s*")
 TOPIC = re.compile(r"(?:[^,.]{0,60}?에도\s*불구하고,?\s+)?(?:[^,.]{0,60}?(?:은|는)\s+)?")
@@ -116,6 +119,34 @@ def one_line(text):
 def link(name, block=None, label=None):
     target = name + (f"#^{block}" if block else "")
     return f"[[{target}|{label}]]" if label else f"[[{target}]]"
+
+
+def official_delegations(response):
+    """Delegations to a 시행령 or 시행규칙 in the 위임조문 data of 법제처, as (lower law, article key, delegating provision).
+
+    The data names the article of the lower law that receives the delegation and the provision that delegates, such as 제43조제4항.
+    """
+    found = []
+    for item in L.as_list(response["lsDelegated"]["법령"].get("위임조문정보")):
+        for entry in L.as_list(item.get("위임정보")):
+            if entry.get("위임구분") not in ("시행령", "시행규칙"):
+                continue
+            for info in L.as_list(entry.get("위임법령조문정보")):
+                found.append((entry["위임법령제목"], L.article_key(info["위임법령조문번호"], info.get("위임법령조문가지번호")), info["조항호목"]))
+    return list(dict.fromkeys(found))
+
+
+def provision_block(provision):
+    """Unit key and block suffix of a provision such as 제10조제1항제3호, which are art-10 and p1-i3."""
+    match = PROVISION.fullmatch(provision)
+    if not match:
+        raise ValueError(f"unknown provision {provision}")
+    block = f"p{match[3]}" if match[3] else None
+    if match[4]:
+        block = (f"{block}-" if block else "") + f"i{match[4]}" + (f"-{match[5]}" if match[5] else "")
+        if match[6]:
+            block += f"-m{LETTERS.index(match[6]) + 1}"
+    return L.article_key(match[1], match[2]), block
 
 
 class Law:
@@ -491,6 +522,7 @@ class Statutes:
         self.as_of = as_of
         self.laws = {name: Law(name, as_of) for name in SOURCES["laws"] + SOURCES.get("references", [])}
         self.review = []
+        self.load_delegations()
         CITED.clear()
         VERSIONS.clear()
         for path in sorted(WIKI.rglob("*.md")):
@@ -500,6 +532,28 @@ class Statutes:
                 unit = self.unit_named(name.strip())
                 if unit is not None and unit.kind != "law":
                     CITED.setdefault((unit.law.name, unit.key), set()).add(cited_date)
+
+    def load_delegations(self):
+        """The 위임조문 data of the current version of every 법률 and 시행령 in scope: the raw note of each law and the delegations by lower article."""
+        self.covered, self.delegations = {}, {}
+        for name in SOURCES["laws"]:
+            law = self.laws[name]
+            if name.endswith(" 시행규칙"):
+                continue
+            mst = law.chosen[law.current]["법령일련번호"]
+            folder = L.RAW / "law" / f"{name} 위임조문"
+            notes = sorted(folder.glob(f"{glob.escape(name)} 위임조문 {law.current}-{mst} *.md"))
+            if not notes:
+                self.review.append(f"{name}: no 위임조문 data of the current version {law.current}-{mst}; basedOn comes from the text alone")
+                continue
+            self.covered[name] = notes[-1]
+            for lower, key, provision in official_delegations(json.loads(notes[-1].with_suffix(".json").read_text(encoding="utf-8"))):
+                self.delegations.setdefault((lower, key), []).append((name, provision))
+
+    def decides(self, unit, upper):
+        """Whether the 위임조문 data decides the delegations from a law to a unit: an article of the current version of a lower law."""
+        return (upper in getattr(self, "covered", {}) and unit.kind == "article" and unit.law.name != upper
+                and unit.key in unit.law.rows_of(unit.law.current))
 
     def family(self, law, short):
         return self.laws.get(law.root + FAMILY[short])
@@ -602,6 +656,7 @@ class Statutes:
         Title lines, 조문참고자료 and the heading of each 부칙 article are not references.
         A 같은 조 or a continued 제3항 belongs to the article cited just before, and 같은 법 to the law named just before.
         A bare article that opens a parenthesis right after a reference belongs to the law of that reference.
+        A reference after "에서 준용하는" is applied, as 법 제15조 in "법 제77조의10제1항에서 준용하는 법 제15조에 따라".
         A range such as 제56조부터 제58조까지 or 제1항부터 제3항까지 cites every unit in it.
         """
         found = []
@@ -677,9 +732,10 @@ class Statutes:
                     part = PART.match(rest)
                     phrase = QUOTED_PHRASE.match(rest)
                     amended = unit.key.split("-")[1] if unit.kind == "addendum" and AMENDED.match(rest) else None
+                    applied = bool(APPLIED.search(before_match)) or bool(chain and state["continued"] and found[chain[0]].applied)
                     chain.append(len(found))
                     found.append(Ref(target.name, key, block, re.sub(r"\s+", " ", part.group(1)) if part else None, bool(delegation),
-                                     phrase.group(1) if phrase else None, amended, follow, lead))
+                                     phrase.group(1) if phrase else None, amended, follow, lead, applied))
                     if delegation or amended:
                         for index in chain:
                             ref = found[index]
@@ -903,7 +959,12 @@ def render_unit(statutes, unit, chosen):
             found = bool(version and ref.block and ref.block in lines)
             text = link(target.name, block_id(version, ref.block) if found else None)
             cites.append(text)
-            delegation = delegated(ref, lines, found, law)
+            delegation = delegated(ref, lines, found, law) if unit.kind != "form" else False
+            if statutes.decides(unit, ref.law) and not ref.applied:
+                listed = {provision_block(p)[0] for upper, p in statutes.delegations.get((law.name, unit.key), []) if upper == ref.law}
+                if delegation is True and ref.key not in listed:
+                    statutes.review.append(f"{unit.name}: the text reads a delegation from {text}, which the 위임조문 data does not list; no basedOn is written")
+                continue
             if delegation == "review":
                 if not ref.lead:
                     why = "it does not open its provision"
@@ -916,6 +977,19 @@ def render_unit(statutes, unit, chosen):
                 statutes.review.append(f"{unit.name}: cites {text}, which delegates, but {why}; no basedOn is written")
             elif delegation:
                 based.append(text)
+    data_notes = []
+    if unit.kind == "article":
+        for upper, provision in statutes.delegations.get((law.name, unit.key), []) if hasattr(statutes, "delegations") else []:
+            key, block = provision_block(provision)
+            target = names.get((upper, key))
+            if target is None:
+                continue
+            version = current.get((upper, key))
+            lines = {s: t for s, t, _ in unit_lines(target, version["effective"])} if version else {}
+            if block and block not in lines:
+                statutes.review.append(f"{unit.name}: the 위임조문 data names {upper} {provision}, which the current version does not declare; the link names the unit")
+            based.append(link(target.name, block_id(version, block) if block in lines else None))
+            data_notes.append(statutes.covered[upper].stem)
     if based:
         meta["basedOn"] = list(dict.fromkeys(based))
     if cites:
@@ -961,7 +1035,7 @@ def render_unit(statutes, unit, chosen):
         meta["typeSubdivision"] = unit.subdivision
         meta["number"] = unit.number
     sources = [law.notes[v["effective"]].stem for v in versions] if versions else [law.notes[d].stem for d in law.needed()]
-    meta["source"] = [link(s) for s in dict.fromkeys(sources)]
+    meta["source"] = [link(s) for s in dict.fromkeys(sources + data_notes)]
     meta["status"] = "verified"
     body = body_of(unit, versions)
     return meta, body

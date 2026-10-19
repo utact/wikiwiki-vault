@@ -6,6 +6,7 @@ Usage:
 
 Writes raw notes under raw/, keeps uncited earlier versions in .cache/law/ and
 .cache/admrul/, and writes a report to .cache/collect-<what>.json.
+laws also collects the 위임조문 data of the current version of every 법률 and 시행령 in scope.
 
 quote appends a short quotation to the latest raw note of a 고용24 guide, after checking that the section of the stored page contains it, whitespace aside.
 """
@@ -107,6 +108,35 @@ def write_law_note(name, law_id, effective, mst, stamp, generated):
     return folder / f"{basename}.md"
 
 
+def write_delegation_note(name, law_id, effective, mst, stamp, generated):
+    """Write the raw note of the 위임조문 data of the current version of a law, unless the latest retrieval is the same.
+
+    법제처 keeps this data for its 현행 version only, so a response of another version is reported and not stored.
+    """
+    folder = L.RAW / "law" / f"{name} 위임조문"
+    text, url = L.law_api("lawService", target="lsDelegated", ID=law_id)
+    info = json.loads(text)["lsDelegated"]["법령"]["법령정보"]
+    if (info["시행일자"], info["법령일련번호"]) != (effective, mst):
+        return None, f"{name}: the 위임조문 data is of {info['시행일자']}-{info['법령일련번호']}, not of the current version {effective}-{mst}"
+    basename = f"{name} 위임조문 {effective}-{mst} {stamp}"
+    digest = L.files_hash(L.json_payload(text))
+    if unchanged(folder, basename, digest):
+        return None, None
+    L.write_json(folder / f"{basename}.json", text)
+    meta = {
+        "identifier": f"raw-law-delegation-{law_id}-{effective}-{mst}-{stamp.lower()}",
+        "title": f"{name} 위임조문",
+        "publisher": L.PUBLISHERS["law"],
+        "url": url,
+        "generatedAtTime": generated,
+        "sha256": digest,
+        "license": L.LICENSES["law"],
+    }
+    body = f"{name}의 {effective} 시행 버전에서 하위 법령에 위임한 조문의 위임조문 정보 원문 노트다. 원문 응답은 같은 이름의 JSON 파일이다."
+    L.write_note(folder / f"{basename}.md", meta, body)
+    return folder / f"{basename}.md", None
+
+
 def collect_cited(as_of, stamp, generated, report):
     """Raw notes of the earlier law versions that wiki notes cite and that no committed raw note holds."""
     import statutes as S
@@ -146,6 +176,13 @@ def collect_laws(as_of, window_start, stamp, generated, report):
             note = write_law_note(name, law_id, effective, chosen[effective]["법령일련번호"], stamp, generated)
             if note:
                 entry["written"].append(note.name)
+        if name in SOURCES["laws"] and not name.endswith(" 시행규칙"):
+            note, problem = write_delegation_note(name, law_id, current, chosen[current]["법령일련번호"], stamp, generated)
+            if note:
+                entry["written"].append(note.name)
+            if problem:
+                entry["delegations"] = problem
+                print(problem)
         cache = L.CACHE / "law" / law_id
         earlier = [d for d in chosen if L.in_force(chosen, window_start) <= d < current] if name in SOURCES["laws"] else []
         for effective in earlier:

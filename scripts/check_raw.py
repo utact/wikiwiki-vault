@@ -207,6 +207,23 @@ def check_reference(name, problems):
             problems.append(f"{name} {effective}: response says {versions[effective]['기본정보']['시행일자']}")
 
 
+def check_delegations(name, problems):
+    """The 위임조문 data of a 법률 or 시행령 in scope: collected for the current version, and of the version its name says."""
+    versions, rows, _, _ = L.stored_versions(name)
+    chosen = L.choose_versions(rows)
+    current = L.in_force(chosen, L.release()[0])
+    folder = L.RAW / "law" / f"{name} 위임조문"
+    found = sorted(folder.glob(f"{name} 위임조문 *.md")) if folder.exists() else []
+    expected = f"{current}-{chosen[current]['법령일련번호']}"
+    if not any(NOTE.match(note.stem) and f"{NOTE.match(note.stem)['date']}-{NOTE.match(note.stem)['serial']}" == expected for note in found):
+        problems.append(f"{name}: 위임조문 data of the current version {expected} not collected")
+    for note in found:
+        match = NOTE.match(note.stem)
+        info = load(note.with_suffix(".json"))["lsDelegated"]["법령"]["법령정보"]
+        if not match or (info["시행일자"], info["법령일련번호"]) != (match["date"], match["serial"]):
+            problems.append(f"{note.name}: response is of {info['시행일자']}-{info['법령일련번호']}")
+
+
 def check_notices(problems, notes):
     """Raw notes of 행정규칙: 시행일자 as named, and a text that is not empty."""
     for note in sorted(L.RAW.glob("law/*/*.md")):
@@ -308,6 +325,8 @@ def main():
     problems, notes = [], []
     for name in sources["laws"]:
         check_law(name, problems, notes)
+        if not name.endswith(" 시행규칙"):
+            check_delegations(name, problems)
     for name in sources.get("references", []):
         check_reference(name, problems)
     check_notices(problems, notes)

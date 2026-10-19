@@ -58,11 +58,15 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Keep attachments with the same basename followed by `-1`, `-2` and so on, with their own extension: first the 첨부파일 of a 고시 in the order of the response, then the image files the response links to as `<img src>` or `<img id>`, in order of first appearance.
   - Store the image files because some text exists only in them, such as the formulas of 고용산재보험료징수법 시행령 제18조의2 and the amount in `2020년 적용 최저임금 고시`.
   - Keep version lists as `<법령명> versions <YYYYMMDDTHHMM>.json`.
+  - 위임조문 data: `raw/law/<법령명> 위임조문/<법령명> 위임조문 <시행일자>-<MST> <YYYYMMDDTHHMM>.md`, in its own folder so that it stays apart from the versions of the law
 - Collect these versions of every 법령 and 행정규칙 in scope.
   - The current version
   - Every scheduled version (시행예정)
   - Every earlier version in force during the transitional window, so that text kept by a 경과조치 is at hand, such as 고용보험법 시행령 제68조 before 2026-01-01
   - Leave out proposals published under the same 행정규칙ID, such as `2027년 적용 최저임금안 고시`.
+- Collect the 위임조문 data of the current version of every 법률 and 시행령 in scope.
+  - It names each provision that delegates to a 시행령 or 시행규칙 and the article that receives it.
+  - 법제처 keeps it for its 현행 version only, so collect it again when a new version comes into force. `scripts/collect.py` stores no response of another version, and `scripts/check_raw.py` fails when the current version lacks it.
 - The transitional window is `transitionalWindow` in `ontology/release.yaml`, counted back from the reference date.
   - It starts with the version in force on its first day.
   - It is the longest time a person can still receive 구직급여 after 이직: 4 years (고용보험법 제48조제2항) plus 2 years of 훈련연장급여 (시행령 제72조), 60 days of 개별연장급여 (법 제52조제2항) and 60 days of 특별연장급여 (법 제53조제1항), which are paid one after another (법 제55조) and lengthen the 수급기간 (법 제54조제1항).
@@ -114,7 +118,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
   - Keep generating every unit that already has a statute note, so that no note goes stale.
   - Commit `scripts/` first: `statutes.py` writes notes only from a committed generator, so that the ledger names it.
-  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers, cited versions without a raw note, references not counted as delegations, units kept only because their note exists, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
+  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers, cited versions without a raw note, references not counted as delegations, delegations the 위임조문 data does not list, units kept only because their note exists, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
   - `--check` lists the notes that differ from a fresh generation or from the ledger. It changes and fetches nothing, and stops when the cache lacks a version it needs.
   - `--versions "<unit>"` lists the versions of a unit in the transitional window with their block IDs, for citing an earlier version.
 - Statute notes follow article numbers.
@@ -154,7 +158,11 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 - The text of a block includes the text of its children, such as the 호 of a 항, for quotes, numbers and hashes.
 - Show image files in place of the `<img>` elements of statute text, as embeds of the attachments of the raw note.
   - Keep the table text an image carries after the embed, inside an Obsidian comment (`%%<img>…</img>%%`), so that quotes and numbers can be checked against it.
-- Generate `cites` from the references in the text, and `basedOn` from explicit delegations such as "법 제45조제5항에 따라".
+- Generate `cites` from the references in the text, and `basedOn` from the 위임조문 data of 법제처.
+  - The data decides the delegations from a 법률 or 시행령 to an article of the current version of a lower law, as 법 제42조제3항 and 제43조제4항 for 시행규칙 제82조의2.
+  - Add the raw note of the data to `source` of each note that takes `basedOn` from it.
+  - Read from the text, by the rules below, the delegations the data does not cover: those applied by 준용, as 법 제15조제3항 in "법 제77조의10제1항에서 준용하는 법 제15조제3항에 따라", and those to 별표, 부칙 and units outside the current version.
+  - When the text reads a delegation that the data does not list, write no `basedOn` and list it for review, as 시행령 제86조 on 법 제64조제1항.
   - Resolve 법, 영 and 규칙 against the law family, and short names defined in the text, such as 고용산재보험료징수법.
   - Resolve 같은 조, 같은 항 and 같은 호 against the article, 항 and 호 cited just before in the line, or the current article when none is.
   - Resolve 같은 법, 같은 영 and 같은 규칙 against the law named just before in the line, by any 「…」 name, and drop the reference when that law is out of scope, as 같은 법 제49조 after 「부가가치세법」 제32조.
@@ -168,10 +176,11 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Skip the 부칙 articles titled 다른 법률의 개정 or 다른 법령의 개정, because their references belong to another law.
   - Link the 개정규정 that a 부칙 names to the version of the 부칙's promulgation, as 제45조제1항 in 고용보험법 부칙 제21473호 to the version of 2028-01-01.
   - When the note of the cited unit does not show that version, link the unit and list it for review.
-  - Count a reference as a delegation only when it is followed by 에 따라, 에 따른 or 에서, stands outside parentheses, opens its 항 or article, and the cited provision delegates to the citing kind of law.
+  - Count a reference in the text as a delegation only when it is followed by 에 따라, 에 따른 or 에서, stands outside parentheses, opens its 항 or article, and the cited provision delegates to the citing kind of law.
+    - A reference in a 별지 서식 never counts, because the article that prescribes the 서식 receives the delegation.
     - A reference opens its provision when nothing precedes it there, or only a topic or a clause of 불구하고, as in "사업주나 하수급인은 법 제15조에 따라" and "제2항에도 불구하고 법 제45조제5항에 따라". Every member of a list such as "법 제21조제1항 및 제2항에 따라" opens it when the first one does.
     - One inside a 호 or in the middle of a sentence describes, as in "법 제48조에 따른 수급기간이 종료된 경우", and so does "에 따라" before a participle, as in "법 제75조에 따라 지급된".
-    - This misses some real delegations in the middle of a sentence, such as 고용보험법 시행규칙 제82조의2 on 법 제42조제3항, which are listed for review.
+    - This misses real delegations in the middle of a sentence, such as 시행규칙 제82조의2 on 법 제42조제3항, which the 위임조문 data supplies. Where the data does not apply, they are listed for review.
     - The cited provision is the text of the cited block without its children, the part the reference names, such as 단서 or 후단, or any 항 or 호 of a whole article.
     - It delegates when a sentence of it says "대통령령으로 정하는" for a 시행령 or "고용노동부령으로 정하는" for a 시행규칙, in any form such as 정한다, or when the reference quotes such a phrase of it, as in "법 제61조제2항 본문에서 "대통령령으로 정하는 사유"란".
     - After 에 따른 or 에서, the word that follows names the matter, and its first two syllables must appear in that sentence, as 추가 for "법 제62조제2항 본문에 따른 추가징수액". "법 제40조제2항제1호에 따른 기준기간" is not a delegation, because the delegating sentence of that 호 is about a 사유. A word of one syllable, such as 월, names no matter. Such references are listed for review.
