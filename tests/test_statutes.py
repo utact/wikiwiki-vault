@@ -311,3 +311,16 @@ def test_a_law_name_with_its_short_name_in_parentheses_prefixes_the_reference():
 def test_a_law_out_of_scope_with_its_short_name_takes_its_references_along():
     statutes = family([article(5, "범위", [("「다른법」(이하 \"다른법률\"이라 한다) 제11조제1항에 따른다.", [])])])
     assert refs(statutes, "시험법 시행령", "art-5") == []
+
+
+def test_a_bare_article_opening_a_parenthesis_belongs_to_the_law_before_it():
+    statutes = family([article(5, "범위", [("법 제11조제1항(제12조제1항에서 준용하는 경우를 포함한다)에 따른다.", [])]),
+                       article(12, "준용", text="준용한다.")])
+    found = [(r.law, r.key, r.block) for r in refs(statutes, "시험법 시행령", "art-5")]
+    assert found == [("시험법", "art-11", "p1"), ("시험법", "art-12", "p1")]
+
+
+def test_a_bare_article_opening_a_parenthesis_after_a_law_out_of_scope_is_dropped():
+    statutes = family([article(5, "범위", [("「다른법」 제11조(제12조에서 준용하는 경우를 포함한다)에 따른다.", [])]),
+                       article(12, "준용", text="준용한다.")])
+    assert refs(statutes, "시험법 시행령", "art-5") == []

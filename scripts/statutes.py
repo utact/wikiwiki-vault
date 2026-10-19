@@ -48,6 +48,7 @@ REFERENCE = re.compile(
     r")"
 )
 CONTINUATION = re.compile(r"\s*(?:부터|까지|ㆍ|·|,|및|와|과|또는)?\s*")
+QUALIFIER = re.compile(r"\s*(?:본문|단서|전단|후단)?\s*\(\s*")
 RANGE_START = re.compile(r"\s*부터\s*")
 RANGE_END = re.compile(r"\s*까지")
 ARTICLE_HEAD = re.compile(r"\s*제\d+조(?:의\d+)?\([^)]*\)")
@@ -600,6 +601,7 @@ class Statutes:
 
         Title lines, 조문참고자료 and the heading of each 부칙 article are not references.
         A 같은 조 or a continued 제3항 belongs to the article cited just before, and 같은 법 to the law named just before.
+        A bare article that opens a parenthesis right after a reference belongs to the law of that reference.
         A range such as 제56조부터 제58조까지 or 제1항부터 제3항까지 cites every unit in it.
         """
         found = []
@@ -632,9 +634,10 @@ class Statutes:
                         continue
                     gap = text[state["end"]: match.start()] if state["end"] is not None else None
                     state["continued"] = gap is not None and bool(CONTINUATION.fullmatch(gap))
+                    qualifies = gap is not None and bool(QUALIFIER.fullmatch(gap))
                     if not state["continued"]:
                         chain = []
-                    origin = state["law"] if state["continued"] and not prefixed else unit.law
+                    origin = state["law"] if (state["continued"] or qualifies) and not prefixed else unit.law
                     previous = state["key"] if state["end"] is not None else None
                     previous_law, previous_block = state["law"], state.get("block")
                     state["end"] = match.end()

@@ -160,6 +160,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Resolve 같은 법, 같은 영 and 같은 규칙 against the law named just before in the line, by any 「…」 name, and drop the reference when that law is out of scope, as 같은 법 제49조 after 「부가가치세법」 제32조.
   - Drop a 같은 조, 같은 항 or 같은 호 that follows a reference to a law out of scope.
   - A reference after 부터, 까지, ㆍ, 및, 또는 or a comma belongs to the law of the reference before it, as 제132조 in "「형법」 제129조부터 제132조까지".
+  - So does an article that opens a parenthesis right after a reference, as 제77조의5제3항 in "법 제87조(제77조의5제3항ㆍ제4항 및 제77조의10제3항ㆍ제4항에서 준용하는 경우를 포함한다)".
   - A bare 항, 호 or 목 after such a word continues the article before it, as 제3항 in "제11조제2항ㆍ제3항" and 다목 in "제58조제1호나목 및 다목".
   - A range such as "제56조부터 제58조까지" or "제1항부터 제3항까지" cites every unit in it.
   - Title lines, 조문참고자료 and the headings of 부칙 articles are not references, because they name the unit itself or its history, as "제44조에서 이동".
