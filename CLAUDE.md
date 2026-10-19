@@ -134,7 +134,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Collect their current and scheduled versions only.
 - Give statute notes these identifiers.
   - Law: `law-<법령ID>`, and for a series of 고시 under one 행정규칙ID: `admrul-<행정규칙ID>`
-  - Units: the law's identifier followed by `-art-40`, `-art-10-2`, `-ch-4`, `-ch-5-2`, `-ch-4-sec-2`, `-annex-1-2`, `-form-6` or `-sup-<공포일자>-<공포번호>`
+  - Units: the law's identifier followed by `-art-40`, `-art-10-2`, `-ch-4`, `-ch-5-2`, `-ch-4-sec-2`, `-part-1-ch-6` for a 장 of a 편, `-annex-1-2`, `-form-6` or `-sup-<공포일자>-<공포번호>`
 - Write a series of 고시 such as the 적용 최저임금 고시 as one `LegalResource` named after the current 고시, with each year's 고시 as a version and its text as the block `^v20260101-t`.
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
