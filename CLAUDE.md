@@ -341,6 +341,7 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
   - `ontology/shapes/README.md` records the SHA-256 of each stored file's bytes.
   - Statute units count as `eli:LegalResource`, because ELI makes subdivisions a kind of it, and as `cccev:ReferenceFramework`. Their versions do not.
   - The export states these types for each unit, so that the file validates without the alignment.
+  - Public organisations count as `org:Organization`, because CPSV-AP makes Public Organisation a subclass of it, and the shape of a channel's `ownedBy` requires that class. The export states this type too.
   - `Participation` without `hasParticipant` is a documented deviation, because party types defined by law are not specific agents. It covers only the missing value.
 
 ## Review

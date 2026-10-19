@@ -353,10 +353,12 @@ SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 ELI = Namespace("http://data.europa.eu/eli/ontology#")
 M8G = Namespace("http://data.europa.eu/m8g/")
 CPSV = Namespace("http://purl.org/vocab/cpsv#")
+ORG = Namespace("http://www.w3.org/ns/org#")
 STANDARD_SHAPES = VAULT / "ontology" / "shapes"
 ALIGNMENT = [
     (ELI.LegalResourceSubdivision, RDFS.subClassOf, ELI.LegalResource),
     (ELI.LegalResource, RDFS.subClassOf, M8G.ReferenceFramework),
+    (M8G.PublicOrganisation, RDFS.subClassOf, ORG.Organization),
 ]
 DESCRIBED = {CPSV.PublicService, CPSV.Rule, M8G.Criterion, M8G.Constraint, M8G.Participation, M8G.PublicOrganisation,
              M8G.Channel, M8G.Output, M8G.LifeEvent, M8G.BusinessEvent, M8G.EvidenceType, M8G.InformationConcept}
@@ -367,7 +369,7 @@ def profile(graph):
     """The graph as the standards expect it.
 
     dct:title and dct:description come from the name and the definition, names and definitions carry the language tag ko, public organisations get the jurisdiction in ontology/release.yaml as dct:spatial, and the values of the schema's enumerations become SKOS concepts in concept schemes.
-    Statute units also get the types that the alignment gives them, eli:LegalResource and cccev:ReferenceFramework, so that the export validates without the alignment.
+    Statute units also get the types that the alignment gives them, eli:LegalResource and cccev:ReferenceFramework, and public organisations get org:Organization, so that the export validates without the alignment.
     """
     jurisdiction = URIRef(yaml.safe_load((VAULT / "ontology" / "release.yaml").read_text(encoding="utf-8"))["jurisdiction"])
     tagged = language_tagged()

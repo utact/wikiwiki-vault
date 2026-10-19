@@ -82,3 +82,11 @@ def test_export_validates_without_the_alignment():
         problems = [line for line in text.splitlines() if "Focus Node" in line]
         participations = set(graph.subjects(vault.RDF.type, vault.M8G.Participation))
         assert all(any(graph.qname(p) in line for p in participations) for line in problems), problems[:3]
+
+
+def test_public_organisations_count_as_organizations():
+    """CPSV-AP makes Public Organisation a subclass of org:Organization, which the shape of Channel.ownedBy requires."""
+    _, graph = vault.check(FIXTURES)
+    organisations = set(graph.subjects(vault.RDF.type, vault.M8G.PublicOrganisation))
+    assert organisations
+    assert all((o, vault.RDF.type, vault.ORG.Organization) in graph for o in organisations)
