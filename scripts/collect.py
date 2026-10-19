@@ -2,9 +2,12 @@
 
 Usage:
     uv run python -X utf8 scripts/collect.py [laws|admrul|work24|shapes|cited|all]
+    uv run python -X utf8 scripts/collect.py quote <page name> <section> <text>
 
 Writes raw notes under raw/, keeps uncited earlier versions in .cache/law/ and
 .cache/admrul/, and writes a report to .cache/collect-<what>.json.
+
+quote appends a short quotation to the latest raw note of a 고용24 guide, after checking that the section of the stored page contains it, whitespace aside.
 """
 
 import hashlib
@@ -293,6 +296,45 @@ def collect_work24(stamp, generated, report):
         print(f"{source['name']}: sections {len(sections)}, empty {empty}, written {written}")
 
 
+QUOTE_LINE = re.compile(r"^(.*\S) \^(q\d+)$", re.M)
+
+
+def quotations(note):
+    """The quotation blocks of a 고용24 raw note as id -> text."""
+    body = note.read_text(encoding="utf-8").split("\n---\n", 1)[1]
+    return {m.group(2): m.group(1).strip() for m in QUOTE_LINE.finditer(body)}
+
+
+def quote(name, section, text, raw=None):
+    """Append a quotation to hasPart of the latest raw note of a guide and declare it as a block ^q<n> in the body."""
+    folder = (raw or L.RAW) / "work24" / name
+    note = latest(folder, f"{name} *.md")
+    if note is None:
+        sys.exit(f"no raw note of {name}")
+    page = note.with_suffix(".html")
+    if not page.exists():
+        sys.exit(f"{page.name} is not stored here, so the quotation cannot be checked")
+    meta = L.frontmatter(note)
+    sections, _ = page_sections(page.read_text(encoding="utf-8"), meta["title"])
+    if section not in sections:
+        sys.exit(f"no section {section!r}; the sections are {list(sections)}")
+    if re.sub(r"\s+", "", text) not in re.sub(r"\s+", "", sections[section]):
+        sys.exit(f"the section {section!r} does not contain the quotation")
+    parts = meta.get("hasPart") or []
+    for number, part in enumerate(parts, 1):
+        if part["text"] == text:
+            print(f"[[{note.stem}#^q{number}]] already holds it")
+            return number
+    number = len(parts) + 1
+    meta["hasPart"] = parts + [{"identifier": f"{meta['identifier']}-q{number}", "text": text, "sha256": L.body_hash(text)}]
+    body = note.read_text(encoding="utf-8").split("\n---\n", 1)[1].strip()
+    if "\n## 인용" not in f"\n{body}":
+        body += "\n\n## 인용"
+    L.write_note(note, meta, f"{body}\n\n{text} ^q{number}")
+    print(f"[[{note.stem}#^q{number}]]")
+    return number
+
+
 def collect_shapes(generated, report):
     """Official SHACL shapes of the standards the schema follows, stored with their attribution."""
     folder = L.VAULT / "ontology" / "shapes"
@@ -323,6 +365,11 @@ def main():
     if not sys.flags.utf8_mode:
         sys.exit("Run with python -X utf8.")
     what = sys.argv[1] if len(sys.argv) > 1 else "all"
+    if what == "quote":
+        if len(sys.argv) != 5:
+            sys.exit("Usage: collect.py quote <page name> <section> <text>")
+        quote(*sys.argv[2:5])
+        return
     as_of, window_start = L.release()
     stamp_time, stamp = L.now()
     generated = stamp_time.isoformat()

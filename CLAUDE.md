@@ -83,6 +83,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Store the captured page as `raw/work24/<page name>/<page name> <YYYYMMDDTHHMM>.html`, which Git ignores.
   - Commit the raw note next to it, with the short quotations the wiki cites in `hasPart`, quoted under 저작권법 제28조.
   - Number the quotation blocks `^q1`, `^q2` in the order of `hasPart`, and cite them as `[[<raw note>#^q1]]`.
+  - Add a quotation with `uv run python -X utf8 scripts/collect.py quote "<page name>" <section> "<text>"`, which checks it against the section of the stored page and appends it to the latest raw note. `scripts/check_raw.py` checks the numbering, blocks, hashes and text of every quotation.
 - Fill every required property in the Raw sources section of `ontology/schema.md`, and the optional ones that apply.
 - Set `sha256` to the SHA-256 of the stored response file followed by its attachments in their order.
   - The latest retrieval of each version stores every attachment. An earlier retrieval keeps the files it stored, such as the 법령 retrievals of 2026-10-15 13:37 made before image files were collected.

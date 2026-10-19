@@ -263,6 +263,32 @@ def check_notes(problems):
             problems.append(f"{note.relative_to(L.VAULT)}: sha256 differs from the stored file")
 
 
+def check_quotations(problems):
+    """Quotations of 고용24 raw notes: numbered in the order of hasPart, declared as blocks with the same text, hashed, and found in the stored page."""
+    for note in sorted((L.RAW / "work24").rglob("*.md")):
+        where = note.relative_to(L.VAULT)
+        meta = L.frontmatter(note)
+        parts = meta.get("hasPart") or []
+        blocks = collect.quotations(note)
+        if set(blocks) != {f"q{n}" for n in range(1, len(parts) + 1)}:
+            problems.append(f"{where}: quotation blocks {sorted(blocks)} do not match the {len(parts)} quotations of hasPart")
+        page = note.with_suffix(".html")
+        stored = ""
+        if page.exists():
+            sections, _ = collect.page_sections(page.read_text(encoding="utf-8"), meta["title"])
+            stored = re.sub(r"\s+", "", "".join(sections.values()))
+        for number, part in enumerate(parts, 1):
+            text = part.get("text", "")
+            if part.get("identifier") != f"{meta['identifier']}-q{number}":
+                problems.append(f"{where}: quotation {number} has identifier {part.get('identifier')!r}")
+            if blocks.get(f"q{number}") != text:
+                problems.append(f"{where}: block ^q{number} differs from quotation {number} of hasPart")
+            if part.get("sha256") != L.body_hash(text):
+                problems.append(f"{where}: quotation {number} has a wrong sha256")
+            if stored and re.sub(r"\s+", "", text) not in stored:
+                problems.append(f"{where}: quotation {number} is not in the stored page")
+
+
 def check_secrets(problems, notes):
     secrets = L.secrets()
     if not secrets:
@@ -286,6 +312,7 @@ def main():
         check_reference(name, problems)
     check_notices(problems, notes)
     check_notes(problems)
+    check_quotations(problems)
     check_secrets(problems, notes)
     for line in notes:
         print(line)
