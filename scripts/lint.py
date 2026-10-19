@@ -800,6 +800,7 @@ class Linter:
             ("schema document", ["scripts/schema_doc.py", "--check"]),
             ("index", ["scripts/index.py", "--check"]),
             ("statute notes", ["scripts/statutes.py", "--check"]),
+            ("canvases", ["scripts/canvas.py", "--check"]),
         ]
         for name, args in commands:
             result = subprocess.run([sys.executable, "-X", "utf8", *args], cwd=L.VAULT, capture_output=True, text=True)
