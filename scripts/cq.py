@@ -10,6 +10,8 @@ docs/competency-questions.md cites must be among the sources, or contain one of 
 Citations under 범위 밖, 관련 사항 and 검사 항목 are not part of the expected answer.
 An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks; the verifier compares the items themselves.
 A query fails when a BIND or FILTER uses a variable that its own group does not bind. SPARQL evaluates such a group before the outer pattern, so the variable is unbound there, and a later triple pattern then matches every note.
+
+The scenarios in docs/scenarios.md are checked too. A step that names its service and states that an earlier step is its 선행 조건 must have that service `requires` the earlier step's service, and every competency question a step lists must be checked and pass.
 """
 
 import re
@@ -24,6 +26,12 @@ import lawlib as L
 import vault as V
 
 QUESTIONS = L.VAULT / "docs" / "competency-questions.md"
+SCENARIOS = L.VAULT / "docs" / "scenarios.md"
+STEP = re.compile(r"^  (\d+)\. (.+)$")
+STEP_ITEM = re.compile(r"^     - (.+)$")
+SERVICE = re.compile(r"서비스는 `([a-z0-9-]+)`")
+PRECONDITION = re.compile(r"선행 조건은 (\d+)단계")
+QUESTION_ID = re.compile(r"cq-\d+")
 QUERIES = L.VAULT / "ontology" / "cq"
 ROOT_LAW = "고용보험법"
 FAMILY = {"법": "", "영": " 시행령", "규칙": " 시행규칙"}
@@ -201,6 +209,63 @@ def within(source, cited, graph):
     return False
 
 
+def scenario_steps(text):
+    """The numbered steps of each scenario, as id -> steps with their number, name, service, 선행 조건 and questions."""
+    found, current, step = {}, None, None
+    for line in text.split("\n"):
+        match = re.match(r"- 식별자: `(sc-\d+)`", line)
+        if match:
+            current, step = match.group(1), None
+            found[current] = []
+            continue
+        if line.startswith("## "):
+            current, step = None, None
+            continue
+        if current is None:
+            continue
+        match = STEP.match(line)
+        if match:
+            step = {"number": int(match.group(1)), "name": match.group(2), "service": None, "requires": [], "questions": []}
+            found[current].append(step)
+            continue
+        item = STEP_ITEM.match(line)
+        if step and item:
+            sentence = item.group(1)
+            service = SERVICE.search(sentence)
+            if service:
+                step["service"] = service.group(1)
+            step["requires"] += [int(n) for n in PRECONDITION.findall(sentence)]
+            if sentence.startswith("검사하는 역량 질문은"):
+                step["questions"] += QUESTION_ID.findall(sentence)
+        elif not line.startswith("     "):
+            step = None
+    return {k: v for k, v in found.items() if v}
+
+
+def check_scenarios(text, graph, writer, checked, failed):
+    """Problems of the scenarios: missing `requires` between the services of steps, and step questions that are unchecked or fail."""
+    found = []
+    for scenario, steps in scenario_steps(text).items():
+        services = {step["number"]: step["service"] for step in steps}
+        for step in steps:
+            where = f"{scenario} step {step['number']} {step['name']}"
+            for number in step["requires"]:
+                if not step["service"] or not services.get(number):
+                    found.append(f"{where}: its 선행 조건 is step {number}, but the step or that step names no service")
+                    continue
+                subject, target = writer.iri(step["service"]), writer.iri(services[number])
+                if (subject, None, None) not in graph:
+                    found.append(f"{where}: no note has the identifier {step['service']}")
+                elif (subject, V.DCT.requires, target) not in graph:
+                    found.append(f"{where}: {step['service']} does not require {services[number]}, the service of step {number}")
+            for question in step["questions"]:
+                if question not in checked:
+                    found.append(f"{where}: {question} has no query yet")
+                elif question in failed:
+                    found.append(f"{where}: {question} fails")
+    return found
+
+
 def check(root):
     problems, graph = V.check(root)
     if problems:
@@ -222,6 +287,8 @@ def check(root):
                 found.append(f"{identifier}: the expected answer cites {citation}, which has no statute note or block")
             elif not any(within(source, iri, graph) for source in sources):
                 found.append(f"{identifier}: no part of the answer rests on {citation}")
+    failed = {line.split(":")[0] for line in found}
+    found += check_scenarios(SCENARIOS.read_text(encoding="utf-8"), graph, resolver.writer, set(report), failed)
     return found, report
 
 

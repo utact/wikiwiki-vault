@@ -461,6 +461,10 @@ Lint compares each number with the cited blocks, not the claim it makes. A sente
   - An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks, so the verifier compares the items.
 - A query fails when a BIND or FILTER uses a variable that its own group does not bind.
   - SPARQL evaluates the group before the outer pattern, so the variable is unbound there and a later triple pattern matches every note, as `{ BIND(?rule AS ?item) } UNION { … }` did.
+- `scripts/cq.py` also checks the scenarios in `docs/scenarios.md`.
+  - A numbered step names its service by `identifier`, as in "서비스는 `job-application`(구직신청)이다", and its 선행 조건 by step number, as in "선행 조건은 3단계 구직 등록이다".
+  - The service of a step must `requires` the service of each step that is its 선행 조건.
+  - Every competency question a step lists must have a query and pass.
 
 ### Views
 
