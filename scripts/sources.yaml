@@ -8,6 +8,7 @@ laws:
 references:
   - 정부조직법
   - 고용정책 기본법
+  - 직업안정법
 admrul:
   - query: 적용 최저임금 고시
     id: "2002374"
