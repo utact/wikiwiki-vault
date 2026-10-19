@@ -270,6 +270,10 @@ decisionTable:
   - Model a transitional provision (경과조치) as a `Criterion` on the date it depends on, such as 이직일, and link it with `appliesWhen`.
   - A note with `appliesWhen` may cite a version that is not in force on the reference date, when the version's period meets the dates in which all its criteria hold.
   - Criteria that test no date leave such a citation unchecked, so lint reports it.
+- State a provision with its 단서 and exceptions, or name the ones a note leaves out.
+  - Leave out a case that a rule, constraint or criterion does not cover through a criterion in `appliesWhen`, as 기초일액 산정 does for 고용보험법 제45조제1항 단서.
+  - Leave out the same way a case in which two provisions can apply and neither prevails, as 최저기초일액이 상한액 이하 does for 고용보험법 제45조제4항 and 제5항.
+- Describe an item that counts only under the condition of the item above it together with that condition, as each 목 of 고용보험법 시행규칙 별표 2 제5호.
 - Never state unconfirmed content as fact.
   - Leave it as a question in a `> [!question]` callout, each line ending in "?".
 

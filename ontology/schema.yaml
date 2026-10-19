@@ -229,6 +229,7 @@ classes:
     comments:
       - 식은 FEEL literal expression으로, 표는 결정표로 적는다. 둘 중 하나만 적는다.
       - 경과조치처럼 규칙이 일부 경우에만 적용되면 그 조건을 `appliesWhen`으로 잇는다.
+      - 단서나 예외처럼 규칙이 다루지 않는 경우는 그 경우가 아님을 판단하는 Criterion을 `appliesWhen`으로 이어 뺀다.
     slots:
       - implements
       - variable
@@ -275,6 +276,9 @@ classes:
     description: 정보 값에 거는 기한·상한·하한 같은 제한
     annotations:
       examples: 기초일액 상한 11만3500원, 이직확인서 발급 기한 10일
+    comments:
+      - 기한은 지켜야 하는 행위의 날짜를 `constrains`로 두고, 법령 문구대로 정의한 기한일 정보 항목과 `<=`로 비교한다.
+      - 기간의 첫날 산입처럼 법령 노트만으로 정할 수 없는 기한일 계산은 기한일 노트에 질문으로 남긴다.
     slots:
       - constrains
     slot_usage:
@@ -300,6 +304,8 @@ classes:
       conformsTo:
         range: ConceptScheme
         description: 값으로 쓸 수 있는 코드 체계
+        comments:
+          - 값은 그 체계의 개념이고, FEEL에서는 개념의 `notation`을 값으로 쓴다.
 
   EvidenceTypeList:
     class_uri: cv:EvidenceTypeList

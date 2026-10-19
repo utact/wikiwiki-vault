@@ -498,3 +498,12 @@
 - 대상: [[피보험기간]]
 - 수정: [[피보험기간]]의 상태를 `verified`로 바꾸고 검증 대장에 기록
 - 내용: 새 검증 agent가 통과로 판정했다. 시범 구간의 LLM 작성 노트 144개가 모두 `verified`다.
+
+## 2026-10-19 14:16 schema
+
+- 대상: 작업 지침과 schema 설명
+- 수정: `CLAUDE.md`, `ontology/schema.yaml`, `ontology/schema.md`, `docs/roadmap.md`
+- 내용:
+  - 시범 구간 검증에서 되풀이된 결함을 작업 지침에 적었다. 조항은 단서와 예외를 함께 적거나 뺀 것을 밝히고, 규칙이 다루지 않는 경우와 두 조항이 함께 적용될 수 있는 경우는 적용 조건으로 뺀다. 위 항목의 조건에서만 성립하는 항목은 그 조건과 함께 적는다.
+  - schema의 Rule에 단서와 예외를 적용 조건으로 빼는 방법을, Constraint에 기한을 기한일과 비교하는 방법을, InformationConcept의 `conformsTo`에 값을 개념의 `notation`으로 적는 방법을 설명으로 보탰다. class와 property는 바꾸지 않았다.
+  - 시범 구간 노트에 남긴 질문 3가지를 6단계 과제로 옮겼다.

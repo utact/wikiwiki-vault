@@ -54,6 +54,9 @@ class를 정의하는 표준은 class가 처음 나오는 순서로, property만
 - `Participation`: 역할에 딸린 기한 같은 의무는 `holdsRequirement`로 적는다. CPSV-AP는 이 property를 PublicService에만 두므로 Participation에 쓰는 것은 확장이다.
 - `Rule`: 식은 FEEL literal expression으로, 표는 결정표로 적는다. 둘 중 하나만 적는다.
 - `Rule`: 경과조치처럼 규칙이 일부 경우에만 적용되면 그 조건을 `appliesWhen`으로 잇는다.
+- `Rule`: 단서나 예외처럼 규칙이 다루지 않는 경우는 그 경우가 아님을 판단하는 Criterion을 `appliesWhen`으로 이어 뺀다.
+- `Constraint`: 기한은 지켜야 하는 행위의 날짜를 `constrains`로 두고, 법령 문구대로 정의한 기한일 정보 항목과 `<=`로 비교한다.
+- `Constraint`: 기간의 첫날 산입처럼 법령 노트만으로 정할 수 없는 기한일 계산은 기한일 노트에 질문으로 남긴다.
 - `LegalResource`: 법률, 시행령, 시행규칙, 고시를 포함한다.
 - `LegalResource`: identifier는 법령이면 law-<법령ID>, 행정규칙이면 admrul-<행정규칙ID>다.
 - `LegalResourceSubdivision`: 장, 절, 조, 별표, 별지 서식, 부칙은 노트로 두고, 항, 호, 목은 노트의 block으로 둔다.
