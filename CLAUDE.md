@@ -59,11 +59,15 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Store the image files because some text exists only in them, such as the formulas of 고용산재보험료징수법 시행령 제18조의2 and the amount in `2020년 적용 최저임금 고시`.
   - Keep version lists as `<법령명> versions <YYYYMMDDTHHMM>.json`.
   - 위임조문 data: `raw/law/<법령명> 위임조문/<법령명> 위임조문 <시행일자>-<MST> <YYYYMMDDTHHMM>.md`, in its own folder so that it stays apart from the versions of the law
+  - 법령해석례: `raw/law/법령해석례/법령해석례 <안건번호> <YYYYMMDDTHHMM>.md`, with the response next to it as `.json`
 - Collect these versions of every 법령 and 행정규칙 in scope.
   - The current version
   - Every scheduled version (시행예정)
   - Every earlier version in force during the transitional window, so that text kept by a 경과조치 is at hand, such as 고용보험법 시행령 제68조 before 2026-01-01
   - Leave out proposals published under the same 행정규칙ID, such as `2027년 적용 최저임금안 고시`.
+- Collect the 법령해석례 of 법제처 listed under `interpretations` in `scripts/sources.yaml` with `scripts/collect.py interpretations`.
+  - List one when it interprets a provision that the wiki states or a question callout asks about, such as 법령해석례 26-0321 on counting a period of days under 행정기본법 제6조제1항 and 민법.
+  - Quote its 질의요지, 회답 or 이유 with `scripts/collect.py quote "법령해석례 <안건번호>" <section> "<text>"`, as for a 고용24 guide.
 - Collect the 위임조문 data of the current version of every 법률 and 시행령 in scope.
   - It names each provision that delegates to a 시행령 or 시행규칙 and the article that receives it.
   - 법제처 keeps it for its 현행 version only, so collect it again when a new version comes into force. `scripts/collect.py` stores no response of another version, and `scripts/check_raw.py` fails when the current version lacks it.
@@ -87,7 +91,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Store the captured page as `raw/work24/<page name>/<page name> <YYYYMMDDTHHMM>.html`, which Git ignores.
   - Commit the raw note next to it, with the short quotations the wiki cites in `hasPart`, quoted under 저작권법 제28조.
   - Number the quotation blocks `^q1`, `^q2` in the order of `hasPart`, and cite them as `[[<raw note>#^q1]]`.
-  - Add a quotation with `uv run python -X utf8 scripts/collect.py quote "<page name>" <section> "<text>"`, which checks it against the section of the stored page and appends it to the latest raw note. `scripts/check_raw.py` checks the numbering, blocks, hashes and text of every quotation.
+  - Add a quotation with `uv run python -X utf8 scripts/collect.py quote "<page name>" <section> "<text>"`, which checks it against the section of the stored page and appends it to the latest raw note. `scripts/check_raw.py` checks the numbering, blocks, hashes and text of every quotation, of 고용24 guides and 법령해석례 alike.
 - Fill every required property in the Raw sources section of `ontology/schema.md`, and the optional ones that apply.
 - Set `sha256` to the SHA-256 of the stored response file followed by its attachments in their order.
   - The latest retrieval of each version stores every attachment. An earlier retrieval keeps the files it stored, such as the 법령 retrievals of 2026-10-15 13:37 made before image files were collected.
@@ -96,9 +100,9 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - For a 고용24 guide, whose page stays out of Git, use the text of its body area without whitespace, section by section. This hash changes when the reading of the page changes.
 - Record the terms of use in `license`.
   - Statutes: not protected works under 저작권법 제7조
-  - Other sources: the 공공누리 type or the 공공데이터포털 terms of use
+  - Other sources: the 공공누리 type or the 공공데이터포털 terms of use, such as 이용허락범위 제한 없음 for the 법령해석 data of 법제처
 - Never edit a saved source.
-  - The only allowed edits are appending a quotation to `hasPart` of a 고용24 raw note, and recomputing `sha256` in every raw note in one `schema` operation when its definition changes.
+  - The only allowed edits are appending a quotation to `hasPart` of a 고용24 or 법령해석례 raw note, and recomputing `sha256` in every raw note in one `schema` operation when its definition changes.
   - On re-collection, write a new note with the new retrieval time.
   - Skip it if its `sha256` equals that of the previous retrieval.
 
@@ -126,7 +130,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - A move or reuse dated on or before the earliest version of a note leaves the note one article, as 정부조직법 제41조 from 2025-10-01, so it is not listed.
   - When a scheduled version moves an article that has a note, change the generator in a `schema` operation before that version becomes current.
   - Cite no earlier version of a reused number until then.
-- List laws that the wiki cites only for a definition, such as 정부조직법 for 고용노동부, under `references` in `scripts/sources.yaml`.
+- List laws that the wiki cites only for a definition or a general rule, such as 정부조직법 for 고용노동부 and 민법 for the computation of periods, under `references` in `scripts/sources.yaml`.
   - Collect their current and scheduled versions only.
 - Give statute notes these identifiers.
   - Law: `law-<법령ID>`, and for a series of 고시 under one 행정규칙ID: `admrul-<행정규칙ID>`
@@ -251,7 +255,7 @@ decisionTable:
   - Statutes: a block of the statute note, labelled with the official citation, as in `[^1]: [[고용보험법 제40조#^v20260918-p1-i1|고용보험법 제40조제1항제1호]]`
   - 단서, 본문, 전단 and 후단: link the block, and name the part in the label, only when the block has it
   - Items of a 별표 or 서식: link the block, and name the item in the label, as in `고용보험법 시행령 별표 2 제1호나목`
-  - 고용24 guides: a quotation block of the raw note
+  - 법령해석례 and 고용24 guides: a quotation block of the raw note, labelled with the name of the source, as in `[^2]: [[법령해석례 26-0321 20261019T2045#^q1|법제처 법령해석례 26-0321]]`
   - A footnote to a whole raw note rests only on its frontmatter and the basic information of its response, such as 시행일자 and 공포번호.
 - Quote statutory text verbatim inside “ ” (U+201C and U+201D), followed directly by its footnote.
   - Statute text itself uses ASCII double quotes, as in `[이하 "기초일액(基礎日額)"이라 한다]`.
@@ -274,8 +278,9 @@ decisionTable:
   2. 시행령
   3. 시행규칙
   4. 고시·행정규칙
-  5. 고용24 official guides
-  6. Statistics
+  5. 법령해석례 of 법제처, which interpret the statutes above without binding as they do
+  6. 고용24 official guides
+  7. Statistics
 - State a fact from the highest-ranked source.
   - When a lower-ranked source says otherwise, add a `> [!warning] 출처 불일치` callout that quotes both.
   - When sources of the same rank disagree, record both under a `> [!warning] 출처 충돌` callout and never pick one yourself.

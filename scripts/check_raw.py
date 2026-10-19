@@ -281,19 +281,17 @@ def check_notes(problems):
 
 
 def check_quotations(problems):
-    """Quotations of 고용24 raw notes: numbered in the order of hasPart, declared as blocks with the same text, hashed, and found in the stored page."""
-    for note in sorted((L.RAW / "work24").rglob("*.md")):
+    """Quotations of 고용24 and 법령해석례 raw notes: numbered in the order of hasPart, declared as blocks with the same text, hashed, and found in the stored source."""
+    folder = L.RAW / "law" / L.INTERPRETATIONS
+    for note in sorted((L.RAW / "work24").rglob("*.md")) + (sorted(folder.glob("*.md")) if folder.exists() else []):
         where = note.relative_to(L.VAULT)
         meta = L.frontmatter(note)
         parts = meta.get("hasPart") or []
         blocks = collect.quotations(note)
         if set(blocks) != {f"q{n}" for n in range(1, len(parts) + 1)}:
             problems.append(f"{where}: quotation blocks {sorted(blocks)} do not match the {len(parts)} quotations of hasPart")
-        page = note.with_suffix(".html")
-        stored = ""
-        if page.exists():
-            sections, _ = collect.page_sections(page.read_text(encoding="utf-8"), meta["title"])
-            stored = re.sub(r"\s+", "", "".join(sections.values()))
+        sections = collect.quote_source(note)
+        stored = re.sub(r"\s+", "", "".join(sections.values())) if sections else ""
         for number, part in enumerate(parts, 1):
             text = part.get("text", "")
             if part.get("identifier") != f"{meta['identifier']}-q{number}":
@@ -304,6 +302,21 @@ def check_quotations(problems):
                 problems.append(f"{where}: quotation {number} has a wrong sha256")
             if stored and re.sub(r"\s+", "", text) not in stored:
                 problems.append(f"{where}: quotation {number} is not in the stored page")
+
+
+def check_interpretations(sources, problems):
+    """Every 법령해석례 in sources.yaml is collected, and each raw note answers for the 해석례 its name and identifier give."""
+    folder = L.RAW / "law" / L.INTERPRETATIONS
+    found = set()
+    for note in sorted(folder.glob("*.md")) if folder.exists() else []:
+        service = load(note.with_suffix(".json"))["ExpcService"]
+        identifier = L.frontmatter(note).get("identifier", "")
+        if not identifier.startswith(f"raw-expc-{service['법령해석례일련번호']}-") or not note.stem.startswith(f"{L.INTERPRETATIONS} {service['안건번호']} "):
+            problems.append(f"{note.name}: response is of 법령해석례 {service['법령해석례일련번호']} ({service['안건번호']})")
+        found.add(service["법령해석례일련번호"])
+    for source in sources.get("interpretations", []):
+        if source["id"] not in found:
+            problems.append(f"법령해석례 {source['id']} not collected")
 
 
 def check_secrets(problems, notes):
@@ -331,6 +344,7 @@ def main():
         check_reference(name, problems)
     check_notices(problems, notes)
     check_notes(problems)
+    check_interpretations(sources, problems)
     check_quotations(problems)
     check_secrets(problems, notes)
     for line in notes:

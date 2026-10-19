@@ -72,3 +72,39 @@ def test_check_raw_finds_a_changed_quotation(tmp_path, monkeypatch):
     note.write_text(note.read_text(encoding="utf-8").replace("사전 확인 ^q1", "사전 교육 ^q1"), encoding="utf-8", newline="\n")
     check_raw.check_quotations(problems)
     assert any("^q1 differs" in p for p in problems)
+
+
+INTERPRETATION = {"ExpcService": {"법령해석례일련번호": "343439", "안건번호": "26-0321", "해석일자": "20260708", "해석기관명": "법제처",
+                                  "안건명": "민원인 - 10일을 산정할 때 토요일 및 공휴일을 포함하여야 하는지?",
+                                  "질의요지": "10일의 입력기간을 산정할 때 토요일 및 공휴일을 포함하여야 하는지",
+                                  "회답": "10일의 입력기간을 산정할 때 토요일 및 공휴일을 포함하여야 합니다.", "이유": "민법을 준용합니다."}}
+
+
+def interpretation(tmp_path, response=INTERPRETATION):
+    import json
+    folder = tmp_path / "raw" / "law" / "법령해석례"
+    folder.mkdir(parents=True)
+    stem = "법령해석례 26-0321 20261019T2100"
+    (folder / f"{stem}.json").write_text(json.dumps(response, ensure_ascii=False), encoding="utf-8")
+    (folder / f"{stem}.md").write_text("---\nidentifier: raw-expc-343439-20261019t2100\ntitle: 해석례\n---\n\n시험용 원문 노트다.\n",
+                                       encoding="utf-8", newline="\n")
+    return folder / f"{stem}.md"
+
+
+def test_quote_takes_an_interpretation_from_its_response(tmp_path):
+    note = interpretation(tmp_path)
+    assert collect.quote("법령해석례 26-0321", "회답", "토요일 및 공휴일을 포함하여야 합니다.", raw=tmp_path / "raw") == 1
+    assert collect.quotations(note) == {"q1": "토요일 및 공휴일을 포함하여야 합니다."}
+    with pytest.raises(SystemExit):
+        collect.quote("법령해석례 26-0321", "질의요지", "민법을 준용합니다.", raw=tmp_path / "raw")
+
+
+def test_check_raw_finds_an_interpretation_of_another_case(tmp_path, monkeypatch):
+    import check_raw
+    other = {"ExpcService": dict(INTERPRETATION["ExpcService"], 법령해석례일련번호="339523")}
+    interpretation(tmp_path, other)
+    monkeypatch.setattr(collect.L, "RAW", tmp_path / "raw")
+    problems = []
+    check_raw.check_interpretations({"interpretations": [{"id": "343439"}]}, problems)
+    assert any("response is of 법령해석례 339523" in p for p in problems)
+    assert any("343439 not collected" in p for p in problems)

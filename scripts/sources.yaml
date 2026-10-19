@@ -9,6 +9,8 @@ references:
   - 정부조직법
   - 고용정책 기본법
   - 직업안정법
+  - 행정기본법
+  - 민법
 admrul:
   - query: 적용 최저임금 고시
     id: "2002374"
@@ -19,6 +21,13 @@ work24:
     url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000255&systCnntId=&systId=SI00000387
   - name: 이직확인서
     url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000260&systCnntId=&systId=SI00000343
+interpretations:
+  - id: "343439"
+  - id: "339523"
+  - id: "314521"
+  - id: "341169"
+  - id: "334739"
+  - id: "331135"
 shapes:
   - name: CPSV-AP 3.2.0
     file: cpsv-ap-3.2.0-shacl.ttl

@@ -1,14 +1,14 @@
 """Collect raw sources listed in scripts/sources.yaml.
 
 Usage:
-    uv run python -X utf8 scripts/collect.py [laws|admrul|work24|shapes|cited|all]
+    uv run python -X utf8 scripts/collect.py [laws|admrul|work24|interpretations|shapes|cited|all]
     uv run python -X utf8 scripts/collect.py quote <page name> <section> <text>
 
 Writes raw notes under raw/, keeps uncited earlier versions in .cache/law/ and
 .cache/admrul/, and writes a report to .cache/collect-<what>.json.
 laws also collects the 위임조문 data of the current version of every 법률 and 시행령 in scope.
 
-quote appends a short quotation to the latest raw note of a 고용24 guide, after checking that the section of the stored page contains it, whitespace aside.
+quote appends a short quotation to the latest raw note of a 고용24 guide or a 법령해석례, after checking that the section of the stored page or response contains it, whitespace aside.
 """
 
 import hashlib
@@ -333,6 +333,58 @@ def collect_work24(stamp, generated, report):
         print(f"{source['name']}: sections {len(sections)}, empty {empty}, written {written}")
 
 
+INTERPRETATION_SECTIONS = ("질의요지", "회답", "이유")
+
+
+def interpretation_sections(response):
+    """The sections of a 법령해석례 that quotations come from: 질의요지, 회답 and 이유."""
+    service = response["ExpcService"]
+    return {name: service.get(name, "") for name in INTERPRETATION_SECTIONS}
+
+
+def collect_interpretations(stamp, generated, report):
+    """The 법령해석례 of 법제처 listed in sources.yaml, one raw note per retrieval with its response."""
+    folder = L.RAW / "law" / L.INTERPRETATIONS
+    for source in SOURCES.get("interpretations", []):
+        text, url = L.law_api("lawService", target="expc", ID=source["id"])
+        response = json.loads(text)
+        service = response["ExpcService"]
+        if service.get("법령해석례일련번호") != source["id"] or not L.canonical("".join(interpretation_sections(response).values())):
+            raise ValueError(f"법령해석례 {source['id']}: the response is of another 해석례 or has no text")
+        basename = f"{L.INTERPRETATIONS} {service['안건번호']} {stamp}"
+        digest = L.files_hash(L.json_payload(text))
+        written = not unchanged(folder, basename, digest)
+        if written:
+            L.write_json(folder / f"{basename}.json", text)
+            meta = {
+                "identifier": f"raw-expc-{source['id']}-{stamp.lower()}",
+                "title": service["안건명"].strip(),
+                "publisher": L.PUBLISHERS["law"],
+                "url": url,
+                "generatedAtTime": generated,
+                "sha256": digest,
+                "license": L.LICENSES["interpretation"],
+            }
+            day = service["해석일자"]
+            body = (f"{service['해석기관명']}가 {day[:4]}-{day[4:6]}-{day[6:]}에 회신한 법령해석례 {service['안건번호']}의 원문 노트다. "
+                    "원문 응답은 같은 이름의 JSON 파일이다.")
+            L.write_note(folder / f"{basename}.md", meta, body)
+        report.setdefault("interpretations", []).append({"id": source["id"], "number": service["안건번호"], "written": written})
+        print(f"법령해석례 {source['id']} ({service['안건번호']}): written {written}")
+
+
+def quote_source(note):
+    """The sections a quotation of a raw note must come from, or None when the source is not stored here."""
+    payload, page = note.with_suffix(".json"), note.with_suffix(".html")
+    if payload.exists():
+        response = json.loads(payload.read_text(encoding="utf-8"))
+        if "ExpcService" in response:
+            return interpretation_sections(response)
+    if page.exists():
+        return page_sections(page.read_text(encoding="utf-8"), L.frontmatter(note)["title"])[0]
+    return None
+
+
 QUOTE_LINE = re.compile(r"^(.*\S) \^(q\d+)$", re.M)
 
 
@@ -343,16 +395,19 @@ def quotations(note):
 
 
 def quote(name, section, text, raw=None):
-    """Append a quotation to hasPart of the latest raw note of a guide and declare it as a block ^q<n> in the body."""
-    folder = (raw or L.RAW) / "work24" / name
+    """Append a quotation to hasPart of the latest raw note of a guide or 법령해석례 and declare it as a block ^q<n> in the body.
+
+    A 법령해석례 is named by 법령해석례 and its 안건번호, as "법령해석례 26-0321".
+    """
+    root = raw or L.RAW
+    folder = root / "law" / L.INTERPRETATIONS if name.startswith(f"{L.INTERPRETATIONS} ") else root / "work24" / name
     note = latest(folder, f"{name} *.md")
     if note is None:
         sys.exit(f"no raw note of {name}")
-    page = note.with_suffix(".html")
-    if not page.exists():
-        sys.exit(f"{page.name} is not stored here, so the quotation cannot be checked")
     meta = L.frontmatter(note)
-    sections, _ = page_sections(page.read_text(encoding="utf-8"), meta["title"])
+    sections = quote_source(note)
+    if sections is None:
+        sys.exit(f"the source of {note.name} is not stored here, so the quotation cannot be checked")
     if section not in sections:
         sys.exit(f"no section {section!r}; the sections are {list(sections)}")
     if re.sub(r"\s+", "", text) not in re.sub(r"\s+", "", sections[section]):
@@ -417,6 +472,8 @@ def main():
         collect_admrul(as_of, window_start, stamp, generated, report)
     if what in ("work24", "all"):
         collect_work24(stamp, generated, report)
+    if what in ("interpretations", "all"):
+        collect_interpretations(stamp, generated, report)
     if what in ("shapes", "all"):
         collect_shapes(generated, report)
     if what in ("cited", "all"):
