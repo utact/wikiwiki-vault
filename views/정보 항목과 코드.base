@@ -1,0 +1,44 @@
+filters:
+  and:
+    - file.inFolder("wiki")
+    - or:
+        - 'note.type == "InformationConcept"'
+        - 'note.type == "Concept"'
+        - 'note.type == "ConceptScheme"'
+views:
+  - type: table
+    name: 정보 항목
+    filters:
+      and:
+        - 'note.type == "InformationConcept"'
+    order:
+      - file.name
+      - note.typeRef
+      - note.unitCode
+      - note.currency
+      - note.conformsTo
+      - note.definition
+      - note.status
+  - type: table
+    name: 코드
+    filters:
+      and:
+        - 'note.type == "Concept"'
+    order:
+      - file.name
+      - note.notation
+      - note.broader
+      - note.definition
+      - note.status
+    groupBy:
+      property: note.inScheme
+      direction: ASC
+  - type: table
+    name: 코드 체계
+    filters:
+      and:
+        - 'note.type == "ConceptScheme"'
+    order:
+      - file.name
+      - note.definition
+      - note.status

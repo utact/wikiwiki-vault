@@ -1,0 +1,36 @@
+filters:
+  and:
+    - file.inFolder("wiki")
+    - 'note.type != "LegalResource"'
+    - 'note.type != "LegalResourceSubdivision"'
+properties:
+  note.type:
+    displayName: class
+  note.status:
+    displayName: 상태
+  note.definition:
+    displayName: 정의
+views:
+  - type: table
+    name: 사람 검토 전
+    filters:
+      and:
+        - 'note.status != "reviewed"'
+    order:
+      - file.name
+      - note.type
+      - note.status
+      - note.definition
+    groupBy:
+      property: note.type
+      direction: ASC
+  - type: table
+    name: 사람 검토 완료
+    filters:
+      and:
+        - 'note.status == "reviewed"'
+    order:
+      - file.name
+      - note.type
+      - note.reviewedBy
+      - note.lastReviewed

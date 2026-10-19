@@ -1,0 +1,569 @@
+{
+	"nodes": [
+		{
+			"id": "c38de701a1793729",
+			"type": "group",
+			"x": 0,
+			"y": 0,
+			"width": 1880,
+			"height": 1220,
+			"label": "CPSV-AP"
+		},
+		{
+			"id": "2b46f9e4529cf76a",
+			"type": "text",
+			"text": "### PublicService\n\n`cpsv:PublicService`\n\n공공기관이 제공하는 서비스(급여와 신청 절차 포함)",
+			"x": 60,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#e8590c"
+		},
+		{
+			"id": "f5ffd422470997dc",
+			"type": "text",
+			"text": "### Participation\n\n`cv:Participation`\n\n서비스에서 당사자가 맡는 역할과 그 역할의 의무",
+			"x": 540,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#d6336c"
+		},
+		{
+			"id": "2c8c3380754c06df",
+			"type": "text",
+			"text": "### Channel\n\n`cv:Channel`\n\n서비스를 이용하는 경로",
+			"x": 540,
+			"y": 320,
+			"width": 320,
+			"height": 180,
+			"color": "#ae3ec9"
+		},
+		{
+			"id": "40a540da572eb8a4",
+			"type": "text",
+			"text": "### Output\n\n`cv:Output`\n\n서비스가 만들어 내는 결과",
+			"x": 540,
+			"y": 540,
+			"width": 320,
+			"height": 180,
+			"color": "#ae3ec9"
+		},
+		{
+			"id": "6090b9b761627fa8",
+			"type": "text",
+			"text": "### Rule\n\n`cpsv:Rule`\n\n서비스가 따르는 산정·판단 규칙",
+			"x": 540,
+			"y": 760,
+			"width": 320,
+			"height": 180,
+			"color": "#7048e8"
+		},
+		{
+			"id": "41a54caaff2f58e6",
+			"type": "text",
+			"text": "### Event\n\n`cv:Event` (abstract)\n\n공공서비스가 필요해지는 사건",
+			"x": 540,
+			"y": 980,
+			"width": 320,
+			"height": 180,
+			"color": "#f59f00"
+		},
+		{
+			"id": "4c1fe74d5b70dbb6",
+			"type": "text",
+			"text": "### LifeEvent\n\n`cv:LifeEvent`\n\n공공서비스가 필요해지는 개인의 사건",
+			"x": 60,
+			"y": 320,
+			"width": 320,
+			"height": 180,
+			"color": "#f59f00"
+		},
+		{
+			"id": "8aa85b4ac788e08e",
+			"type": "text",
+			"text": "### BusinessEvent\n\n`cv:BusinessEvent`\n\n공공서비스가 필요해지는 사업장의 사건",
+			"x": 60,
+			"y": 540,
+			"width": 320,
+			"height": 180,
+			"color": "#f59f00"
+		},
+		{
+			"id": "f87a4858eb5cb145",
+			"type": "text",
+			"text": "### Agent\n\n`foaf:Agent` (abstract)\n\n서비스에 참여하는 당사자",
+			"x": 1500,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#0ca678"
+		},
+		{
+			"id": "334f5183d378ffe3",
+			"type": "text",
+			"text": "### PublicOrganisation\n\n`cv:PublicOrganisation`\n\n공공기관",
+			"x": 1020,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#0ca678"
+		},
+		{
+			"id": "f34f5f9467219b93",
+			"type": "group",
+			"x": 2040,
+			"y": 0,
+			"width": 1400,
+			"height": 780,
+			"label": "CCCEV"
+		},
+		{
+			"id": "cadf2c334336cb94",
+			"type": "text",
+			"text": "### Requirement\n\n`cv:Requirement` (abstract)\n\nCriterion과 Constraint의 상위 class",
+			"x": 2580,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "c8bf983e9c494a1c",
+			"type": "text",
+			"text": "### Criterion\n\n`cv:Criterion`\n\n서비스를 받으려면 충족해야 하는 조건",
+			"x": 2100,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "660e24b4fea4944e",
+			"type": "text",
+			"text": "### Constraint\n\n`cv:Constraint`\n\n정보 값에 거는 기한·상한·하한 같은 제한",
+			"x": 2100,
+			"y": 320,
+			"width": 320,
+			"height": 180,
+			"color": "#1098ad"
+		},
+		{
+			"id": "b681ee6d3b60b54f",
+			"type": "text",
+			"text": "### InformationConcept\n\n`cv:InformationConcept`\n\n조건과 규칙이 판단하는 정보 항목",
+			"x": 3060,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#37b24d"
+		},
+		{
+			"id": "09343ec4f29a9c45",
+			"type": "text",
+			"text": "### EvidenceType\n\n`cv:EvidenceType`\n\n증빙 서류의 유형",
+			"x": 2100,
+			"y": 540,
+			"width": 320,
+			"height": 180,
+			"color": "#f76707"
+		},
+		{
+			"id": "600707ad27b2b1dd",
+			"type": "group",
+			"x": 3600,
+			"y": 0,
+			"width": 920,
+			"height": 560,
+			"label": "ELI"
+		},
+		{
+			"id": "16bf77995288954a",
+			"type": "text",
+			"text": "### Work\n\n`eli:Work` (abstract)\n\n법령과 그 하위 단위의 공통 상위 class",
+			"x": 4140,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#495057"
+		},
+		{
+			"id": "68e884ba50afbb39",
+			"type": "text",
+			"text": "### LegalResource\n\n`eli:LegalResource`\n\n시행일 버전과 무관한 법령",
+			"x": 3660,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#495057"
+		},
+		{
+			"id": "e245ec32a80b9510",
+			"type": "text",
+			"text": "### LegalResourceSubdivision\n\n`eli:LegalResourceSubdivision`\n\n시행일 버전과 무관한 법령의 하위 단위",
+			"x": 3660,
+			"y": 320,
+			"width": 320,
+			"height": 180,
+			"color": "#868e96"
+		},
+		{
+			"id": "cceb6bf301b22824",
+			"type": "group",
+			"x": 4680,
+			"y": 0,
+			"width": 920,
+			"height": 340,
+			"label": "SKOS"
+		},
+		{
+			"id": "66e712da7f543e5d",
+			"type": "text",
+			"text": "### ConceptScheme\n\n`skos:ConceptScheme`\n\n용어집과 코드 체계",
+			"x": 5220,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#c2255c"
+		},
+		{
+			"id": "70fcf9b0e8b8a47d",
+			"type": "text",
+			"text": "### Concept\n\n`skos:Concept`\n\n용어, 코드 값, 당사자 유형, 사유 목록의 항목",
+			"x": 4740,
+			"y": 100,
+			"width": 320,
+			"height": 180,
+			"color": "#e64980"
+		}
+	],
+	"edges": [
+		{
+			"id": "2455630f46c7157e",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "334f5183d378ffe3",
+			"toSide": "left",
+			"label": "hasCompetentAuthority"
+		},
+		{
+			"id": "a9ae2bcf4d7ed74e",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "70fcf9b0e8b8a47d",
+			"toSide": "left",
+			"label": "audience"
+		},
+		{
+			"id": "d8cc7aa4bc14cd0f",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "6090b9b761627fa8",
+			"toSide": "left",
+			"label": "follows"
+		},
+		{
+			"id": "149ee23f882854f5",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "2c8c3380754c06df",
+			"toSide": "left",
+			"label": "hasChannel"
+		},
+		{
+			"id": "b1d0bebb14c84abd",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "09343ec4f29a9c45",
+			"toSide": "left",
+			"label": "hasInputType"
+		},
+		{
+			"id": "5f699e0a125e57fd",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "16bf77995288954a",
+			"toSide": "left",
+			"label": "hasLegalResource"
+		},
+		{
+			"id": "fedb6d93c4c2d64f",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "top",
+			"toNode": "2b46f9e4529cf76a",
+			"toSide": "right",
+			"label": "hasPart"
+		},
+		{
+			"id": "0ada6646bd4dfe2a",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "f5ffd422470997dc",
+			"toSide": "left",
+			"label": "hasParticipation"
+		},
+		{
+			"id": "97605f1fbfea3c92",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "left",
+			"label": "holdsRequirement"
+		},
+		{
+			"id": "43ea7b56f41052a3",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "41a54caaff2f58e6",
+			"toSide": "left",
+			"label": "isGroupedBy"
+		},
+		{
+			"id": "feff8b5851c389cf",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "right",
+			"toNode": "40a540da572eb8a4",
+			"toSide": "left",
+			"label": "produces"
+		},
+		{
+			"id": "6c500affdab39312",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "top",
+			"toNode": "2b46f9e4529cf76a",
+			"toSide": "right",
+			"label": "relatedService"
+		},
+		{
+			"id": "5d05031d5f2a39a0",
+			"fromNode": "2b46f9e4529cf76a",
+			"fromSide": "top",
+			"toNode": "2b46f9e4529cf76a",
+			"toSide": "right",
+			"label": "requires"
+		},
+		{
+			"id": "85b72dc3e4af697e",
+			"fromNode": "4c1fe74d5b70dbb6",
+			"fromSide": "right",
+			"toNode": "41a54caaff2f58e6",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "74dbaae9c77f1fcf",
+			"fromNode": "8aa85b4ac788e08e",
+			"fromSide": "right",
+			"toNode": "41a54caaff2f58e6",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "8c7c3458d9bb6c16",
+			"fromNode": "334f5183d378ffe3",
+			"fromSide": "top",
+			"toNode": "334f5183d378ffe3",
+			"toSide": "right",
+			"label": "subOrganizationOf"
+		},
+		{
+			"id": "10e9d0315021ee8f",
+			"fromNode": "334f5183d378ffe3",
+			"fromSide": "right",
+			"toNode": "f87a4858eb5cb145",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "d985aee21de19be6",
+			"fromNode": "f5ffd422470997dc",
+			"fromSide": "right",
+			"toNode": "70fcf9b0e8b8a47d",
+			"toSide": "left",
+			"label": "role"
+		},
+		{
+			"id": "664d54e6ec69da04",
+			"fromNode": "f5ffd422470997dc",
+			"fromSide": "right",
+			"toNode": "f87a4858eb5cb145",
+			"toSide": "left",
+			"label": "hasParticipant"
+		},
+		{
+			"id": "c5015281dd62a185",
+			"fromNode": "f5ffd422470997dc",
+			"fromSide": "right",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "left",
+			"label": "holdsRequirement"
+		},
+		{
+			"id": "24886080c45097d7",
+			"fromNode": "2c8c3380754c06df",
+			"fromSide": "right",
+			"toNode": "334f5183d378ffe3",
+			"toSide": "left",
+			"label": "ownedBy"
+		},
+		{
+			"id": "c015c7e261dc1150",
+			"fromNode": "6090b9b761627fa8",
+			"fromSide": "right",
+			"toNode": "16bf77995288954a",
+			"toSide": "left",
+			"label": "implements"
+		},
+		{
+			"id": "75665b0cb773f9c3",
+			"fromNode": "6090b9b761627fa8",
+			"fromSide": "right",
+			"toNode": "b681ee6d3b60b54f",
+			"toSide": "left",
+			"label": "variable"
+		},
+		{
+			"id": "480a62fe02c0be71",
+			"fromNode": "6090b9b761627fa8",
+			"fromSide": "right",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "8ec778f33e8feb23",
+			"fromNode": "6090b9b761627fa8",
+			"fromSide": "right",
+			"toNode": "b681ee6d3b60b54f",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "c74f1cf91a639ad0",
+			"fromNode": "cadf2c334336cb94",
+			"fromSide": "right",
+			"toNode": "b681ee6d3b60b54f",
+			"toSide": "left",
+			"label": "hasConcept"
+		},
+		{
+			"id": "6c83da93f913ad40",
+			"fromNode": "cadf2c334336cb94",
+			"fromSide": "top",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "right",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "78ecbd27980b8eaf",
+			"fromNode": "cadf2c334336cb94",
+			"fromSide": "top",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "right",
+			"label": "hasRequirement"
+		},
+		{
+			"id": "1251243a50f53584",
+			"fromNode": "c8bf983e9c494a1c",
+			"fromSide": "right",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "42ed1dfe33d87466",
+			"fromNode": "660e24b4fea4944e",
+			"fromSide": "right",
+			"toNode": "b681ee6d3b60b54f",
+			"toSide": "left",
+			"label": "constrains"
+		},
+		{
+			"id": "64c0d124deb0fa37",
+			"fromNode": "660e24b4fea4944e",
+			"fromSide": "right",
+			"toNode": "cadf2c334336cb94",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "8b8b8507b1492ff3",
+			"fromNode": "b681ee6d3b60b54f",
+			"fromSide": "right",
+			"toNode": "66e712da7f543e5d",
+			"toSide": "left",
+			"label": "conformsTo"
+		},
+		{
+			"id": "35503b684ae0ac62",
+			"fromNode": "09343ec4f29a9c45",
+			"fromSide": "right",
+			"toNode": "16bf77995288954a",
+			"toSide": "left",
+			"label": "isDefinedBy"
+		},
+		{
+			"id": "3d54e70c5294bb00",
+			"fromNode": "68e884ba50afbb39",
+			"fromSide": "right",
+			"toNode": "70fcf9b0e8b8a47d",
+			"toSide": "left",
+			"label": "typeDocument"
+		},
+		{
+			"id": "3512b90db43ed8dc",
+			"fromNode": "68e884ba50afbb39",
+			"fromSide": "right",
+			"toNode": "16bf77995288954a",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "35e73516e56c865c",
+			"fromNode": "e245ec32a80b9510",
+			"fromSide": "right",
+			"toNode": "16bf77995288954a",
+			"toSide": "left",
+			"label": "isPartOf"
+		},
+		{
+			"id": "fef29573dbabf489",
+			"fromNode": "e245ec32a80b9510",
+			"fromSide": "right",
+			"toNode": "16bf77995288954a",
+			"toSide": "left",
+			"label": "is_a",
+			"color": "#868e96"
+		},
+		{
+			"id": "c77fb4898fb54dc6",
+			"fromNode": "70fcf9b0e8b8a47d",
+			"fromSide": "right",
+			"toNode": "66e712da7f543e5d",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "1fcd552e7bbd32fe",
+			"fromNode": "70fcf9b0e8b8a47d",
+			"fromSide": "top",
+			"toNode": "70fcf9b0e8b8a47d",
+			"toSide": "right",
+			"label": "broader"
+		},
+		{
+			"id": "e00cda4813b7c66a",
+			"fromNode": "70fcf9b0e8b8a47d",
+			"fromSide": "top",
+			"toNode": "70fcf9b0e8b8a47d",
+			"toSide": "right",
+			"label": "related"
+		}
+	]
+}

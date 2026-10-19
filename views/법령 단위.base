@@ -1,0 +1,32 @@
+filters:
+  and:
+    - file.inFolder("wiki")
+    - or:
+        - 'note.type == "LegalResource"'
+        - 'note.type == "LegalResourceSubdivision"'
+views:
+  - type: table
+    name: 하위 단위
+    filters:
+      and:
+        - 'note.type == "LegalResourceSubdivision"'
+    order:
+      - file.name
+      - note.number
+      - note.typeSubdivision
+      - note.title
+      - note.basedOn
+      - note.status
+    groupBy:
+      property: note.isPartOf
+      direction: ASC
+  - type: table
+    name: 법령
+    filters:
+      and:
+        - 'note.type == "LegalResource"'
+    order:
+      - file.name
+      - note.typeDocument
+      - note.idLocal
+      - note.status

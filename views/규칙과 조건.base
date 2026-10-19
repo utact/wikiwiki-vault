@@ -1,0 +1,47 @@
+filters:
+  and:
+    - file.inFolder("wiki")
+    - or:
+        - 'note.type == "Rule"'
+        - 'note.type == "Criterion"'
+        - 'note.type == "Constraint"'
+views:
+  - type: table
+    name: 규칙
+    filters:
+      and:
+        - 'note.type == "Rule"'
+    order:
+      - file.name
+      - note.variable
+      - note.requiredInput
+      - note.literalExpression
+      - note.appliesWhen
+      - note.implements
+      - note.status
+  - type: table
+    name: 조건
+    filters:
+      and:
+        - 'note.type == "Criterion"'
+    order:
+      - file.name
+      - note.hasConcept
+      - note.unaryTests
+      - note.appliesWhen
+      - note.hasRequirement
+      - note.isDerivedFrom
+      - note.status
+  - type: table
+    name: 제한
+    filters:
+      and:
+        - 'note.type == "Constraint"'
+    order:
+      - file.name
+      - note.constrains
+      - note.hasConcept
+      - note.unaryTests
+      - note.appliesWhen
+      - note.isDerivedFrom
+      - note.status

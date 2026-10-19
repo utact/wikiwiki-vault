@@ -507,3 +507,15 @@
   - 시범 구간 검증에서 되풀이된 결함을 작업 지침에 적었다. 조항은 단서와 예외를 함께 적거나 뺀 것을 밝히고, 규칙이 다루지 않는 경우와 두 조항이 함께 적용될 수 있는 경우는 적용 조건으로 뺀다. 위 항목의 조건에서만 성립하는 항목은 그 조건과 함께 적는다.
   - schema의 Rule에 단서와 예외를 적용 조건으로 빼는 방법을, Constraint에 기한을 기한일과 비교하는 방법을, InformationConcept의 `conformsTo`에 값을 개념의 `notation`으로 적는 방법을 설명으로 보탰다. class와 property는 바꾸지 않았다.
   - 시범 구간 노트에 남긴 질문 3가지를 6단계 과제로 옮겼다.
+
+## 2026-10-19 19:19 schema
+
+- 대상: Obsidian 보기
+- 추가: `views/schema.canvas`, `views/역량 질문/`의 canvas 9개, `views/`의 base 5개
+- 수정: `.obsidian/graph.json`, `CLAUDE.md`
+- 내용:
+  - graph view는 링크의 종류를 그리지 않으므로, 관계 이름을 연결선 라벨로 다는 canvas를 `scripts/canvas.py`로 생성한다. schema canvas는 class를 CPSV-AP, CCCEV, ELI, SKOS로 묶고 object property와 is_a를 그린다.
+  - 역량 질문 canvas는 질의가 돌려주는 노트, 질의가 이름으로 부르는 노트, 둘을 잇는 노트와 그 관계, 근거 조문 block을 그린다. 조문 block은 노트 안의 그 block만 보이게 했다.
+  - base 5개는 class별 property 표와, 사람이 아직 검토하지 않은 노트의 대기열이다. tests 아래 fixture 노트가 섞이지 않게 `wiki` 폴더로 한정했다.
+  - graph view는 class 폴더별로 canvas와 같은 색을 칠하고 화살표로 방향을 보인다.
+  - `.obsidian/` 설정은 작업과 함께 커밋하고, 창 배치만 담는 workspace 파일은 Git에서 뺀다.

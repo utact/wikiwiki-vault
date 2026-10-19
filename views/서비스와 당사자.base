@@ -1,0 +1,58 @@
+filters:
+  and:
+    - file.inFolder("wiki")
+    - or:
+        - 'note.type == "PublicService"'
+        - 'note.type == "Participation"'
+        - 'note.type == "EvidenceType"'
+        - 'note.type == "LifeEvent"'
+        - 'note.type == "BusinessEvent"'
+        - 'note.type == "PublicOrganisation"'
+views:
+  - type: table
+    name: 서비스
+    filters:
+      and:
+        - 'note.type == "PublicService"'
+    order:
+      - file.name
+      - note.hasCompetentAuthority
+      - note.isGroupedBy
+      - note.holdsRequirement
+      - note.hasParticipation
+      - note.hasInputType
+      - note.follows
+      - note.status
+  - type: table
+    name: 역할
+    filters:
+      and:
+        - 'note.type == "Participation"'
+    order:
+      - file.name
+      - note.role
+      - note.holdsRequirement
+      - note.definition
+      - note.status
+  - type: table
+    name: 증빙 유형
+    filters:
+      and:
+        - 'note.type == "EvidenceType"'
+    order:
+      - file.name
+      - note.isDefinedBy
+      - note.definition
+      - note.status
+  - type: table
+    name: 사건과 기관
+    filters:
+      or:
+        - 'note.type == "LifeEvent"'
+        - 'note.type == "BusinessEvent"'
+        - 'note.type == "PublicOrganisation"'
+    order:
+      - file.name
+      - note.type
+      - note.definition
+      - note.status

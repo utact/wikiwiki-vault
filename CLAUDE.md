@@ -18,6 +18,8 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 | `ontology/shapes/` | Schema | Official SHACL shapes of CPSV-AP and CCCEV |
 | `ontology/verification.jsonl` | — | Verification ledger |
 | `ontology/cq/` | — | SPARQL queries of the competency questions |
+| `views/` | — | Obsidian canvases and bases that show the wiki |
+| `.obsidian/` | — | Obsidian settings, without the workspace files |
 | `synthetic/` | — | Synthetic data |
 | `scripts/` | — | Collection, generation and validation scripts |
 | `tests/` | — | Fixture notes and tests for the scripts |
@@ -400,6 +402,7 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
 - Schema
   - Notes that fail `uv run python -X utf8 scripts/vault.py check`, which validates them against LinkML, the SHACL shapes of the schema and the official shapes in `ontology/shapes/`
   - `ontology/schema.md` out of date with `ontology/schema.yaml`
+  - Canvases in `views/` out of date with the notes, the schema or the competency question queries
   - Duplicate file names, identifiers or aliases
 - Rules
   - `unaryTests` and FEEL expressions that do not parse
@@ -440,6 +443,18 @@ Lint compares each number with the cited blocks, not the claim it makes. A sente
   - An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks, so the verifier compares the items.
 - A query fails when a BIND or FILTER uses a variable that its own group does not bind.
   - SPARQL evaluates the group before the outer pattern, so the variable is unbound there and a later triple pattern matches every note, as `{ BIND(?rule AS ?item) } UNION { … }` did.
+
+### Views
+
+Obsidian's graph view draws links without their kind, so `views/` shows the ontology in canvases, whose edges carry labels, and in bases.
+
+- Regenerate the canvases with `uv run python -X utf8 scripts/canvas.py` after changing notes, the schema or a query in `ontology/cq/`.
+  - `views/schema.canvas` shows the classes grouped by standard, with their object properties and `is_a` as labelled edges.
+  - `views/역량 질문/` holds one canvas per checked competency question: the notes its query returns, the notes the query names, the notes that join them, and the statute blocks they cite in `source`.
+  - Each edge is labelled with the property of the note it starts from.
+- Write the bases in `views/` by hand: tables per class and a queue of notes the human owner has not reviewed.
+- The graph view in `.obsidian/graph.json` colors notes by class folder, with the colors of the canvases.
+- Commit changes to `.obsidian/` with the work that makes them, but keep `workspace.json` and `workspace-mobile.json` out of Git.
 
 ## Log
 

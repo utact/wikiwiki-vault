@@ -6,9 +6,115 @@
   "hideUnresolved": false,
   "showOrphans": true,
   "collapse-color-groups": true,
-  "colorGroups": [],
+  "colorGroups": [
+    {
+      "query": "path:\"wiki/PublicService/\"",
+      "color": {
+        "a": 1,
+        "rgb": 15227148
+      }
+    },
+    {
+      "query": "path:\"wiki/LifeEvent/\"",
+      "color": {
+        "a": 1,
+        "rgb": 16097024
+      }
+    },
+    {
+      "query": "path:\"wiki/BusinessEvent/\"",
+      "color": {
+        "a": 1,
+        "rgb": 16097024
+      }
+    },
+    {
+      "query": "path:\"wiki/PublicOrganisation/\"",
+      "color": {
+        "a": 1,
+        "rgb": 829048
+      }
+    },
+    {
+      "query": "path:\"wiki/Participation/\"",
+      "color": {
+        "a": 1,
+        "rgb": 14037868
+      }
+    },
+    {
+      "query": "path:\"wiki/Rule/\"",
+      "color": {
+        "a": 1,
+        "rgb": 7358696
+      }
+    },
+    {
+      "query": "path:\"wiki/Criterion/\"",
+      "color": {
+        "a": 1,
+        "rgb": 1867478
+      }
+    },
+    {
+      "query": "path:\"wiki/Constraint/\"",
+      "color": {
+        "a": 1,
+        "rgb": 1087661
+      }
+    },
+    {
+      "query": "path:\"wiki/InformationConcept/\"",
+      "color": {
+        "a": 1,
+        "rgb": 3650125
+      }
+    },
+    {
+      "query": "path:\"wiki/EvidenceType/\"",
+      "color": {
+        "a": 1,
+        "rgb": 16213767
+      }
+    },
+    {
+      "query": "path:\"wiki/ConceptScheme/\"",
+      "color": {
+        "a": 1,
+        "rgb": 12723548
+      }
+    },
+    {
+      "query": "path:\"wiki/Concept/\"",
+      "color": {
+        "a": 1,
+        "rgb": 15092096
+      }
+    },
+    {
+      "query": "path:\"wiki/LegalResource/\"",
+      "color": {
+        "a": 1,
+        "rgb": 4804695
+      }
+    },
+    {
+      "query": "path:\"wiki/LegalResourceSubdivision/\"",
+      "color": {
+        "a": 1,
+        "rgb": 8818326
+      }
+    },
+    {
+      "query": "path:\"raw/\"",
+      "color": {
+        "a": 1,
+        "rgb": 13554906
+      }
+    }
+  ],
   "collapse-display": true,
-  "showArrow": false,
+  "showArrow": true,
   "textFadeMultiplier": 0,
   "nodeSizeMultiplier": 1,
   "lineSizeMultiplier": 1,
@@ -17,6 +123,6 @@
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 0.6471414915332315,
+  "scale": 0.9072813035709023,
   "close": true
 }

@@ -1,0 +1,488 @@
+{
+	"nodes": [
+		{
+			"id": "594fd1615a341c77",
+			"type": "text",
+			"text": "## cq-13 피보험자격 상실사유 구분코드\n\n질문: 피보험자격 상실신고의 상실사유 구분코드에는 무엇이 있는가?\n\n`ontology/cq/cq-13.rq`가 돌려주는 노트와 그 노트들의 관계, 근거 조문 block이다. 연결선의 이름은 schema의 property다.",
+			"x": 0,
+			"y": -320,
+			"width": 880,
+			"height": 260
+		},
+		{
+			"id": "f47b8e3683661001",
+			"type": "file",
+			"file": "wiki/ConceptScheme/피보험자격 상실사유 구분코드.md",
+			"x": 1120,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#c2255c"
+		},
+		{
+			"id": "5512e70b5a1aa807",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 11.md",
+			"x": 0,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "3765f2b705e2cb31",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 12.md",
+			"x": 0,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "306142fcf313b1e3",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 22.md",
+			"x": 0,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "afd7b0f8caafc3bd",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 23.md",
+			"x": 0,
+			"y": 840,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "a6b77c898f950684",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 26.md",
+			"x": 0,
+			"y": 1120,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "907940a8ddfcb417",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 31.md",
+			"x": 0,
+			"y": 1400,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "f76df3a72461aea6",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 32.md",
+			"x": 0,
+			"y": 1680,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "b60c9da4f9055901",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 41.md",
+			"x": 0,
+			"y": 1960,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "b6d54a558761ed3b",
+			"type": "file",
+			"file": "wiki/Concept/상실사유 구분코드 42.md",
+			"x": 0,
+			"y": 2240,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "0e1436f1f4312010",
+			"type": "file",
+			"file": "wiki/Concept/자진퇴사.md",
+			"x": 560,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "515f8806b81d5807",
+			"type": "file",
+			"file": "wiki/Concept/회사사정과 근로자 귀책사유에 의한 이직.md",
+			"x": 560,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "08eb0742af7d1a3f",
+			"type": "file",
+			"file": "wiki/Concept/정년 등 기간만료에 의한 이직.md",
+			"x": 560,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "20924982a17284e8",
+			"type": "file",
+			"file": "wiki/Concept/기타 (상실사유 구분코드).md",
+			"x": 560,
+			"y": 840,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "fb3d8d7d480f9269",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제5조.md",
+			"x": 1680,
+			"y": 0,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p1-i2"
+		},
+		{
+			"id": "5c6408a728ac4ac8",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 별지 제6호서식.md",
+			"x": 1680,
+			"y": 280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-t"
+		}
+	],
+	"edges": [
+		{
+			"id": "111537006faae778",
+			"fromNode": "5512e70b5a1aa807",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "d028d1f67d00d370",
+			"fromNode": "5512e70b5a1aa807",
+			"fromSide": "right",
+			"toNode": "0e1436f1f4312010",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "4f5b3baec108e349",
+			"fromNode": "3765f2b705e2cb31",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "ded6a1870fde7edf",
+			"fromNode": "3765f2b705e2cb31",
+			"fromSide": "right",
+			"toNode": "0e1436f1f4312010",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "a059d11651e6b546",
+			"fromNode": "306142fcf313b1e3",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "72d97d2c4a4d1a72",
+			"fromNode": "306142fcf313b1e3",
+			"fromSide": "right",
+			"toNode": "515f8806b81d5807",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "326d828d520437ec",
+			"fromNode": "afd7b0f8caafc3bd",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "4d458830739bbbf4",
+			"fromNode": "afd7b0f8caafc3bd",
+			"fromSide": "right",
+			"toNode": "515f8806b81d5807",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "31d09f3019036603",
+			"fromNode": "a6b77c898f950684",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "a75612ecf15bec41",
+			"fromNode": "a6b77c898f950684",
+			"fromSide": "right",
+			"toNode": "515f8806b81d5807",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "d078ec33a990a80f",
+			"fromNode": "907940a8ddfcb417",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "e5c352f6cf472481",
+			"fromNode": "907940a8ddfcb417",
+			"fromSide": "right",
+			"toNode": "08eb0742af7d1a3f",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "4fb37d0b878e168f",
+			"fromNode": "f76df3a72461aea6",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "f21a05b1072cf275",
+			"fromNode": "f76df3a72461aea6",
+			"fromSide": "right",
+			"toNode": "08eb0742af7d1a3f",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "7fbeaa3ae92b3913",
+			"fromNode": "b60c9da4f9055901",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "9c5053f309b52e5a",
+			"fromNode": "b60c9da4f9055901",
+			"fromSide": "right",
+			"toNode": "20924982a17284e8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "3ac176da80037237",
+			"fromNode": "b6d54a558761ed3b",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "9666928ed0625caa",
+			"fromNode": "b6d54a558761ed3b",
+			"fromSide": "right",
+			"toNode": "20924982a17284e8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "5b29dc970ba09d48",
+			"fromNode": "0e1436f1f4312010",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "790761a878de613a",
+			"fromNode": "515f8806b81d5807",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "3d4ce065e1080920",
+			"fromNode": "08eb0742af7d1a3f",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "61dd4dba298490a6",
+			"fromNode": "20924982a17284e8",
+			"fromSide": "right",
+			"toNode": "f47b8e3683661001",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "2047c90117432c93",
+			"fromNode": "f47b8e3683661001",
+			"fromSide": "right",
+			"toNode": "fb3d8d7d480f9269",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "c233bf19855622e5",
+			"fromNode": "f47b8e3683661001",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "c0cdf9ebc5ae9180",
+			"fromNode": "5512e70b5a1aa807",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "621966f3f572847b",
+			"fromNode": "3765f2b705e2cb31",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "d796be10547857e3",
+			"fromNode": "306142fcf313b1e3",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "0eb635dc09c5c598",
+			"fromNode": "afd7b0f8caafc3bd",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "fc895c89b5e9e416",
+			"fromNode": "a6b77c898f950684",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "c867d030706d8952",
+			"fromNode": "907940a8ddfcb417",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "b4fd99f3b8ab29e9",
+			"fromNode": "f76df3a72461aea6",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "f98352ddfb02b2b2",
+			"fromNode": "b60c9da4f9055901",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "0d644e9dc410ad09",
+			"fromNode": "b6d54a558761ed3b",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "0bc89388b5f3d7ad",
+			"fromNode": "0e1436f1f4312010",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1510059aac213ca9",
+			"fromNode": "515f8806b81d5807",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e6f2bb39e244d7ae",
+			"fromNode": "08eb0742af7d1a3f",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "43b62f9e9730464a",
+			"fromNode": "20924982a17284e8",
+			"fromSide": "right",
+			"toNode": "5c6408a728ac4ac8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		}
+	]
+}

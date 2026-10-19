@@ -1,0 +1,1033 @@
+{
+	"nodes": [
+		{
+			"id": "594fd1615a341c77",
+			"type": "text",
+			"text": "## cq-06 정당한 이직 사유\n\n질문: 자기 사정으로 이직했더라도 수급자격이 제한되지 않는 정당한 이직 사유는 무엇인가?\n\n`ontology/cq/cq-06.rq`가 돌려주는 노트와 그 노트들의 관계, 근거 조문 block이다. 연결선의 이름은 schema의 property다.",
+			"x": 0,
+			"y": -320,
+			"width": 880,
+			"height": 260
+		},
+		{
+			"id": "03e9f9ba0346049e",
+			"type": "file",
+			"file": "wiki/ConceptScheme/정당한 이직 사유.md",
+			"x": 1120,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#c2255c"
+		},
+		{
+			"id": "5863ce12bc75fc8c",
+			"type": "file",
+			"file": "wiki/Concept/이직일 전 1년 이내 2개월 이상 발생한 근로조건 등의 사유.md",
+			"x": 560,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "3ead6654f446e2df",
+			"type": "file",
+			"file": "wiki/Concept/실제 근로조건이 낮아진 경우.md",
+			"x": 0,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "4b2c3db382d92754",
+			"type": "file",
+			"file": "wiki/Concept/임금체불.md",
+			"x": 0,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "c34433e2e7fba692",
+			"type": "file",
+			"file": "wiki/Concept/최저임금 미달.md",
+			"x": 0,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "f7c9a3df61dc3de9",
+			"type": "file",
+			"file": "wiki/Concept/연장 근로의 제한 위반.md",
+			"x": 0,
+			"y": 840,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "a8debc717ce5ab69",
+			"type": "file",
+			"file": "wiki/Concept/휴업으로 평균임금의 70퍼센트 미만 지급.md",
+			"x": 0,
+			"y": 1120,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "b790569017908895",
+			"type": "file",
+			"file": "wiki/Concept/임신, 출산, 육아, 의무복무 등으로 인한 이직.md",
+			"x": 0,
+			"y": 1400,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "ea462eeef37c1864",
+			"type": "file",
+			"file": "wiki/Concept/사업 내용의 위법화.md",
+			"x": 0,
+			"y": 1680,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "469160db97e6b17e",
+			"type": "file",
+			"file": "wiki/Concept/정년의 도래나 계약기간의 만료.md",
+			"x": 0,
+			"y": 1960,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "655a1a2af52c640b",
+			"type": "file",
+			"file": "wiki/Concept/통상의 다른 근로자도 이직했을 사정.md",
+			"x": 0,
+			"y": 2240,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "6349100365ba1f96",
+			"type": "file",
+			"file": "wiki/Concept/불합리한 차별대우.md",
+			"x": 0,
+			"y": 2520,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "8b2f1d521be999ac",
+			"type": "file",
+			"file": "wiki/Concept/성희롱, 성폭력, 그 밖의 성적인 괴롭힘.md",
+			"x": 0,
+			"y": 2800,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "5931fdf31011204c",
+			"type": "file",
+			"file": "wiki/Concept/직장 내 괴롭힘.md",
+			"x": 0,
+			"y": 3080,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "cfb3dc01884a8a34",
+			"type": "file",
+			"file": "wiki/Concept/도산·폐업 확실 또는 대량 감원 예정.md",
+			"x": 0,
+			"y": 3360,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "69b0a63ad3c84fd8",
+			"type": "file",
+			"file": "wiki/Concept/퇴직 권고나 퇴직 희망자 모집에 따른 이직.md",
+			"x": 560,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "096cacd60b157472",
+			"type": "file",
+			"file": "wiki/Concept/사업의 양도·인수·합병.md",
+			"x": 0,
+			"y": 3640,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "03890c5cea9d5975",
+			"type": "file",
+			"file": "wiki/Concept/일부 사업의 폐지나 업종전환.md",
+			"x": 0,
+			"y": 3920,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "6e3ad00d8f037523",
+			"type": "file",
+			"file": "wiki/Concept/직제개편에 따른 조직의 폐지·축소.md",
+			"x": 0,
+			"y": 4200,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "8cad008601fa1ffc",
+			"type": "file",
+			"file": "wiki/Concept/신기술의 도입 등에 따른 작업형태의 변경.md",
+			"x": 0,
+			"y": 4480,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "55c42076f59fab50",
+			"type": "file",
+			"file": "wiki/Concept/경영의 악화, 인사 적체 등.md",
+			"x": 0,
+			"y": 4760,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "b873fe91c0717abb",
+			"type": "file",
+			"file": "wiki/Concept/통근 곤란.md",
+			"x": 560,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "d1d9304796ed06ca",
+			"type": "file",
+			"file": "wiki/Concept/사업장의 이전.md",
+			"x": 0,
+			"y": 5040,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "d0121cb28e8796fe",
+			"type": "file",
+			"file": "wiki/Concept/지역을 달리하는 사업장으로의 전근.md",
+			"x": 0,
+			"y": 5320,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "c744d159d88e8eba",
+			"type": "file",
+			"file": "wiki/Concept/동거를 위한 거소 이전.md",
+			"x": 0,
+			"y": 5600,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "899709891b4f9be0",
+			"type": "file",
+			"file": "wiki/Concept/그 밖에 피할 수 없는 사유로 인한 통근 곤란.md",
+			"x": 0,
+			"y": 5880,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "1a0f2211d7aaf676",
+			"type": "file",
+			"file": "wiki/Concept/간호를 위한 이직.md",
+			"x": 0,
+			"y": 6160,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "b37427fba4fc6c73",
+			"type": "file",
+			"file": "wiki/Concept/중대재해 시정명령 미이행.md",
+			"x": 0,
+			"y": 6440,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "603c23cae5c445b6",
+			"type": "file",
+			"file": "wiki/Concept/업무 수행 곤란.md",
+			"x": 0,
+			"y": 6720,
+			"width": 400,
+			"height": 240,
+			"color": "#e64980"
+		},
+		{
+			"id": "60a553449f1f9b6a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제101조.md",
+			"x": 1680,
+			"y": 0,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220701-p2"
+		},
+		{
+			"id": "19ffaab0f939a28c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제101조.md",
+			"x": 1680,
+			"y": 280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220701-p3"
+		},
+		{
+			"id": "5d06dfc4f88a0169",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제101조.md",
+			"x": 1680,
+			"y": 560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220701-p4"
+		},
+		{
+			"id": "a1d5a378288536d9",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제58조.md",
+			"x": 1680,
+			"y": 840,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-i2"
+		},
+		{
+			"id": "5e680721c81fe3fb",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제58조.md",
+			"x": 1680,
+			"y": 1120,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-i2-m3"
+		},
+		{
+			"id": "6ad9b9ae075cad5a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제58조.md",
+			"x": 1680,
+			"y": 1400,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-lead"
+		},
+		{
+			"id": "afcade777e48f14e",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 별표 2.md",
+			"x": 1680,
+			"y": 1680,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20240701-t"
+		}
+	],
+	"edges": [
+		{
+			"id": "78a3389bd7e2913f",
+			"fromNode": "5863ce12bc75fc8c",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "28689045e0762591",
+			"fromNode": "3ead6654f446e2df",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "78875aed89f5a321",
+			"fromNode": "3ead6654f446e2df",
+			"fromSide": "right",
+			"toNode": "5863ce12bc75fc8c",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "57b2928394bfb1f3",
+			"fromNode": "4b2c3db382d92754",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "7db5764bbf56d719",
+			"fromNode": "4b2c3db382d92754",
+			"fromSide": "right",
+			"toNode": "5863ce12bc75fc8c",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "82ce42f948463cdc",
+			"fromNode": "c34433e2e7fba692",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "a0ee295746aab40e",
+			"fromNode": "c34433e2e7fba692",
+			"fromSide": "right",
+			"toNode": "5863ce12bc75fc8c",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "305ebacbb46d5685",
+			"fromNode": "f7c9a3df61dc3de9",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "1410dbfaa26a6558",
+			"fromNode": "f7c9a3df61dc3de9",
+			"fromSide": "right",
+			"toNode": "5863ce12bc75fc8c",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "91abf55ada01ef4f",
+			"fromNode": "a8debc717ce5ab69",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "9eba610960eec85e",
+			"fromNode": "a8debc717ce5ab69",
+			"fromSide": "right",
+			"toNode": "5863ce12bc75fc8c",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "ddcfbc0ebbd1b9d8",
+			"fromNode": "b790569017908895",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "d4fb0b16da9256c4",
+			"fromNode": "ea462eeef37c1864",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "aa45714fc3c24080",
+			"fromNode": "469160db97e6b17e",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "fe3ee9aebab4da5c",
+			"fromNode": "655a1a2af52c640b",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "424def56bc1a6328",
+			"fromNode": "6349100365ba1f96",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "693a422ef2e8bf82",
+			"fromNode": "8b2f1d521be999ac",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "d2b21b51498d5e65",
+			"fromNode": "5931fdf31011204c",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "edb91ff2f3fef7f3",
+			"fromNode": "cfb3dc01884a8a34",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "f364529b8290b1f7",
+			"fromNode": "69b0a63ad3c84fd8",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "a3b53786460f9a4f",
+			"fromNode": "096cacd60b157472",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "410f7c6d495f64cc",
+			"fromNode": "096cacd60b157472",
+			"fromSide": "right",
+			"toNode": "69b0a63ad3c84fd8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "a856fb44d2f2213e",
+			"fromNode": "03890c5cea9d5975",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "a29da9a9d35fabf5",
+			"fromNode": "03890c5cea9d5975",
+			"fromSide": "right",
+			"toNode": "69b0a63ad3c84fd8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "91cb9728b92aea7c",
+			"fromNode": "6e3ad00d8f037523",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "2b71822298ff6dc1",
+			"fromNode": "6e3ad00d8f037523",
+			"fromSide": "right",
+			"toNode": "69b0a63ad3c84fd8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "ed7a9dd18f6e720e",
+			"fromNode": "8cad008601fa1ffc",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "e4277e73e5438530",
+			"fromNode": "8cad008601fa1ffc",
+			"fromSide": "right",
+			"toNode": "69b0a63ad3c84fd8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "8aabfed1149b38b9",
+			"fromNode": "55c42076f59fab50",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "232386a7d67de394",
+			"fromNode": "55c42076f59fab50",
+			"fromSide": "right",
+			"toNode": "69b0a63ad3c84fd8",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "fa2c8500ca8c3769",
+			"fromNode": "b873fe91c0717abb",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "4604c072a5763de4",
+			"fromNode": "d1d9304796ed06ca",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "48ed2a8a68cf7977",
+			"fromNode": "d1d9304796ed06ca",
+			"fromSide": "right",
+			"toNode": "b873fe91c0717abb",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "244124a29846e469",
+			"fromNode": "d0121cb28e8796fe",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "a6f29aedaf0d07f6",
+			"fromNode": "d0121cb28e8796fe",
+			"fromSide": "right",
+			"toNode": "b873fe91c0717abb",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "08301ae896d1e712",
+			"fromNode": "c744d159d88e8eba",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "9e0eeb6145daf147",
+			"fromNode": "c744d159d88e8eba",
+			"fromSide": "right",
+			"toNode": "b873fe91c0717abb",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "c1f0fcde8beecc3e",
+			"fromNode": "899709891b4f9be0",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "10598644293aae00",
+			"fromNode": "899709891b4f9be0",
+			"fromSide": "right",
+			"toNode": "b873fe91c0717abb",
+			"toSide": "left",
+			"label": "broader"
+		},
+		{
+			"id": "02d9d82ecde2c9a1",
+			"fromNode": "1a0f2211d7aaf676",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "049f095c7d8f2f5d",
+			"fromNode": "b37427fba4fc6c73",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "71f552e5135b91a0",
+			"fromNode": "603c23cae5c445b6",
+			"fromSide": "right",
+			"toNode": "03e9f9ba0346049e",
+			"toSide": "left",
+			"label": "inScheme"
+		},
+		{
+			"id": "4e1cf7a4b7934a54",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "9c7f1e1db864046d",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "60a553449f1f9b6a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "c45b225efe71fa4b",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "19ffaab0f939a28c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2d0e778261ec5049",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "5d06dfc4f88a0169",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "353022da1551f821",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "6ad9b9ae075cad5a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "b1cbc1d12a021839",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "a1d5a378288536d9",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "5d4308288f5a81f7",
+			"fromNode": "03e9f9ba0346049e",
+			"fromSide": "right",
+			"toNode": "5e680721c81fe3fb",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2f313cd9c084a67e",
+			"fromNode": "5863ce12bc75fc8c",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e66e62e01ee4a8fc",
+			"fromNode": "3ead6654f446e2df",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "eec465608286d9c7",
+			"fromNode": "4b2c3db382d92754",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "eff0b5d303961e7e",
+			"fromNode": "c34433e2e7fba692",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1125d59e1fef5757",
+			"fromNode": "f7c9a3df61dc3de9",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "9a36db1c9d0db203",
+			"fromNode": "a8debc717ce5ab69",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "77493633ff474c65",
+			"fromNode": "b790569017908895",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1669d13bdba47dda",
+			"fromNode": "ea462eeef37c1864",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "97ec35b1d4fad1ea",
+			"fromNode": "469160db97e6b17e",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "6e4c691a42c6b6ed",
+			"fromNode": "655a1a2af52c640b",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "5342af476972c305",
+			"fromNode": "6349100365ba1f96",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "38f498954c7faa3d",
+			"fromNode": "8b2f1d521be999ac",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "410fb1530cb341df",
+			"fromNode": "5931fdf31011204c",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "97e3be9297c6ee98",
+			"fromNode": "cfb3dc01884a8a34",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "9399ec702a0effaf",
+			"fromNode": "69b0a63ad3c84fd8",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "cb55ce22a3ff4b73",
+			"fromNode": "096cacd60b157472",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "6ca7a08ec74f4c22",
+			"fromNode": "03890c5cea9d5975",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "3b718255586468d0",
+			"fromNode": "6e3ad00d8f037523",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e99d77a900ddd68c",
+			"fromNode": "8cad008601fa1ffc",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2635528c0a8e0025",
+			"fromNode": "55c42076f59fab50",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "de6f6dcf51e5c9b2",
+			"fromNode": "b873fe91c0717abb",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2487b840c27b8ac9",
+			"fromNode": "d1d9304796ed06ca",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "62f63cb3e468453f",
+			"fromNode": "d0121cb28e8796fe",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "5d266789fd34bf70",
+			"fromNode": "c744d159d88e8eba",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "8ffadadf9a613500",
+			"fromNode": "899709891b4f9be0",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "0955490830f61d7b",
+			"fromNode": "1a0f2211d7aaf676",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "c8a285ad32a85552",
+			"fromNode": "b37427fba4fc6c73",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e3c64c352312bffa",
+			"fromNode": "603c23cae5c445b6",
+			"fromSide": "right",
+			"toNode": "afcade777e48f14e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		}
+	]
+}
