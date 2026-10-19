@@ -14,6 +14,10 @@ admrul:
 work24:
   - name: 실업급여(상용직)
     url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000254&systCnntId=&systId=SI00000411
+  - name: 실업급여(일용직)
+    url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000255&systCnntId=&systId=SI00000387
+  - name: 이직확인서
+    url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000260&systCnntId=&systId=SI00000343
 shapes:
   - name: CPSV-AP 3.2.0
     file: cpsv-ap-3.2.0-shacl.ttl
