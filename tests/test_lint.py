@@ -306,3 +306,15 @@ def test_form_item_labels(tmp_path, label, problem):
                 ("wiki/Concept/시험 코드.md", None, FORM_CITER.replace("LABEL", label)))
     labels = [p for p in found if "시험 코드" in p and "footnote label" in p]
     assert labels == [] if problem is None else any(problem in p for p in labels), labels
+
+
+@pytest.mark.parametrize("sentence, flagged", [
+    ("이 두 제한은 기초일액에 적용한다.", "두 제한은"),
+    ("이 세 경우는 하나로 모인다.", "세 경우는"),
+    ("이 제한은 한 종류의 제한이다.", None),
+])
+def test_native_numeral_determiners(tmp_path, sentence, flagged):
+    original = "2026-01-01 이후 이직한 사람의 기초일액은 11만3500원을 넘을 수 없다.[^1][^2][^3]"
+    found = run(tmp_path, (CAP, original, original + "\n\n" + sentence[:-1] + ".[^1]"))
+    numerals = [p for p in found if "Arabic numerals" in p]
+    assert numerals == [] if flagged is None else any(flagged in p for p in numerals), numerals
