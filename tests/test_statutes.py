@@ -360,3 +360,21 @@ def test_delegation_data_decides_for_articles_of_the_current_version():
     assert statutes.decides(unit, "시험법")
     assert not statutes.decides(unit, "시험법 시행규칙")
     assert not statutes.decides(S.Unit(statutes.laws["시험법"], "art-10"), "시험법")
+
+
+def moved_article(reference):
+    row = article(5, "범위", [("신고한다.", [])])
+    row["조문참고자료"] = reference
+    return family([row])
+
+
+def test_a_move_before_the_earliest_version_is_not_listed():
+    statutes = moved_article("[제4조에서 이동, 종전 제5조는 제7조로 이동 <2009.10.9>]")
+    assert S.review_unit(S.Unit(statutes.laws["시험법 시행령"], "art-5")) == []
+
+
+def test_a_move_after_the_earliest_version_is_listed():
+    statutes = moved_article("[제4조에서 이동, 종전 제5조는 제7조로 이동 <2026.3.1>]")
+    found = S.review_unit(S.Unit(statutes.laws["시험법 시행령"], "art-5"))
+    assert any("moved here from art-4" in line for line in found)
+    assert any("moved to art-7" in line and "reused" in line for line in found)

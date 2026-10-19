@@ -1171,31 +1171,41 @@ def commit():
 SIDE_BY_SIDE = re.compile(r"\S {8,}\S")
 MOVED_FROM = re.compile(r"제(\d+)조(?:의(\d+))?에서\s*이동")
 MOVED_AWAY = re.compile(r"종전\s*제\d+조(?:의\d+)?[은는]\s*제(\d+)조(?:의(\d+))?로\s*이동")
+MOVE_NOTE = re.compile(r"\[([^\]]*이동[^\]]*)\]")
+MOVE_DATE = re.compile(r"<(\d{4})\.(\d{1,2})\.(\d{1,2})>")
 
 
 def review_unit(unit):
-    """Things in a unit that a person should look at: moved or reused numbers, images without text, lost glyphs and text side by side in a form."""
+    """Things in a unit that a person should look at: moved or reused numbers, images without text, lost glyphs and text side by side in a form.
+
+    A move dated on or before the earliest version of the note leaves the note one article, so it is not listed.
+    """
     if unit.kind in ("law", "heading"):
         return []
     found = []
     law = unit.law
     if unit.kind == "article":
-        dates = sorted({v["first"] for v in unit_versions(law, unit.key)} | set(law.needed()))
+        versions = unit_versions(law, unit.key)
+        earliest = min((v["first"] for v in versions), default=law.current)
+        dates = sorted({v["first"] for v in versions} | set(law.needed()))
         for effective in dates:
             kind_row = law.rows_of(effective).get(unit.key)
             row = kind_row[1] if kind_row else {}
             for field, meaning in (("조문이동이전", "moved here from"), ("조문이동이후", "moved away to")):
                 code = row.get(field, "")
-                if code and int(code):
+                if code and int(code) and effective > earliest:
                     line = f"{unit.name}: the article {meaning} {L.article_key(code[:4], code[4:])} by the version of {effective}"
                     if effective > law.current:
                         line += "; notes follow numbers, not moves, so this note will show another article from then on"
                     found.append(line)
-            note = row.get("조문참고자료", "")
-            for number, branch in MOVED_FROM.findall(note):
-                found.append(f"{unit.name}: the article moved here from {L.article_key(number, branch)}, as its 조문참고자료 says")
-            for number, branch in MOVED_AWAY.findall(note):
-                found.append(f"{unit.name}: the earlier article of this number moved to {L.article_key(number, branch)}, as its 조문참고자료 says; the number is reused")
+            for bracket in MOVE_NOTE.findall(row.get("조문참고자료", "")):
+                moved = MOVE_DATE.search(bracket)
+                if moved and f"{moved[1]}{int(moved[2]):02d}{int(moved[3]):02d}" <= earliest:
+                    continue
+                for number, branch in MOVED_FROM.findall(bracket):
+                    found.append(f"{unit.name}: the article moved here from {L.article_key(number, branch)}, as its 조문참고자료 says")
+                for number, branch in MOVED_AWAY.findall(bracket):
+                    found.append(f"{unit.name}: the earlier article of this number moved to {L.article_key(number, branch)}, as its 조문참고자료 says; the number is reused")
     text = law.units(law.needed()[-1] if unit.key not in law.units(law.current) else law.current)[unit.key]
     for element in IMAGE_ELEMENT.findall(text):
         if not L.canonical(L.IMAGE_TAG.sub("", element)):

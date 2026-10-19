@@ -118,11 +118,12 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Generate the units that wiki notes or competency questions cite, their parent units, and the units those units cite directly.
   - Keep generating every unit that already has a statute note, so that no note goes stale.
   - Commit `scripts/` first: `statutes.py` writes notes only from a committed generator, so that the ledger names it.
-  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers, cited versions without a raw note, references not counted as delegations, delegations the 위임조문 data does not list, units kept only because their note exists, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
+  - It prints `REVIEW` lines for dates that fail the check below, moved or reused article numbers within the versions a note shows, cited versions without a raw note, references not counted as delegations, delegations the 위임조문 data does not list, units kept only because their note exists, images without text, glyphs lost as "?" and form text that stands side by side without frames. Record them in `log.md`.
   - `--check` lists the notes that differ from a fresh generation or from the ledger. It changes and fetches nothing, and stops when the cache lacks a version it needs.
   - `--versions "<unit>"` lists the versions of a unit in the transitional window with their block IDs, for citing an earlier version.
 - Statute notes follow article numbers.
   - `statutes.py` does not yet carry an identifier across a move, or keep the earlier article of a reused number apart.
+  - A move or reuse dated on or before the earliest version of a note leaves the note one article, as 정부조직법 제41조 from 2025-10-01, so it is not listed.
   - When a scheduled version moves an article that has a note, change the generator in a `schema` operation before that version becomes current.
   - Cite no earlier version of a reused number until then.
 - List laws that the wiki cites only for a definition, such as 정부조직법 for 고용노동부, under `references` in `scripts/sources.yaml`.
