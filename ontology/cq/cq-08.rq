@@ -11,6 +11,7 @@ SELECT ?item ?source WHERE {
     employment:job-seeking-benefit cpsv:follows ?item .
     ?item employment:variable ?variable .
     VALUES ?variable { employment:base-daily-wage employment:daily-job-seeking-benefit }
+    FILTER NOT EXISTS { ?item employment:appliesWhen employment:daily-worker-at-separation }
   }
   UNION
   { ?item cv:constrains employment:base-daily-wage }

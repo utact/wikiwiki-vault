@@ -19,6 +19,7 @@ SELECT ?item ?source WHERE {
   } UNION {
     employment:job-seeking-benefit cv:holdsRequirement ?item .
     ?item a cv:Constraint .
+    FILTER NOT EXISTS { ?item employment:appliesWhen employment:construction-daily-worker-at-separation }
   }
   ?note foaf:primaryTopic ?item ;
         dct:source ?expression .
