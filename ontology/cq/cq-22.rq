@@ -1,0 +1,22 @@
+# cq-22: 직업안정기관에 출석하기 어려우면 실업의 신고와 실업의 인정을 어떻게 받는가?
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    VALUES ?item { employment:unemployment-report employment:unemployment-recognition }
+  } UNION {
+    VALUES ?service { employment:unemployment-report employment:unemployment-recognition }
+    ?service cv:hasChannel ?item .
+  } UNION {
+    employment:unemployment-recognition cv:relatedService ?item .
+  } UNION {
+    employment:unemployment-recognition cv:relatedService/cv:hasChannel ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}

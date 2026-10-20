@@ -1,0 +1,31 @@
+# cq-24: 실업의 인정을 받으려면 어떤 재취업활동을 해야 하는가?
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    VALUES ?item { employment:unemployment-recognition }
+  } UNION {
+    employment:unemployment-recognition cv:holdsRequirement ?item .
+  } UNION {
+    employment:unemployment-recognition cv:holdsRequirement/cv:hasRequirement ?item .
+  } UNION {
+    employment:unemployment-recognition cv:holdsRequirement/cv:hasRequirement/cv:hasConcept ?item .
+  } UNION {
+    employment:unemployment-recognition cv:holdsRequirement/cv:hasRequirement/cv:hasConcept/dct:conformsTo ?item .
+  } UNION {
+    employment:unemployment-recognition cv:holdsRequirement/cv:hasRequirement/cv:hasConcept/dct:conformsTo ?scheme .
+    ?item skos:inScheme ?scheme .
+  } UNION {
+    VALUES ?item { employment:inactive-reemployment-cases }
+  } UNION {
+    ?item skos:inScheme employment:inactive-reemployment-cases .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
