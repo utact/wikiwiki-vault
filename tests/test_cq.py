@@ -106,3 +106,10 @@ def test_scenario_check_needs_requires_and_passing_questions():
     graph.add((writer.iri("recognition"), C.V.DCT.requires, writer.iri("application")))
     found = C.check_scenarios(SCENARIO, graph, writer, checked={"cq-01", "cq-02", "cq-03"}, failed=set())
     assert found == []
+
+
+def test_a_range_of_items_continues_the_paragraph_before_it():
+    resolver = FakeResolver({"고용보험법 제118조": "law-001761-art-118"},
+                            [f"law-001761-art-118-p1-i{n}" for n in (1, 2, 3)])
+    found = resolver.citations("(법 제118조제1항제1호부터 제3호까지)")
+    assert [iri for _, iri in found] == ["law-001761-art-118-p1-i1", "law-001761-art-118-p1-i2", "law-001761-art-118-p1-i3"]

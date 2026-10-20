@@ -9,6 +9,7 @@ statute units or blocks they rest on. Every provision that the expected answer i
 docs/competency-questions.md cites must be among the sources, or contain one of them.
 Citations under 범위 밖, 관련 사항 and 검사 항목 are not part of the expected answer.
 An item of a 별표 or 별지 서식 resolves to the whole unit, because their notes declare no item blocks; the verifier compares the items themselves.
+A bare 호 continues the article and 항 before it, and a range such as 제1호부터 제3호까지 cites every 호 in it.
 A query fails when a BIND or FILTER uses a variable that its own group does not bind. SPARQL evaluates such a group before the outer pattern, so the variable is unbound there, and a later triple pattern then matches every note.
 
 The scenarios in docs/scenarios.md are checked too. A step that names its service and states that an earlier step is its 선행 조건 must have that service `requires` the earlier step's service, and every competency question a step lists must be checked and pass.
@@ -97,7 +98,7 @@ class Resolver:
         """(citation, IRI or None) for each provision a parenthesised group of an expected answer cites."""
         found = []
         for group in GROUP.findall(text):
-            law, article, sup = ROOT_LAW, None, None
+            law, article, sup, paragraph, previous = ROOT_LAW, None, None, None, None
             if NOTICE in group or "최저임금 고시" in group:
                 unit = self.unit(NOTICE)
                 found.append((NOTICE, self.iri(unit) if unit else None))
@@ -131,9 +132,14 @@ class Resolver:
                     p, items = match["p"], [(match["i"], match["i_b"])] if match["i"] else []
                     items += [(n, b) for n, b in re.findall(r"제(\d+)호(?:의(\d+))?", match["parts"] or "")]
                     found += [self.article(article, p, i, m=match["m"] if not k else None, word=match["word"]) for k, i in enumerate(items or [None])]
+                    paragraph, previous = p, (items[-1], match.end()) if items else None
                     continue
                 if match["item"] and article:
-                    found.append(self.article(article, None, (match["item"], match["item_b"])))
+                    item = (match["item"], match["item_b"])
+                    if previous and re.search(r"부터", group[previous[1]:match.start()]) and not previous[0][1] and not item[1]:
+                        found += [self.article(article, paragraph, (str(n), None)) for n in range(int(previous[0][0]) + 1, int(item[0]))]
+                    found.append(self.article(article, paragraph, item))
+                    previous = (item, match.end())
         return found
 
     def addendum(self, sup, number):
