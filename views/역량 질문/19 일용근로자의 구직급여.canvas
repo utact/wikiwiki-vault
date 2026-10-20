@@ -1124,6 +1124,16 @@
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20200526-p3"
+		},
+		{
+			"id": "fff4c35acb7e8e35",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 별지 제7호서식.md",
+			"x": 3360,
+			"y": 21280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96"
 		}
 	],
 	"edges": [
@@ -1462,6 +1472,14 @@
 			"toNode": "a8079ecae41e4278",
 			"toSide": "left",
 			"label": "requires"
+		},
+		{
+			"id": "141befda1f39087e",
+			"fromNode": "185fd05917e6b753",
+			"fromSide": "right",
+			"toNode": "fff4c35acb7e8e35",
+			"toSide": "left",
+			"label": "isDefinedBy"
 		},
 		{
 			"id": "46729c20172505f6",
