@@ -1,0 +1,31 @@
+# cq-17: 구직급여를 받는 동안 취업하거나 일을 하면 무엇을 해야 하는가?
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    VALUES ?item { employment:claimant-employment-report employment:recognition-period-limited-payment-restriction }
+  } UNION {
+    employment:claimant-employment-report cv:holdsRequirement|cv:hasInputType ?item .
+  } UNION {
+    employment:claimant-employment-report cv:holdsRequirement/(cv:hasConcept|employment:appliesWhen) ?item .
+  } UNION {
+    employment:claimant-employment-report cv:holdsRequirement/employment:appliesWhen/cv:hasConcept ?item .
+  } UNION {
+    employment:claimant-employment-report cv:holdsRequirement/cv:hasConcept/dct:conformsTo ?item .
+  } UNION {
+    employment:claimant-employment-report cv:holdsRequirement/cv:hasConcept/dct:conformsTo ?scheme .
+    ?item skos:inScheme ?scheme .
+  } UNION {
+    employment:recognition-period-limited-payment-restriction employment:appliesWhen ?item .
+  } UNION {
+    employment:recognition-period-limited-payment-restriction employment:appliesWhen/cv:hasConcept ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}

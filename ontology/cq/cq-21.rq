@@ -1,0 +1,26 @@
+# cq-21: 소정급여일수가 끝나도 취업하지 못하면 구직급여를 더 받을 수 있는가?
+PREFIX cpsv: <http://purl.org/vocab/cpsv#>
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    BIND(employment:individual-extended-benefit AS ?item)
+  } UNION {
+    employment:individual-extended-benefit cv:holdsRequirement|cpsv:follows|cv:hasInputType ?item .
+  } UNION {
+    employment:individual-extended-benefit cv:holdsRequirement/cv:hasRequirement ?item .
+  } UNION {
+    employment:individual-extended-benefit cv:holdsRequirement/cv:hasRequirement?/cv:hasConcept ?item .
+  } UNION {
+    employment:individual-extended-benefit cv:holdsRequirement/cv:constrains ?item .
+  } UNION {
+    employment:individual-extended-benefit cpsv:follows/employment:variable ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
