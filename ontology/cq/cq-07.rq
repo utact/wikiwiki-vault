@@ -9,7 +9,7 @@ SELECT ?item ?source WHERE {
   {
     employment:job-seeking-benefit dct:requires* ?item .
   } UNION {
-    employment:job-seeking-benefit dct:requires* ?service .
+    employment:job-seeking-benefit dct:requires+ ?service .
     ?item dct:hasPart ?service .
   } UNION {
     employment:job-seeking-benefit dct:requires*/dct:hasPart ?item .

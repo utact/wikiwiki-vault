@@ -1,0 +1,16 @@
+# cq-01: 실업급여에는 어떤 급여가 있는가?
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    BIND(employment:unemployment-benefit AS ?item)
+  } UNION {
+    employment:unemployment-benefit dct:hasPart+ ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
