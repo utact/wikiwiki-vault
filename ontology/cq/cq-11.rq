@@ -1,0 +1,13 @@
+# cq-11: 구직급여는 언제까지 받을 수 있는가?
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  ?rule employment:variable employment:benefit-period .
+  ?rule (employment:variable|employment:requiredInput|employment:appliesWhen)? ?item .
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
