@@ -209,3 +209,7 @@ def test_lost_glyph_counts_wide_at_the_start_of_a_line():
 def test_same_name_ignores_spaces():
     assert L.same_name("고용보험법시행령", "고용보험법 시행령")
     assert not L.same_name("고용보험법", "고용보험법 시행령")
+
+
+def test_a_name_with_digits_is_not_a_number():
+    assert L.number_tokens("고용24 안내는 90일 안에 청구한다고 적는다.", notes=False) == [("number", 90, "일")]

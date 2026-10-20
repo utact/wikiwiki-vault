@@ -227,6 +227,7 @@ CODE_TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Z]{1,3}\d{2,}(?![A-Za-z0-9])")
 AMOUNT_TOKEN = re.compile(r"\d[\d,]*\s*[억만천백](?:\s*(?:\d[\d,]*)?\s*[억만천백])*(?:\s*\d[\d,]*)?|\d[\d,]*(?:\.\d+)?")
 UNIT = re.compile(r"\s*(원|일|개월|년|세|시간|명|회|배|주|달러|유로|엔|위안|분(?!의)|초(?!과)|개(?!월)|건|곳|쪽|점)")
 KOREAN_UNITS = {"억": 10 ** 8, "만": 10 ** 4, "천": 1000, "백": 100}
+NAMES_WITH_DIGITS = re.compile(r"고용24")
 
 
 def korean_number(text):
@@ -250,9 +251,10 @@ def number_tokens(text, notes=True):
     """Dates, ratios, codes and amounts in a text, as (kind, value, unit) tuples, leaving out citations such as 제45조제5항.
 
     Ratios join 100분의 60 and 60퍼센트 as one value, and amounts keep their unit, such as 원 or 개월.
+    Names that contain digits, such as 고용24, are not numbers.
     With notes, it also leaves out the bracketed notes of statute text, such as <개정 2019.1.15> and [본조신설 2020.6.9].
     """
-    text = CITATION.sub(" ", text)
+    text = NAMES_WITH_DIGITS.sub(" ", CITATION.sub(" ", text))
     if notes:
         text = NOTES_IN_TEXT.sub(" ", text)
     found = []

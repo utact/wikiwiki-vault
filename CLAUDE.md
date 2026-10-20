@@ -265,6 +265,7 @@ decisionTable:
 - Every number, amount and date in a footnoted sentence must appear in a cited block, with the same unit.
   - Numbers inside citations, such as 제45조제5항, 별표 1 and 부칙 제21473호, are exempt.
   - Numbers inside the names of wiki notes, such as 이직 전 1일 소정근로시간, are exempt, because the note they name carries its own sources.
+  - Names that contain digits, such as 고용24, are not numbers.
   - Give a calculated number a footnote that links its `Rule` and states the calculation in inline code, such as `113500 * 60 / 100`; the checker evaluates it.
   - The operands of a calculation must appear in a cited block, as a number or as a ratio such as 100분의 60 for `60 / 100`.
   - Mark a calculation on example inputs with 예시 in its footnote, as in `` [^3]: [[최저기초일액 산정]] 예시 `8 * 10320` ``. Its operands may then appear in the sentence instead.
