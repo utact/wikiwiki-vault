@@ -40,44 +40,21 @@
 			"color": "#7048e8"
 		},
 		{
-			"id": "a5e5950757d89693",
+			"id": "50c744bddf007ea3",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35934호.md",
-			"x": 1120,
-			"y": 0,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20260101-a1"
-		},
-		{
-			"id": "46502fb1ffc74201",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35934호.md",
-			"x": 1120,
+			"file": "wiki/Rule/일용근로자의 기초일액 산정.md",
+			"x": 0,
 			"y": 280,
-			"width": 440,
+			"width": 400,
 			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20260101-a4"
-		},
-		{
-			"id": "91fec6e1cfb71c28",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제68조.md",
-			"x": 1120,
-			"y": 560,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20260101-p1"
+			"color": "#7048e8"
 		},
 		{
 			"id": "8cc12b92525c925a",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제45조.md",
 			"x": 1120,
-			"y": 840,
+			"y": 0,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -88,7 +65,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제45조.md",
 			"x": 1120,
-			"y": 1120,
+			"y": 280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -99,7 +76,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제45조.md",
 			"x": 1120,
-			"y": 1400,
+			"y": 560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -110,7 +87,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제45조.md",
 			"x": 1120,
-			"y": 1680,
+			"y": 840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -121,11 +98,44 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제45조.md",
 			"x": 1120,
-			"y": 1960,
+			"y": 1120,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20210701-p5"
+		},
+		{
+			"id": "a5e5950757d89693",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35934호.md",
+			"x": 1120,
+			"y": 1400,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20260101-a1"
+		},
+		{
+			"id": "46502fb1ffc74201",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35934호.md",
+			"x": 1120,
+			"y": 1680,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20260101-a4"
+		},
+		{
+			"id": "91fec6e1cfb71c28",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제68조.md",
+			"x": 1120,
+			"y": 1960,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20260101-p1"
 		},
 		{
 			"id": "32c0275f39d41f6d",
@@ -148,6 +158,39 @@
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20260317-a3"
+		},
+		{
+			"id": "4eeba19d258f89ce",
+			"type": "file",
+			"file": "wiki/LegalResource/2026년 적용 최저임금 고시.md",
+			"x": 1120,
+			"y": 2800,
+			"width": 440,
+			"height": 240,
+			"color": "#495057",
+			"subpath": "#^v20260101-t"
+		},
+		{
+			"id": "fee2fbf34889c235",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
+			"x": 1120,
+			"y": 3080,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20191001-p1-i1"
+		},
+		{
+			"id": "853c9c45625b22d6",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
+			"x": 1120,
+			"y": 3360,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20191001-p1-i2"
 		}
 	],
 	"edges": [
@@ -162,6 +205,22 @@
 		{
 			"id": "5f2345275329eb42",
 			"fromNode": "99517fb4980461f1",
+			"fromSide": "right",
+			"toNode": "cea931d92ccf6ee4",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "69131367320d8d93",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "fea39c2b72c8eaab",
+			"toSide": "left",
+			"label": "variable"
+		},
+		{
+			"id": "310febb8fac2b923",
+			"fromNode": "50c744bddf007ea3",
 			"fromSide": "right",
 			"toNode": "cea931d92ccf6ee4",
 			"toSide": "left",
@@ -316,6 +375,123 @@
 			"fromNode": "99517fb4980461f1",
 			"fromSide": "right",
 			"toNode": "d841af3018c5dc26",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "cd6b7b665d1e7055",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "8cc12b92525c925a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "a25d5a6ead78f896",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "b78c0a2194d123ba",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1b9e193e2615f7d9",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "b086cc7e21332ad0",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "22cbc8058a399f19",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "eee28e22caa76efa",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "65829915743d5a8a",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "035dc4e98323d19a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "8a78777a92b71597",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "91fec6e1cfb71c28",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "561401f2f18f0625",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "a5e5950757d89693",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "9ba57d71c4710124",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "46502fb1ffc74201",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "4b56d8bf46083aef",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "32c0275f39d41f6d",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "7457dee7ee0a263a",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "d841af3018c5dc26",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2f4477f191350106",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "fee2fbf34889c235",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ea413f7cff51b0c3",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "853c9c45625b22d6",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "056f12807261e702",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "4eeba19d258f89ce",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
