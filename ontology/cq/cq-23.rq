@@ -1,0 +1,24 @@
+# cq-23: 수급자격이나 실업급여에 관한 처분에 이의가 있으면 어떻게 하는가?
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    BIND(employment:review-request AS ?item)
+  } UNION {
+    ?item dct:requires employment:review-request .
+  } UNION {
+    {
+      BIND(employment:review-request AS ?service)
+    } UNION {
+      ?service dct:requires employment:review-request .
+    }
+    ?service cv:hasCompetentAuthority|cv:hasChannel|cv:hasInputType|cv:holdsRequirement ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
