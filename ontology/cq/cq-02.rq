@@ -8,4 +8,5 @@ SELECT ?item ?label ?source WHERE {
   ?eligibility cv:hasRequirement ?item .
   ?item skos:prefLabel ?label ;
         cv:isDerivedFrom ?source .
+  FILTER NOT EXISTS { ?eligibility employment:appliesWhen employment:daily-worker-at-separation }
 }

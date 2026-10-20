@@ -1,0 +1,41 @@
+# cq-19: 최종 이직 당시 일용근로자였던 사람의 구직급여는 무엇이 다른가?
+PREFIX cpsv: <http://purl.org/vocab/cpsv#>
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    VALUES ?service { employment:job-seeking-benefit employment:eligibility-recognition }
+    VALUES ?case { employment:daily-worker-at-separation employment:construction-daily-worker-at-separation }
+    ?service cv:holdsRequirement|cpsv:follows ?item .
+    ?item employment:appliesWhen ?case .
+  } UNION {
+    VALUES ?service { employment:job-seeking-benefit employment:eligibility-recognition }
+    ?service cv:holdsRequirement ?requirement .
+    ?requirement employment:appliesWhen employment:daily-worker-at-separation ;
+                 cv:hasRequirement ?item .
+  } UNION {
+    VALUES ?service { employment:job-seeking-benefit employment:eligibility-recognition }
+    ?service cv:holdsRequirement ?requirement .
+    ?requirement employment:appliesWhen employment:daily-worker-at-separation ;
+                 cv:hasRequirement/employment:appliesWhen ?item .
+  } UNION {
+    employment:eligibility-recognition cpsv:follows ?item .
+    ?item employment:variable ?variable .
+    VALUES ?variable { employment:eligibility-base-business employment:daily-worker-recent-work-status }
+  } UNION {
+    employment:eligibility-recognition cpsv:follows ?rule .
+    ?rule employment:variable employment:eligibility-base-business ;
+          employment:appliesWhen ?item .
+  } UNION {
+    VALUES ?item { employment:daily-worker-work-report }
+  } UNION {
+    employment:daily-worker-work-report cv:hasInputType|cv:hasParticipation|cv:hasParticipation/cv:holdsRequirement ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
