@@ -1,0 +1,789 @@
+{
+	"nodes": [
+		{
+			"id": "594fd1615a341c77",
+			"type": "text",
+			"text": "## cq-11 수급기간\n\n질문: 구직급여는 언제까지 받을 수 있는가?\n\n`ontology/cq/cq-11.rq`가 돌려주는 노트와 그 노트들의 관계, 근거 조문 block이다. 연결선의 이름은 schema의 property다.",
+			"x": 0,
+			"y": -320,
+			"width": 880,
+			"height": 260
+		},
+		{
+			"id": "844de64c71f3cd55",
+			"type": "file",
+			"file": "wiki/InformationConcept/수급기간.md",
+			"x": 560,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "792bf2be58f9dccb",
+			"type": "file",
+			"file": "wiki/InformationConcept/수급기간 연기 사유 신고 여부.md",
+			"x": 560,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "11b74d0925ff9f70",
+			"type": "file",
+			"file": "wiki/Rule/수급기간 산정.md",
+			"x": 0,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#7048e8"
+		},
+		{
+			"id": "6b6a9db6789d5358",
+			"type": "file",
+			"file": "wiki/InformationConcept/연장되는 구직급여일수.md",
+			"x": 560,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "1350248adbc707e8",
+			"type": "file",
+			"file": "wiki/InformationConcept/수급기간 연기 사유로 취업할 수 없는 기간.md",
+			"x": 560,
+			"y": 840,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "404540ed3b96ad93",
+			"type": "file",
+			"file": "wiki/InformationConcept/이직일.md",
+			"x": 560,
+			"y": 1120,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "8748495aedec473c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제48조.md",
+			"x": 1120,
+			"y": 0,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p1"
+		},
+		{
+			"id": "a0fed81610561e6b",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제50조.md",
+			"x": 1120,
+			"y": 280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20190716-p2"
+		},
+		{
+			"id": "434f5dd2e5444b7c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제51조.md",
+			"x": 1120,
+			"y": 560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20100705-p2"
+		},
+		{
+			"id": "4642967999ddccde",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제52조.md",
+			"x": 1120,
+			"y": 840,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p2"
+		},
+		{
+			"id": "6014803b283be84e",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제53조.md",
+			"x": 1120,
+			"y": 1120,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20100705-p1"
+		},
+		{
+			"id": "32628e4dabcae72f",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제53조.md",
+			"x": 1120,
+			"y": 1400,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20100705-p2"
+		},
+		{
+			"id": "aee7771eea32d009",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제54조.md",
+			"x": 1120,
+			"y": 1680,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20081231-p1"
+		},
+		{
+			"id": "869645654dedb7d8",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제71조.md",
+			"x": 1120,
+			"y": 1960,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p1"
+		},
+		{
+			"id": "06fd1f7b9d8ccaba",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제71조.md",
+			"x": 1120,
+			"y": 2240,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p2"
+		},
+		{
+			"id": "9242dbb1c5e3842a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제71조.md",
+			"x": 1120,
+			"y": 2520,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p3"
+		},
+		{
+			"id": "53231ad50e59a48a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제48조.md",
+			"x": 1120,
+			"y": 2800,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p2"
+		},
+		{
+			"id": "ced8f81ef1ab1ac9",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제48조.md",
+			"x": 1120,
+			"y": 3080,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p3"
+		},
+		{
+			"id": "83231402d0388c13",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제48조.md",
+			"x": 1120,
+			"y": 3360,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p3-i1"
+		},
+		{
+			"id": "01658e971879ea2b",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제48조.md",
+			"x": 1120,
+			"y": 3640,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p3-i2"
+		},
+		{
+			"id": "dae3de55861920c2",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제73조.md",
+			"x": 1120,
+			"y": 3920,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250101-p2"
+		},
+		{
+			"id": "ff5b4944a403a27f",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제92조의2.md",
+			"x": 1120,
+			"y": 4200,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200331-t"
+		},
+		{
+			"id": "4384a8eb3c467b72",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 4480,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i1"
+		},
+		{
+			"id": "31d030e0dc620f72",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 4760,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i2"
+		},
+		{
+			"id": "227386c3a8f75302",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 5040,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i3"
+		},
+		{
+			"id": "58b3d4ba15fb99c2",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 5320,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i4"
+		},
+		{
+			"id": "9ce006c81b928f44",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 5600,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i5"
+		},
+		{
+			"id": "6c836bc4de682cfb",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 5880,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i6"
+		},
+		{
+			"id": "64342af15f6e6022",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 6160,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-i7"
+		},
+		{
+			"id": "cda860dea7afd616",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제70조.md",
+			"x": 1120,
+			"y": 6440,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20120113-lead"
+		},
+		{
+			"id": "fb08448f37d041aa",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제58조.md",
+			"x": 1120,
+			"y": 6720,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-i1"
+		},
+		{
+			"id": "1dbf41c727307380",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제58조.md",
+			"x": 1120,
+			"y": 7000,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-i1-m1"
+		},
+		{
+			"id": "6ad9b9ae075cad5a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제58조.md",
+			"x": 1120,
+			"y": 7280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-lead"
+		},
+		{
+			"id": "d3251d6578f7c584",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제63조.md",
+			"x": 1120,
+			"y": 7560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200828-p1"
+		},
+		{
+			"id": "d841af3018c5dc26",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제21473호.md",
+			"x": 1120,
+			"y": 7840,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20260317-a3"
+		},
+		{
+			"id": "46502fb1ffc74201",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35934호.md",
+			"x": 1120,
+			"y": 8120,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20260101-a4"
+		},
+		{
+			"id": "85ee359a5cffd9b4",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제2조.md",
+			"x": 1120,
+			"y": 8400,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-i2"
+		}
+	],
+	"edges": [
+		{
+			"id": "0c57709e245f0649",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "844de64c71f3cd55",
+			"toSide": "left",
+			"label": "variable"
+		},
+		{
+			"id": "b9be9ed5fc0024ca",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "404540ed3b96ad93",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "a15e22462eb1f373",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "792bf2be58f9dccb",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "d9fe45dabd53b074",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "1350248adbc707e8",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "256bdf0ad764c25d",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "6b6a9db6789d5358",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "fe83ded5d731e1e6",
+			"fromNode": "844de64c71f3cd55",
+			"fromSide": "right",
+			"toNode": "8748495aedec473c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "b13c9e550cb929d7",
+			"fromNode": "844de64c71f3cd55",
+			"fromSide": "right",
+			"toNode": "53231ad50e59a48a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "66d283b1f8a1d1b4",
+			"fromNode": "844de64c71f3cd55",
+			"fromSide": "right",
+			"toNode": "aee7771eea32d009",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "23f51968bb5f931b",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "53231ad50e59a48a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "3e262364e36481d8",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "ced8f81ef1ab1ac9",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "3144def955aeedce",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "83231402d0388c13",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "69ce4ac520b31856",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "01658e971879ea2b",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "cef1daec496063d1",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "869645654dedb7d8",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "79c4faf225729a80",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "06fd1f7b9d8ccaba",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2a23ba6a172b8fae",
+			"fromNode": "792bf2be58f9dccb",
+			"fromSide": "right",
+			"toNode": "9242dbb1c5e3842a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "bcd036e57ec2f665",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "8748495aedec473c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "abb9ce3b1be00c37",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "53231ad50e59a48a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "68d3127b6855c0b3",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "a0fed81610561e6b",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "fc228d1f1da93c7c",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "aee7771eea32d009",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "a874c33c5d3898e6",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "434f5dd2e5444b7c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "5248ab199f5ec583",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "4642967999ddccde",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "271b552e82f0bdb4",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "32628e4dabcae72f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "b98d1e391e6278b9",
+			"fromNode": "11b74d0925ff9f70",
+			"fromSide": "right",
+			"toNode": "6014803b283be84e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "fed82398c3a6d43b",
+			"fromNode": "6b6a9db6789d5358",
+			"fromSide": "right",
+			"toNode": "aee7771eea32d009",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "33a94bbbbe85f0bb",
+			"fromNode": "6b6a9db6789d5358",
+			"fromSide": "right",
+			"toNode": "dae3de55861920c2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "756463e3f8b02b68",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "53231ad50e59a48a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ec73621b8adc305f",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "cda860dea7afd616",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "8445238f1728fda7",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "4384a8eb3c467b72",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "cd6acd0c32c90c10",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "31d030e0dc620f72",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1f9c9cb0beea06a2",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "227386c3a8f75302",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e6681e9d50d6d35d",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "58b3d4ba15fb99c2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ef08feb4734d98d9",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "9ce006c81b928f44",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e38c8ed713ed67f1",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "6c836bc4de682cfb",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "00f654557ec5bca1",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "64342af15f6e6022",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "8cd63268c6d9b2e2",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "ff5b4944a403a27f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "5ebd9cdc5169f341",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "d3251d6578f7c584",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e853362ed63b5b2e",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "6ad9b9ae075cad5a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "4b1b1daf42ebac0e",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "fb08448f37d041aa",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2b96126787151a0d",
+			"fromNode": "1350248adbc707e8",
+			"fromSide": "right",
+			"toNode": "1dbf41c727307380",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2dc86b385696c7ab",
+			"fromNode": "404540ed3b96ad93",
+			"fromSide": "right",
+			"toNode": "85ee359a5cffd9b4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "d9512b80b4c009ea",
+			"fromNode": "404540ed3b96ad93",
+			"fromSide": "right",
+			"toNode": "d841af3018c5dc26",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "fac69ea6b289a0c7",
+			"fromNode": "404540ed3b96ad93",
+			"fromSide": "right",
+			"toNode": "46502fb1ffc74201",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		}
+	]
+}
