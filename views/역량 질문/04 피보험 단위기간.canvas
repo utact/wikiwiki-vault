@@ -1,0 +1,287 @@
+{
+	"nodes": [
+		{
+			"id": "594fd1615a341c77",
+			"type": "text",
+			"text": "## cq-04 피보험 단위기간\n\n질문: 피보험 단위기간은 어떻게 계산하는가?\n\n`ontology/cq/cq-04.rq`가 돌려주는 노트와 그 노트들의 관계, 근거 조문 block이다. 연결선의 이름은 schema의 property다.",
+			"x": 0,
+			"y": -320,
+			"width": 880,
+			"height": 260
+		},
+		{
+			"id": "72d27d98c369c52b",
+			"type": "file",
+			"file": "wiki/InformationConcept/피보험 단위기간.md",
+			"x": 560,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "11a369f52a597339",
+			"type": "file",
+			"file": "wiki/InformationConcept/최후 피보험자격 취득일 이전 구직급여 수급 여부.md",
+			"x": 560,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "b1f109fa8c48ecaa",
+			"type": "file",
+			"file": "wiki/InformationConcept/보수 지급의 기초가 된 날수.md",
+			"x": 560,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "20ed5478c001f363",
+			"type": "file",
+			"file": "wiki/InformationConcept/구직급여와 관련된 피보험자격 상실일 이전 보수 지급의 기초가 된 날수.md",
+			"x": 560,
+			"y": 840,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "bded92fb00eb2e79",
+			"type": "file",
+			"file": "wiki/Rule/피보험 단위기간 산정.md",
+			"x": 0,
+			"y": 0,
+			"width": 400,
+			"height": 240,
+			"color": "#7048e8"
+		},
+		{
+			"id": "779746e86a0ead2b",
+			"type": "file",
+			"file": "wiki/Criterion/기준기간 동안 근로자·예술인·노무제공자 중 둘 이상으로 종사하지 않음.md",
+			"x": 560,
+			"y": 1120,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "98f5d74018977072",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제61조.md",
+			"x": 1120,
+			"y": 0,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200828-p3"
+		},
+		{
+			"id": "b8e03b28373a187f",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제41조.md",
+			"x": 1120,
+			"y": 280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p2"
+		},
+		{
+			"id": "17903f2f43e48fe2",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제41조.md",
+			"x": 1120,
+			"y": 560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p1"
+		},
+		{
+			"id": "069420ce4b6957fa",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제2조.md",
+			"x": 1120,
+			"y": 840,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-i5"
+		},
+		{
+			"id": "06fc7e5b372847e9",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제41조.md",
+			"x": 1120,
+			"y": 1120,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210701-p3"
+		}
+	],
+	"edges": [
+		{
+			"id": "e9aa48e178192d49",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "72d27d98c369c52b",
+			"toSide": "left",
+			"label": "variable"
+		},
+		{
+			"id": "7a2298fb5096302e",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "779746e86a0ead2b",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "dd17936017228e9d",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "b1f109fa8c48ecaa",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "6135fe620c4f5562",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "11a369f52a597339",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "7c72287a1f5dd167",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "20ed5478c001f363",
+			"toSide": "left",
+			"label": "requiredInput"
+		},
+		{
+			"id": "2454a9d1748307fb",
+			"fromNode": "72d27d98c369c52b",
+			"fromSide": "right",
+			"toNode": "17903f2f43e48fe2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "7d26c9fb699d8706",
+			"fromNode": "72d27d98c369c52b",
+			"fromSide": "right",
+			"toNode": "b8e03b28373a187f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "d69aa7915de64187",
+			"fromNode": "11a369f52a597339",
+			"fromSide": "right",
+			"toNode": "b8e03b28373a187f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "46103e36d81b3e79",
+			"fromNode": "11a369f52a597339",
+			"fromSide": "right",
+			"toNode": "98f5d74018977072",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "e7e7dee8e3ad9a42",
+			"fromNode": "b1f109fa8c48ecaa",
+			"fromSide": "right",
+			"toNode": "17903f2f43e48fe2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "83aa2904302e3eef",
+			"fromNode": "b1f109fa8c48ecaa",
+			"fromSide": "right",
+			"toNode": "b8e03b28373a187f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "b8938e8932b02451",
+			"fromNode": "b1f109fa8c48ecaa",
+			"fromSide": "right",
+			"toNode": "069420ce4b6957fa",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "86de710131e2af13",
+			"fromNode": "20ed5478c001f363",
+			"fromSide": "right",
+			"toNode": "17903f2f43e48fe2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "022ab938417fd297",
+			"fromNode": "20ed5478c001f363",
+			"fromSide": "right",
+			"toNode": "b8e03b28373a187f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "b34aef91566d01c5",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "17903f2f43e48fe2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "166ce6f7ed5e46c6",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "b8e03b28373a187f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ae8cb8124ac3a135",
+			"fromNode": "bded92fb00eb2e79",
+			"fromSide": "right",
+			"toNode": "06fc7e5b372847e9",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "8e20ab996e55ce28",
+			"fromNode": "779746e86a0ead2b",
+			"fromSide": "right",
+			"toNode": "06fc7e5b372847e9",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		}
+	]
+}
