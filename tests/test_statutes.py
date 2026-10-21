@@ -378,3 +378,11 @@ def test_a_move_after_the_earliest_version_is_listed():
     found = S.review_unit(S.Unit(statutes.laws["시험법 시행령"], "art-5"))
     assert any("moved here from art-4" in line for line in found)
     assert any("moved to art-7" in line and "reused" in line for line in found)
+
+
+def test_a_bare_article_in_a_phrase_quoted_from_another_law_belongs_to_that_law():
+    statutes = family([article(5, "사유", [('법 제12조제1항 본문에서 "제11조제1항에 따른 신고의무의 불이행 등 대통령령으로 정하는 사유"란 다음을 말한다.', [])]),
+                       article(11, "다른 조", text="다른 내용이다.")])
+    found = [(r.law, r.key, r.block, r.delegation) for r in refs(statutes, "시험법 시행령", "art-5")]
+    assert ("시험법", "art-11", "p1", False) in found
+    assert not any(law == "시험법 시행령" and key == "art-11" for law, key, _, _ in found)

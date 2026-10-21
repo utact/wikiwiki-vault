@@ -50,6 +50,7 @@ REFERENCE = re.compile(
 )
 CONTINUATION = re.compile(r"\s*(?:부터|까지|ㆍ|·|,|및|와|과|또는)?\s*")
 QUALIFIER = re.compile(r"\s*(?:본문|단서|전단|후단)?\s*\(\s*")
+QUOTE_LEAD = re.compile(r"\s*(?:본문|단서|전단|후단|각\s*호\s*외의\s*부분)?\s*에서\s*$")
 RANGE_START = re.compile(r"\s*부터\s*")
 RANGE_END = re.compile(r"\s*까지")
 ARTICLE_HEAD = re.compile(r"\s*제\d+조(?:의\d+)?\([^)]*\)")
@@ -657,6 +658,8 @@ class Statutes:
         A 같은 조 or a continued 제3항 belongs to the article cited just before, and 같은 법 to the law named just before.
         A bare article that opens a parenthesis right after a reference belongs to the law of that reference.
         A reference after "에서 준용하는" is applied, as 법 제15조 in "법 제77조의10제1항에서 준용하는 법 제15조에 따라".
+        A bare article inside a phrase quoted from another provision belongs to the law of that provision, as 제47조제1항 in
+        "법 제68조제2항 본문에서 "제47조제1항에 따른 신고의무의 불이행 … 사유"란".
         A range such as 제56조부터 제58조까지 or 제1항부터 제3항까지 cites every unit in it.
         """
         found = []
@@ -678,7 +681,7 @@ class Statutes:
                 opens = bool(re.fullmatch(r"t|lead|p\d+|a\d+(?:-\d+)?(?:-p\d+)?", suffix))
                 names = [(m.end(), self.law_named(m.group(1))) for m in LAW_NAME.finditer(text)]
                 state = {"law": unit.law, "key": unit.key if unit.kind == "article" else None, "p": None, "end": None, "continued": False}
-                chain = []
+                chain, laws_at = [], {}
                 for match in REFERENCE.finditer(text, head.end() if head else 0):
                     while names and names[0][0] <= match.start():
                         state["named"] = names.pop(0)[1]
@@ -693,6 +696,12 @@ class Statutes:
                     if not state["continued"]:
                         chain = []
                     origin = state["law"] if (state["continued"] or qualifies) and not prefixed else unit.law
+                    quoted_law = None
+                    if text.count('"', 0, match.start()) % 2 == 1:
+                        lead_in = QUOTE_LEAD.search(text, 0, text.rfind('"', 0, match.start()))
+                        quoted_law = laws_at.get(lead_in.start()) if lead_in else None
+                        if quoted_law is not None and not prefixed:
+                            origin = quoted_law
                     previous = state["key"] if state["end"] is not None else None
                     previous_law, previous_block = state["law"], state.get("block")
                     state["end"] = match.end()
@@ -708,6 +717,7 @@ class Statutes:
                         state["named"] = target
                     state.update(law=target, key=key if key.startswith("art-") else None, block=block,
                                  p=(block or "").split("-")[0] if block and block.startswith("p") else None)
+                    laws_at[match.end()] = target
                     if (target, key) == (unit.law, unit.key) and unit.kind == "article":
                         continue
                     if previous and RANGE_START.fullmatch(gap or "") and RANGE_END.match(text, match.end()):
@@ -716,7 +726,8 @@ class Statutes:
                             found.append(Ref(target.name, inner_key, inner_block, None, False, None, None, None, False))
                     rest = text[match.end():]
                     before_match = text[:match.start()]
-                    enclosed = before_match.count("(") > before_match.count(")") or before_match.count("[") > before_match.count("]")
+                    enclosed = (before_match.count("(") > before_match.count(")") or before_match.count("[") > before_match.count("]")
+                                or quoted_law is not None)
                     delegation = DELEGATION.match(rest)
                     delegation = bool(target is not unit.law and self.delegates(unit.law, target) and delegation and not enclosed) and delegation
                     follow = None
