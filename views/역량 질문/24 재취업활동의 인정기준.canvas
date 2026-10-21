@@ -635,11 +635,22 @@
 			"subpath": "#^v20220218-p1-i8"
 		},
 		{
-			"id": "9993cc420368a066",
+			"id": "8e42de96609f6a2c",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
 			"x": 2800,
 			"y": 9800,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220218-p2"
+		},
+		{
+			"id": "9993cc420368a066",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
+			"x": 2800,
+			"y": 10080,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -650,22 +661,11 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
 			"x": 2800,
-			"y": 10080,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20220218-p1-i6"
-		},
-		{
-			"id": "8e42de96609f6a2c",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
-			"x": 2800,
 			"y": 10360,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20220218-p2"
+			"subpath": "#^v20220218-p1-i6"
 		},
 		{
 			"id": "6aa8668c2c5c997f",
@@ -1166,6 +1166,24 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "eefd4a1992e844e8",
+			"fromNode": "84f80c29196d8f54",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "27002fa192063790",
+			"fromNode": "84f80c29196d8f54",
+			"fromSide": "right",
+			"toNode": "66e5947bed354c73",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "7efa6397b9c3d430",
 			"fromNode": "84f80c29196d8f54",
 			"fromSide": "right",
@@ -1193,6 +1211,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "8e8708e265f493f9",
+			"fromNode": "6b831066297b898e",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "b174dfa1d6b5d651",
 			"fromNode": "cc2295ded696364e",
 			"fromSide": "right",
@@ -1206,6 +1233,15 @@
 			"fromNode": "cc2295ded696364e",
 			"fromSide": "right",
 			"toNode": "b6a785a9e3cb5ef4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "f080e89ddb115cc0",
+			"fromNode": "cc2295ded696364e",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -1229,6 +1265,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "ab3e2d485c104119",
+			"fromNode": "33db087ab68735a3",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "d893931a1cbffd59",
 			"fromNode": "c19e393323da2293",
 			"fromSide": "right",
@@ -1242,6 +1287,15 @@
 			"fromNode": "c19e393323da2293",
 			"fromSide": "right",
 			"toNode": "b6a785a9e3cb5ef4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "077c8376e15a1082",
+			"fromNode": "c19e393323da2293",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -1265,6 +1319,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "c0587a22aeb8eee6",
+			"fromNode": "bd430abca47ceb66",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "1f601efa1e5f98f6",
 			"fromNode": "6a205a519e214510",
 			"fromSide": "right",
@@ -1278,6 +1341,15 @@
 			"fromNode": "6a205a519e214510",
 			"fromSide": "right",
 			"toNode": "b6a785a9e3cb5ef4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "6dbdc3aeaddff3e4",
+			"fromNode": "6a205a519e214510",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -1301,6 +1373,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "7fb944e73120ae80",
+			"fromNode": "5dca321adb00bcb3",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "d42061532af1fc6c",
 			"fromNode": "797883a21a69590b",
 			"fromSide": "right",
@@ -1314,6 +1395,15 @@
 			"fromNode": "797883a21a69590b",
 			"fromSide": "right",
 			"toNode": "b6a785a9e3cb5ef4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "d755364c2183df4b",
+			"fromNode": "797883a21a69590b",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -1337,6 +1427,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "401a35a064f5da90",
+			"fromNode": "2d44b04fbeceb718",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "7e118253128edb39",
 			"fromNode": "6d8eb81bd2fee04b",
 			"fromSide": "right",
@@ -1350,6 +1449,15 @@
 			"fromNode": "6d8eb81bd2fee04b",
 			"fromSide": "right",
 			"toNode": "b6a785a9e3cb5ef4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "45e8fcf923577a8a",
+			"fromNode": "6d8eb81bd2fee04b",
+			"fromSide": "right",
+			"toNode": "8e42de96609f6a2c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
