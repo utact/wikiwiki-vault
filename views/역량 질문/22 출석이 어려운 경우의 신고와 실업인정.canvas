@@ -222,11 +222,22 @@
 			"subpath": "#^v20230929-p1"
 		},
 		{
+			"id": "66e5947bed354c73",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제63조.md",
+			"x": 1680,
+			"y": 3360,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20110915-p1"
+		},
+		{
 			"id": "ab0f9545468a0ff9",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제84조.md",
 			"x": 1680,
-			"y": 3360,
+			"y": 3640,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -237,7 +248,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
 			"x": 1680,
-			"y": 3640,
+			"y": 3920,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -248,7 +259,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
 			"x": 1680,
-			"y": 3920,
+			"y": 4200,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -259,22 +270,11 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제61조.md",
 			"x": 1680,
-			"y": 4200,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20210701-p4"
-		},
-		{
-			"id": "66e5947bed354c73",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제63조.md",
-			"x": 1680,
 			"y": 4480,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20110915-p1"
+			"subpath": "#^v20210701-p4"
 		},
 		{
 			"id": "26126bd5918590dd",
@@ -1202,6 +1202,15 @@
 			"fromNode": "829d1e6d10973be6",
 			"fromSide": "right",
 			"toNode": "526bd05eb5790c8a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "eaf25251ece4b9a0",
+			"fromNode": "829d1e6d10973be6",
+			"fromSide": "right",
+			"toNode": "66e5947bed354c73",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
