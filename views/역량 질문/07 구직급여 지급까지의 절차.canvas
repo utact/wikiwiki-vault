@@ -688,11 +688,22 @@
 			"subpath": "#^v20200526-p2-i3"
 		},
 		{
+			"id": "526bd05eb5790c8a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제44조.md",
+			"x": 2800,
+			"y": 13720,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p2"
+		},
+		{
 			"id": "02009c04c9860371",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제82조의2.md",
 			"x": 2800,
-			"y": 13720,
+			"y": 14000,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -703,7 +714,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제62조.md",
 			"x": 2800,
-			"y": 14000,
+			"y": 14280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -714,7 +725,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제63조.md",
 			"x": 2800,
-			"y": 14280,
+			"y": 14560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -725,22 +736,11 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
 			"x": 2800,
-			"y": 14560,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20200828-p2"
-		},
-		{
-			"id": "526bd05eb5790c8a",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제44조.md",
-			"x": 2800,
 			"y": 14840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20200526-p2"
+			"subpath": "#^v20200828-p2"
 		},
 		{
 			"id": "c5450a20f57e8ed5",
@@ -974,11 +974,22 @@
 			"subpath": "#^v20200526-p3"
 		},
 		{
+			"id": "0eb532c2b21a000c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
+			"x": 2800,
+			"y": 21000,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p2"
+		},
+		{
 			"id": "1b437d718e44ba7a",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제157조.md",
 			"x": 2800,
-			"y": 21000,
+			"y": 21280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -989,7 +1000,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/직업안정법 제9조.md",
 			"x": 2800,
-			"y": 21280,
+			"y": 21560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1000,7 +1011,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
 			"x": 2800,
-			"y": 21560,
+			"y": 21840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1011,7 +1022,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 별지 제76호서식.md",
 			"x": 2800,
-			"y": 21840,
+			"y": 22120,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96"
@@ -1021,22 +1032,11 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
 			"x": 2800,
-			"y": 22120,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20230701-p1"
-		},
-		{
-			"id": "0eb532c2b21a000c",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
-			"x": 2800,
 			"y": 22400,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20230701-p2"
+			"subpath": "#^v20230701-p1"
 		},
 		{
 			"id": "d8191ef2dd841386",
@@ -1433,6 +1433,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "69eb1fd66e785494",
+			"fromNode": "f545361d27788c62",
+			"fromSide": "right",
+			"toNode": "526bd05eb5790c8a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "f390c8b72d151363",
 			"fromNode": "f545361d27788c62",
 			"fromSide": "right",
@@ -1455,6 +1464,15 @@
 			"fromNode": "f545361d27788c62",
 			"fromSide": "right",
 			"toNode": "7f8f5fd492cad7e7",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1e076dfbf910f574",
+			"fromNode": "f545361d27788c62",
+			"fromSide": "right",
+			"toNode": "0eb532c2b21a000c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"

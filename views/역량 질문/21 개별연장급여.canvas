@@ -595,22 +595,44 @@
 			"subpath": "#^v20200526-p1"
 		},
 		{
+			"id": "526bd05eb5790c8a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제44조.md",
+			"x": 2240,
+			"y": 10080,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p2"
+		},
+		{
 			"id": "7f8f5fd492cad7e7",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
 			"x": 2240,
-			"y": 10080,
+			"y": 10360,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20230701-p1"
 		},
 		{
+			"id": "0eb532c2b21a000c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
+			"x": 2240,
+			"y": 10640,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p2"
+		},
+		{
 			"id": "f58b61a427e76f2b",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제69조의3.md",
 			"x": 2240,
-			"y": 10360,
+			"y": 10920,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -621,7 +643,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제77조의3.md",
 			"x": 2240,
-			"y": 10640,
+			"y": 11200,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -632,7 +654,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제77조의8.md",
 			"x": 2240,
-			"y": 10920,
+			"y": 11480,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1440,6 +1462,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "69eb1fd66e785494",
+			"fromNode": "f545361d27788c62",
+			"fromSide": "right",
+			"toNode": "526bd05eb5790c8a",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "f390c8b72d151363",
 			"fromNode": "f545361d27788c62",
 			"fromSide": "right",
@@ -1462,6 +1493,15 @@
 			"fromNode": "f545361d27788c62",
 			"fromSide": "right",
 			"toNode": "7f8f5fd492cad7e7",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1e076dfbf910f574",
+			"fromNode": "f545361d27788c62",
+			"fromSide": "right",
+			"toNode": "0eb532c2b21a000c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
