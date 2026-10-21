@@ -1,0 +1,44 @@
+# cq-14: 거짓이나 그 밖의 부정한 방법으로 실업급여를 받으면 어떤 제재를 받는가?
+PREFIX cpsv: <http://purl.org/vocab/cpsv#>
+PREFIX cv: <http://data.europa.eu/m8g/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX employment: <https://w3id.org/kr-employment/>
+
+SELECT ?item ?source WHERE {
+  {
+    VALUES ?item {
+      employment:fraud-benefit-restriction
+      employment:fraud-repayment-and-additional-collection
+      employment:fraud-penalty
+      employment:collusive-fraud-penalty
+      employment:additional-collection-exemption-reasons
+    }
+  } UNION {
+    VALUES ?service { employment:fraud-benefit-restriction employment:fraud-repayment-and-additional-collection }
+    ?service cv:holdsRequirement|cpsv:follows|cv:hasParticipation ?item .
+  } UNION {
+    VALUES ?service { employment:fraud-benefit-restriction employment:fraud-repayment-and-additional-collection }
+    ?service cv:holdsRequirement/employment:appliesWhen|cpsv:follows/employment:appliesWhen|cv:hasParticipation/cv:holdsRequirement ?item .
+  } UNION {
+    VALUES ?service { employment:fraud-benefit-restriction employment:fraud-repayment-and-additional-collection }
+    ?service cv:holdsRequirement/cv:hasConcept|cv:holdsRequirement/employment:appliesWhen/cv:hasConcept|cpsv:follows/employment:requiredInput ?item .
+  } UNION {
+    VALUES ?service { employment:fraud-benefit-restriction employment:fraud-repayment-and-additional-collection }
+    ?service cpsv:follows/employment:requiredInput/dct:conformsTo ?item .
+  } UNION {
+    VALUES ?service { employment:fraud-benefit-restriction employment:fraud-repayment-and-additional-collection }
+    ?service cpsv:follows/employment:requiredInput/dct:conformsTo ?scheme .
+    ?item skos:inScheme ?scheme .
+  } UNION {
+    ?item skos:inScheme employment:additional-collection-exemption-reasons .
+  } UNION {
+    VALUES ?penalty { employment:fraud-penalty employment:collusive-fraud-penalty }
+    ?penalty cv:hasRequirement|employment:appliesWhen ?item .
+  }
+  ?note foaf:primaryTopic ?item ;
+        dct:source ?expression .
+  ?expression eli:realizes ?source .
+}
