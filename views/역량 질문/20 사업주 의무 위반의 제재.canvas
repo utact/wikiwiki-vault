@@ -154,7 +154,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/과태료 감경 사유에 해당.md",
 			"x": 1120,
-			"y": 560,
+			"y": 840,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -244,7 +244,27 @@
 			"type": "file",
 			"file": "wiki/Criterion/과태료를 체납하고 있지 않음.md",
 			"x": 1120,
-			"y": 840,
+			"y": 1120,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "ec9ae421000dd7a0",
+			"type": "file",
+			"file": "wiki/Criterion/과태료 가중 사유에 해당하지 않음.md",
+			"x": 1120,
+			"y": 1400,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "46119826256d65d2",
+			"type": "file",
+			"file": "wiki/Criterion/과태료 감경 사유에 해당하지 않음.md",
+			"x": 1120,
+			"y": 560,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -254,7 +274,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/피보험자격 신고 위반이 아님.md",
 			"x": 1120,
-			"y": 1400,
+			"y": 1960,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -264,7 +284,7 @@
 			"type": "file",
 			"file": "wiki/PublicService/이직확인서 발급.md",
 			"x": 1120,
-			"y": 1120,
+			"y": 1680,
 			"width": 400,
 			"height": 240,
 			"color": "#e8590c"
@@ -421,7 +441,7 @@
 			"subpath": "#^v20240517-p3"
 		},
 		{
-			"id": "f3b978e39b4fcd68",
+			"id": "73e323d43b0dcb83",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제82조의2.md",
 			"x": 2800,
@@ -429,47 +449,14 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20220701-p1"
-		},
-		{
-			"id": "02009c04c9860371",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제82조의2.md",
-			"x": 2800,
-			"y": 3360,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20220701-p3"
-		},
-		{
-			"id": "73e323d43b0dcb83",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제82조의2.md",
-			"x": 2800,
-			"y": 3640,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
 			"subpath": "#^v20220701-p4"
-		},
-		{
-			"id": "23361429255fc3c7",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제3조.md",
-			"x": 2800,
-			"y": 3920,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20100705-t"
 		},
 		{
 			"id": "e53918b05e7f9914",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 별표 3.md",
 			"x": 2800,
-			"y": 4200,
+			"y": 3360,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -480,7 +467,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제15조.md",
 			"x": 2800,
-			"y": 4480,
+			"y": 3640,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -491,7 +478,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제7조.md",
 			"x": 2800,
-			"y": 4760,
+			"y": 3920,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -502,11 +489,44 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제118조.md",
 			"x": 2800,
-			"y": 5040,
+			"y": 4200,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20221231-p1-i1"
+		},
+		{
+			"id": "23361429255fc3c7",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제3조.md",
+			"x": 2800,
+			"y": 4480,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20100705-t"
+		},
+		{
+			"id": "f3b978e39b4fcd68",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제82조의2.md",
+			"x": 2800,
+			"y": 4760,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220701-p1"
+		},
+		{
+			"id": "02009c04c9860371",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제82조의2.md",
+			"x": 2800,
+			"y": 5040,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220701-p3"
 		},
 		{
 			"id": "a948b42b0f67937a",
@@ -542,11 +562,33 @@
 			"subpath": "#^v20220701-p5"
 		},
 		{
+			"id": "d0345e8bc418b9d2",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제77조의2.md",
+			"x": 2800,
+			"y": 6160,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p3"
+		},
+		{
+			"id": "0fc1b1130d79a8de",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제77조의7.md",
+			"x": 2800,
+			"y": 6440,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20220101-p1"
+		},
+		{
 			"id": "c910283bd2257771",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제118조.md",
 			"x": 2800,
-			"y": 6160,
+			"y": 6720,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -557,7 +599,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제42조.md",
 			"x": 2800,
-			"y": 6440,
+			"y": 7000,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -568,7 +610,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
 			"x": 2800,
-			"y": 6720,
+			"y": 7280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -649,6 +691,14 @@
 			"label": "appliesWhen"
 		},
 		{
+			"id": "b87bb99a608cd5ac",
+			"fromNode": "de7bf7eed6ccd18d",
+			"fromSide": "right",
+			"toNode": "46119826256d65d2",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
 			"id": "913c3beea4f57b09",
 			"fromNode": "de7bf7eed6ccd18d",
 			"fromSide": "right",
@@ -685,6 +735,14 @@
 			"fromNode": "6b0099806d9489d6",
 			"fromSide": "right",
 			"toNode": "927006d4d2640038",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "c69e7e7b61b2bd34",
+			"fromNode": "6b0099806d9489d6",
+			"fromSide": "right",
+			"toNode": "ec9ae421000dd7a0",
 			"toSide": "left",
 			"label": "appliesWhen"
 		},
@@ -1106,6 +1164,24 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "19e6884f0c542f6e",
+			"fromNode": "4e75773b36af3327",
+			"fromSide": "right",
+			"toNode": "d0345e8bc418b9d2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "71a85693cfb3691f",
+			"fromNode": "4e75773b36af3327",
+			"fromSide": "right",
+			"toNode": "0fc1b1130d79a8de",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "83f961659514e89e",
 			"fromNode": "0ec2de50574440a5",
 			"fromSide": "right",
@@ -1128,6 +1204,24 @@
 			"fromNode": "0ec2de50574440a5",
 			"fromSide": "right",
 			"toNode": "cff4ecab7282e564",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "f99602ff267411cd",
+			"fromNode": "0ec2de50574440a5",
+			"fromSide": "right",
+			"toNode": "d0345e8bc418b9d2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "be89c156a91d6690",
+			"fromNode": "0ec2de50574440a5",
+			"fromSide": "right",
+			"toNode": "0fc1b1130d79a8de",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -1333,6 +1427,24 @@
 		{
 			"id": "e236e301dce8dc21",
 			"fromNode": "927006d4d2640038",
+			"fromSide": "right",
+			"toNode": "e53918b05e7f9914",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2532bc19b827566a",
+			"fromNode": "ec9ae421000dd7a0",
+			"fromSide": "right",
+			"toNode": "e53918b05e7f9914",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "3fb3ec45a4b5b05b",
+			"fromNode": "46119826256d65d2",
 			"fromSide": "right",
 			"toNode": "e53918b05e7f9914",
 			"toSide": "left",
