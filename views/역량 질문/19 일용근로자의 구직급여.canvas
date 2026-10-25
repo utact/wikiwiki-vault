@@ -587,26 +587,26 @@
 			"subpath": "#^v20251001-p1-i5-m1"
 		},
 		{
-			"id": "0840c197878e2706",
+			"id": "e5172a72053a52f4",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제40조.md",
 			"x": 3360,
 			"y": 7560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20200828-p1"
+			"subpath": "#^v20251001-p1"
 		},
 		{
-			"id": "e5172a72053a52f4",
+			"id": "0840c197878e2706",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제40조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
 			"x": 3360,
 			"y": 7840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20251001-p1"
+			"subpath": "#^v20200828-p1"
 		},
 		{
 			"id": "c10f5ab0ea74b9d9",
@@ -1869,6 +1869,15 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "8d0d3628d2c51887",
+			"fromNode": "e81d02dca1e5766a",
+			"fromSide": "right",
+			"toNode": "e5172a72053a52f4",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "8de381dbc32bc5d1",
 			"fromNode": "e81d02dca1e5766a",
 			"fromSide": "right",
@@ -2296,6 +2305,15 @@
 			"fromNode": "83c0627df6828ddd",
 			"fromSide": "right",
 			"toNode": "a0eb8df68d1fcce2",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "862c3ef8c2176849",
+			"fromNode": "a55894c74d319b3e",
+			"fromSide": "right",
+			"toNode": "e5172a72053a52f4",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
