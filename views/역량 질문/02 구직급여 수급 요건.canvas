@@ -682,11 +682,22 @@
 			"subpath": "#^v20191001-p1-i2"
 		},
 		{
+			"id": "f7f65cd0db84bdf0",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
+			"x": 1680,
+			"y": 14560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20191001-p2"
+		},
+		{
 			"id": "b78c0a2194d123ba",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제45조.md",
 			"x": 1680,
-			"y": 14560,
+			"y": 14840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1458,6 +1469,15 @@
 			"fromNode": "50c744bddf007ea3",
 			"fromSide": "right",
 			"toNode": "853c9c45625b22d6",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1dff265f96ae3282",
+			"fromNode": "50c744bddf007ea3",
+			"fromSide": "right",
+			"toNode": "f7f65cd0db84bdf0",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
