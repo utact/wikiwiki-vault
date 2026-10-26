@@ -31,7 +31,7 @@ QUESTIONS = L.VAULT / "docs" / "competency-questions.md"
 SOURCES = yaml.safe_load((Path(__file__).parent / "sources.yaml").read_text(encoding="utf-8"))
 CIRCLED = {chr(0x2460 + i): i + 1 for i in range(20)} | {chr(0x3251 + i): i + 21 for i in range(15)}
 LETTERS = "가나다라마바사아자차카타파하"
-KIND_NOTES = {"A0002": "법률", "A0007": "대통령령", "A0097": "고용노동부령", "B0003": "고시"}
+KIND_NOTES = {"A0002": "법률", "A0007": "대통령령", "A0097": "고용노동부령", "B0001": "훈령", "B0002": "예규", "B0003": "고시"}
 SUBDIVISIONS = {"heading-ch": "chapter", "heading-sec": "section", "article": "article", "annex": "annex", "form": "form", "addendum": "addendum"}
 FAMILY = {"법": "", "영": " 시행령", "규칙": " 시행규칙"}
 REFERENCE = re.compile(
@@ -1052,28 +1052,49 @@ def render_unit(statutes, unit, chosen):
     return meta, body
 
 
-def notice_versions(source, as_of):
-    """Raw notes of a 행정규칙 series keyed by 시행일자: the current version and every scheduled one."""
-    found = {}
-    for note in L.RAW.glob("law/*/*.md"):
-        match = L.RAW_NOTE.match(note.stem)
-        payload = note.with_suffix(".json")
-        if not match or not payload.exists():
-            continue
-        response = json.loads(payload.read_text(encoding="utf-8"))
-        info = response.get("AdmRulService", {}).get("행정규칙기본정보")
-        if info and info["행정규칙ID"] == source["id"]:
+RAW_NOTICES = {}
+
+
+def raw_notices(source):
+    """The latest raw note and response of every committed version of a 행정규칙, keyed by 시행일자."""
+    if not RAW_NOTICES:
+        for note in sorted(L.RAW.glob("law/*/*.md")):
+            match = L.RAW_NOTE.match(note.stem)
+            payload = note.with_suffix(".json")
+            if not match or not payload.exists():
+                continue
+            text = payload.read_text(encoding="utf-8")
+            if '"AdmRulService"' not in text[:200]:
+                continue
+            response = json.loads(text)
+            rule_id = response["AdmRulService"]["행정규칙기본정보"]["행정규칙ID"]
+            found = RAW_NOTICES.setdefault(rule_id, {})
             if match["date"] not in found or note.stem > found[match["date"]][0].stem:
                 found[match["date"]] = (note, response)
+    return dict(sorted(RAW_NOTICES.get(source["id"], {}).items()))
+
+
+def notice_versions(source, as_of):
+    """Raw notes of a 행정규칙 series keyed by 시행일자: the current version and every scheduled one."""
+    found = raw_notices(source)
     current = L.in_force(found, as_of)
     return {d: found[d] for d in sorted(found) if d >= current}, current
 
 
+def in_articles(service):
+    """Whether a 행정규칙 response gives its text as a list of articles, as a 훈령 or 예규 does, rather than as one text."""
+    return isinstance(service.get("조문내용"), list)
+
+
 def render_notice(source, as_of):
-    """Path, identifier, frontmatter, body and block hashes of the note of a 행정규칙 series such as the 최저임금 고시."""
+    """Path, identifier, frontmatter, body and block hashes of the note of a 행정규칙 series such as the 최저임금 고시.
+
+    A 행정규칙 written in articles shows only its versions, because its articles and 장 have notes of their own.
+    """
     versions, current = notice_versions(source, as_of)
     identifier = f"admrul-{source['id']}"
     info = {d: response["AdmRulService"]["행정규칙기본정보"] for d, (_, response) in versions.items()}
+    articles = in_articles(versions[current][1]["AdmRulService"])
     realized, body, blocks = [], [], {}
     dates = list(versions)
     for effective, following in zip(dates, [*dates[1:], None]):
@@ -1088,9 +1109,13 @@ def render_notice(source, as_of):
             "wasDerivedFrom": link(note.stem),
         }
         realized.append(order({k: v for k, v in entry.items() if v}))
-        text = L.notice_text(response["AdmRulService"], L.note_attachments(note, response))
         label = "현행" if effective == current else "시행예정"
-        body += [f"## {iso(effective)} 시행 ({label})", "", f"{info[effective]['행정규칙명']}, {info[effective]['소관부처명']} 고시 {entry['number']}", "",
+        issued = f"{info[effective]['소관부처명']} {info[effective]['행정규칙종류']} {entry['number']}"
+        if articles:
+            body += [f"## {iso(effective)} 시행 ({label})", "", f"{iso(info[effective]['발령일자'])} 발령 {issued}, 원문은 {link(note.stem)}이다.", ""]
+            continue
+        text = L.notice_text(response["AdmRulService"], L.note_attachments(note, response))
+        body += [f"## {iso(effective)} 시행 ({label})", "", f"{info[effective]['행정규칙명']}, {issued}", "",
                  "```text", text.rstrip("\n"), "```", "", f"^v{effective}-t", ""]
         blocks[f"v{effective}-t"] = L.sha256(L.version_text(text))
     name = info[current]["행정규칙명"]
@@ -1104,8 +1129,206 @@ def render_notice(source, as_of):
         "source": [link(note.stem) for note, _ in versions.values()],
         "status": "verified",
     }
-    text = f"{name}의 법령 노트다. 같은 행정규칙ID의 해마다 고시를 시행일 버전으로 두고, 본문은 원문의 PDF 첨부파일에서 스크립트로 옮겼다."
+    if articles:
+        text = f"{name}의 법령 노트다. 시행일 버전마다 원문 노트를 잇는다."
+    else:
+        text = f"{name}의 법령 노트다. 같은 행정규칙ID의 고시를 시행일 버전으로 두고, 본문은 원문의 조문내용과 고시 이름의 PDF 첨부파일에서 스크립트로 옮겼다."
     return WIKI / "LegalResource" / f"{name}.md", identifier, meta, "\n".join([text, "", *body]).rstrip() + "\n", blocks
+
+
+ADMRUL_ARTICLE = re.compile(r"제(\d+)조(?:의(\d+))?\(([^)]*)\)")
+ADMRUL_CHAPTER = re.compile(r"제(\d+)장(?:의(\d+))?\s+(\S.*)")
+
+
+class Rule:
+    """A 행정규칙 written in articles, such as a 훈령 or 예규, with every stored version, extended into the past when a unit needs it.
+
+    Its units are its articles and 장, keyed as art-12 and ch-2. 법제처 gives each as one string, so a version of a unit is one block.
+    """
+
+    def __init__(self, source, as_of):
+        self.id = source["id"]
+        self.identifier = f"admrul-{self.id}"
+        self.notes, self.versions = {}, {}
+        for effective, (note, response) in raw_notices(source).items():
+            self.notes[effective] = note
+            self.versions[effective] = response["AdmRulService"]
+        self.folder = L.CACHE / "admrul" / self.id
+        for path in sorted(self.folder.glob("*-*.json")):
+            match = re.fullmatch(r"\d+-(\d{8})", path.stem)
+            if match and match[1] not in self.versions:
+                self.versions[match[1]] = json.loads(path.read_text(encoding="utf-8"))["AdmRulService"]
+        self.versions = dict(sorted(self.versions.items()))
+        listing = self.folder / "versions.json"
+        self.listing = json.loads(listing.read_text(encoding="utf-8")) if listing.exists() else {}
+        self.current = L.in_force(self.notes, as_of)
+        self.scheduled = [d for d in self.notes if d > self.current]
+        self.name = self.versions[self.current]["행정규칙기본정보"]["행정규칙명"]
+        self._units = {}
+
+    def needed(self):
+        return [self.current, *self.scheduled]
+
+    def units(self, effective):
+        """Articles and 장 of a version in document order, as key -> (kind, number, title, text)."""
+        if effective not in self._units:
+            found = {}
+            for text in L.as_list(self.versions[effective].get("조문내용")):
+                if match := ADMRUL_ARTICLE.match(text):
+                    number = f"제{match[1]}조" + (f"의{match[2]}" if match[2] else "")
+                    found[L.article_key(match[1], match[2])] = ("article", number, match[3], text)
+                elif match := ADMRUL_CHAPTER.match(text):
+                    number = f"제{match[1]}장" + (f"의{match[2]}" if match[2] else "")
+                    found[f"ch-{match[1]}" + (f"-{match[2]}" if match[2] else "")] = ("chapter", number, " ".join(match[3].split()), text)
+            self._units[effective] = found
+        return self._units[effective]
+
+    def text(self, effective, key):
+        unit = self.units(effective).get(key)
+        return None if unit is None else L.version_text(unit[3])
+
+    def unit_name(self, key):
+        effective = next(d for d in reversed(self.needed()) if key in self.units(d))
+        return f"{self.name} {self.units(effective)[key][1]}"
+
+    def parent(self, key):
+        """The 장 that holds an article in the latest version that has it, or None for a 장 or an article outside any 장."""
+        if not key.startswith("art-"):
+            return None
+        effective = next(d for d in reversed(self.needed()) if key in self.units(d))
+        chapter = None
+        for other in self.units(effective):
+            if other == key:
+                return chapter
+            if other.startswith("ch-"):
+                chapter = other
+        return None
+
+    def extend(self):
+        """Fetch the version before the earliest stored one into the cache. Returns False at the first version."""
+        earlier = [d for d in self.listing if d < min(self.versions)]
+        if not earlier:
+            return False
+        effective = earlier[-1]
+        row = self.listing[effective]
+        path = self.folder / f"{row['행정규칙일련번호']}-{effective}.json"
+        if not path.exists():
+            if OFFLINE:
+                sys.exit(f"{self.name}: the cache lacks the version of {effective}; run scripts/statutes.py without --check, which fetches it")
+            text, _, files = collect.fetch_notice(row)
+            L.write_json(path, text)
+            collect.write_attachments(self.folder, path.stem, files)
+        self.versions[effective] = json.loads(path.read_text(encoding="utf-8"))["AdmRulService"]
+        self.versions = dict(sorted(self.versions.items()))
+        return True
+
+    def first_date(self, key, effective, review):
+        """시행일자 of the earliest version in the unbroken run of versions up to effective with the same text of a unit."""
+        text = self.text(effective, key)
+        start = effective
+        while True:
+            earlier = [d for d in self.versions if d < start]
+            if not earlier and self.extend():
+                continue
+            if not earlier:
+                return start
+            if self.text(earlier[-1], key) != text:
+                if not in_articles(self.versions[earlier[-1]]) or not self.units(earlier[-1]):
+                    review.append(f"{self.name} {key}: the version of {earlier[-1]} has no articles in 조문내용, so the version of {start} may be older")
+                return start
+            start = earlier[-1]
+
+    def unit_versions(self, key, review):
+        """Versions of a unit in the current and scheduled versions, oldest first, as in compute_versions."""
+        found = []
+        for effective in self.needed():
+            text = self.text(effective, key)
+            if text is None:
+                if found and "last" not in found[-1]:
+                    found[-1]["last"] = before(effective)
+                continue
+            if found and found[-1]["text"] == text and "last" not in found[-1]:
+                continue
+            found.append({"first": self.first_date(key, effective, review), "effective": effective, "text": text})
+        for version in found:
+            version.pop("last", None)
+            later = next((d for d in self.versions if d > version["first"] and self.text(d, key) != version["text"]), None)
+            if later:
+                version["last"] = before(later)
+        return found
+
+
+def rule_selection(rules, review):
+    """Units of 행정규칙 that wiki notes link to, the 장 that hold them, and the units that already have statute notes."""
+    names = {}
+    for rule in rules:
+        for effective in rule.needed():
+            for key in rule.units(effective):
+                names.setdefault(rule.unit_name(key), (rule, key))
+    cited, existing = [], []
+    for path in sorted(WIKI.rglob("*.md")):
+        if path.parent.name in ("LegalResource", "LegalResourceSubdivision"):
+            if path.stem in names:
+                existing.append(names[path.stem])
+            continue
+        for name in re.findall(r"\[\[([^\]|#]+)", path.read_text(encoding="utf-8")):
+            if name.strip() in names and names[name.strip()] not in cited:
+                cited.append(names[name.strip()])
+    chosen = []
+    for rule, key in cited:
+        for item in [(rule, key), (rule, rule.parent(key))]:
+            if item[1] and item not in chosen:
+                chosen.append(item)
+    for item in existing:
+        if item not in chosen:
+            review.append(f"{item[0].unit_name(item[1])}: kept because its note exists; nothing in scope cites it")
+            chosen.append(item)
+    return chosen
+
+
+def render_rule_unit(rule, key, review):
+    """Path, identifier, note text and block hashes of an article or 장 of a 행정규칙."""
+    versions = rule.unit_versions(key, review)
+    shown = next((v for v in versions if v["first"] <= rule.current and v.get("last", "99999999") >= rule.current), versions[-1])
+    kind, number, title, _ = rule.units(shown["effective"])[key]
+    name = rule.unit_name(key)
+    identifier = f"{rule.identifier}-{key}"
+    realized, lines, blocks = [], [f"{name}({title})의 법령 노트다. 본문은 원문에서 스크립트로 옮겼고, 시행일 버전마다 따로 둔다.", ""], {}
+    for version in versions:
+        info = rule.versions[version["first"]]["행정규칙기본정보"]
+        entry = {
+            "identifier": f"{identifier}-v{version['first']}",
+            "firstDateEntryInForce": iso(version["first"]),
+            "dateNoLongerInForce": iso(version["last"]) if "last" in version else None,
+            "datePublication": iso(info["발령일자"]),
+            "idLocal": info["행정규칙일련번호"],
+            "number": f"제{info['발령번호']}호",
+            "wasDerivedFrom": link(rule.notes[version["effective"]].stem),
+        }
+        realized.append(order({k: v for k, v in entry.items() if v}))
+        text = rule.units(version["effective"])[key][3]
+        tags = L.amendment_dates(text)
+        if tags and max(tags) != info["발령일자"]:
+            review.append(f"{name} v{version['first']}: the latest amendment tag {max(tags)} is not the 발령일자 {info['발령일자']} of that version")
+        if "<img" in text:
+            review.append(f"{name} v{version['first']}: the text has an image element, which 행정규칙 notes do not show")
+        current = version["first"] <= rule.current and version.get("last", "99999999") >= rule.current
+        label = "현행" if current else ("시행예정" if version["first"] > rule.current else "종전")
+        lines += [f"## {iso(version['first'])} 시행 ({label})", "", f"{one_line(text)} ^v{version['first']}-t", ""]
+        blocks[f"v{version['first']}-t"] = L.sha256(version["text"])
+    parent = rule.parent(key)
+    meta = {
+        "type": "LegalResourceSubdivision",
+        "identifier": identifier,
+        "isRealizedBy": realized,
+        "title": title,
+        "isPartOf": link(rule.unit_name(parent) if parent else rule.name),
+        "typeSubdivision": kind,
+        "number": number,
+        "source": [link(s) for s in dict.fromkeys(rule.notes[v["effective"]].stem for v in versions)],
+        "status": "verified",
+    }
+    return WIKI / "LegalResourceSubdivision" / f"{name}.md", identifier, note_text(meta, "\n".join(lines).rstrip() + "\n"), blocks
 
 
 LEGAL_EXPRESSION_ORDER = ("identifier", "firstDateEntryInForce", "dateNoLongerInForce", "datePublication", "idLocal", "number", "wasDerivedFrom")
@@ -1243,9 +1466,16 @@ def generate():
         notes[note_path(unit)] = (unit.identifier, note_text(meta, body), block_hashes(unit, versions))
         statutes.review += review_unit(unit)
     statutes.review += list(dict.fromkeys(CITED.pop("review", [])))
+    rules = []
     for source in SOURCES["admrul"]:
         path, identifier, meta, body, blocks = render_notice(source, as_of)
         notes[path] = (identifier, note_text(meta, body), blocks)
+        versions, current = notice_versions(source, as_of)
+        if in_articles(versions[current][1]["AdmRulService"]):
+            rules.append(Rule(source, as_of))
+    for rule, key in rule_selection(rules, statutes.review):
+        path, identifier, text, blocks = render_rule_unit(rule, key, statutes.review)
+        notes[path] = (identifier, text, blocks)
     names = [path.stem for path in notes]
     duplicates = sorted({n for n in names if names.count(n) > 1})
     if duplicates:

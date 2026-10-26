@@ -1,4 +1,6 @@
-"""Tests for scripts/statutes.py: references, delegations, 부칙 blocks and block hashes, on a synthetic law family."""
+"""Tests for scripts/statutes.py: references, delegations, 부칙 blocks, block hashes and 행정규칙 articles, on synthetic laws."""
+
+from pathlib import Path
 
 import lawlib as L
 import statutes as S
@@ -386,3 +388,56 @@ def test_a_bare_article_in_a_phrase_quoted_from_another_law_belongs_to_that_law(
     found = [(r.law, r.key, r.block, r.delegation) for r in refs(statutes, "시험법 시행령", "art-5")]
     assert ("시험법", "art-11", "p1", False) in found
     assert not any(law == "시험법 시행령" and key == "art-11" for law, key, _, _ in found)
+
+
+class FakeRule(S.Rule):
+    """A 행정규칙 in articles whose versions are lists of article strings by 시행일자, without raw notes or cache."""
+
+    def __init__(self, versions, current):
+        self.id, self.identifier, self.name = "1", "admrul-1", "시험 예규"
+        self.versions = {}
+        for number, (effective, texts) in enumerate(sorted(versions.items()), 1):
+            info = {"발령일자": effective, "발령번호": str(number), "행정규칙일련번호": str(number)}
+            self.versions[effective] = {"행정규칙기본정보": info, "조문내용": texts}
+        self.notes = {d: Path(f"시험 예규 {d}.md") for d in versions}
+        self.listing, self.folder = {}, None
+        self.current, self.scheduled = current, [d for d in sorted(versions) if d > current]
+        self._units = {}
+
+
+RULE_TEXTS = ["제1장 총칙", "제1조(목적) 이 예규는 목적을 정한다.", "제2장  실업인정", "제12조(실업인정일) ① 1차 실업인정일은 14일이 되는 날이다."]
+
+
+def test_rule_articles_and_chapters():
+    rule = FakeRule({"20260101": RULE_TEXTS}, "20260101")
+    assert list(rule.units("20260101")) == ["ch-1", "art-1", "ch-2", "art-12"]
+    assert rule.units("20260101")["ch-2"][2] == "실업인정"
+    assert rule.parent("art-12") == "ch-2" and rule.parent("ch-2") is None
+    assert rule.unit_name("art-12") == "시험 예규 제12조"
+
+
+def test_a_rule_article_version_starts_at_its_last_change():
+    changed = RULE_TEXTS[:3] + ["제12조(실업인정일) ① 1차 실업인정일은 21일이 되는 날이다."]
+    rule = FakeRule({"20190101": RULE_TEXTS, "20220101": changed, "20260101": changed, "20270101": RULE_TEXTS}, "20260101")
+    review = []
+    versions = rule.unit_versions("art-12", review)
+    assert [(v["first"], v.get("last")) for v in versions] == [("20220101", "20261231"), ("20270101", None)]
+    assert [(v["first"], v.get("last")) for v in rule.unit_versions("art-1", review)] == [("20190101", None)]
+    assert review == []
+
+
+def test_an_earlier_version_without_articles_is_listed_for_review():
+    rule = FakeRule({"20190101": RULE_TEXTS, "20260101": RULE_TEXTS}, "20260101")
+    rule.versions["20190101"]["조문내용"] = "본문은 첨부파일에 있다."
+    review = []
+    assert rule.unit_versions("art-12", review)[0]["first"] == "20260101"
+    assert any("has no articles" in line for line in review)
+
+
+def test_a_rule_article_note_holds_one_block_per_version():
+    rule = FakeRule({"20260101": RULE_TEXTS}, "20260101")
+    path, identifier, text, blocks = S.render_rule_unit(rule, "art-12", [])
+    assert path.name == "시험 예규 제12조.md" and identifier == "admrul-1-art-12"
+    assert "isPartOf: '[[시험 예규 제2장]]'" in text and "typeSubdivision: article" in text
+    assert "제12조(실업인정일) ① 1차 실업인정일은 14일이 되는 날이다. ^v20260101-t" in text
+    assert blocks == {"v20260101-t": L.sha256(L.version_text(RULE_TEXTS[3]))}

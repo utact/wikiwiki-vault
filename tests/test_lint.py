@@ -308,6 +308,38 @@ def test_form_item_labels(tmp_path, label, problem):
     assert labels == [] if problem is None else any(problem in p for p in labels), labels
 
 
+RULE_ARTICLE = """---
+type: LegalResourceSubdivision
+identifier: admrul-1-art-12
+title: 실업인정일의 지정
+isPartOf: '[[고용보험법]]'
+typeSubdivision: article
+number: 제12조
+status: verified
+---
+
+## 2026-09-01 시행 (현행)
+
+제12조(실업인정일의 지정) ① 담당직원은 다음 실업인정일을 지정한다.② 지정하는 기준은 다음 각 호에 따른다.1. 1차 실업인정일: 실업신고일부터 14일이 되는 날 ^v20260901-t
+"""
+
+RULE_CITER = FORM_CITER.replace("고용보험법 시행규칙 별지 제6호서식#^v20230701-t", "시험 예규 제12조#^v20260901-t").replace(
+    "이 코드는 상실사유란에 구분코드와 함께 적는다.", "담당직원은 다음 실업인정일을 지정한다.")
+
+
+@pytest.mark.parametrize("label, problem", [
+    ("시험 예규 제12조", None),
+    ("시험 예규 제12조제2항제1호", None),
+    ("시험 예규 제12조제3항", "names 제3항, which the article does not contain"),
+    ("시험 예규 제12조 제1항", "is not the citation"),
+])
+def test_rule_article_labels(tmp_path, label, problem):
+    found = run(tmp_path, ("wiki/LegalResourceSubdivision/시험 예규 제12조.md", None, RULE_ARTICLE),
+                ("wiki/Concept/시험 코드.md", None, RULE_CITER.replace("LABEL", label)))
+    labels = [p for p in found if "시험 코드" in p and "footnote label" in p]
+    assert labels == [] if problem is None else any(problem in p for p in labels), labels
+
+
 @pytest.mark.parametrize("sentence, flagged", [
     ("이 두 제한은 기초일액에 적용한다.", "두 제한은"),
     ("이 세 경우는 하나로 모인다.", "세 경우는"),

@@ -137,6 +137,11 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Law: `law-<법령ID>`, and for a series of 고시 under one 행정규칙ID: `admrul-<행정규칙ID>`
   - Units: the law's identifier followed by `-art-40`, `-art-10-2`, `-ch-4`, `-ch-5-2`, `-ch-4-sec-2`, `-part-1-ch-6` for a 장 of a 편, `-annex-1-2`, `-form-6` or `-sup-<공포일자>-<공포번호>`
 - Write a series of 고시 such as the 적용 최저임금 고시 as one `LegalResource` named after the current 고시, with each year's 고시 as a version and its text as the block `^v20260101-t`.
+- Write a 행정규칙 that 법제처 gives as a list of articles, such as a 훈령 or 예규, as a `LegalResource` that links its versions, with notes for the articles that wiki notes cite and the 장 that hold them.
+  - Units: `admrul-<행정규칙ID>-art-12` and `admrul-<행정규칙ID>-ch-2`, named as in `실업인정 및 재취업지원규정 제12조`
+  - 법제처 gives each article as one string, so each version of a unit is one block, `^v20260901-t`. A citation names its 항 and 호 in the label.
+  - Date the versions as for a law, with the 발령일자, 발령번호 and 행정규칙일련번호 of the version found. A unit is listed for review when an earlier version has no articles in 조문내용.
+  - These notes carry no `cites` or `basedOn` yet.
 - Name statute notes with the law name and the unit.
   - Examples: `고용보험법 제40조`, `고용보험법 별표 1`, `고용보험법 시행규칙 별지 제6호서식`, `고용보험법 부칙 제21473호`
   - When two 부칙 of a law share a 공포번호, add the 공포일자 in parentheses, as in `고용보험법 시행규칙 부칙 제263호 (2019. 9. 30.)` and `고용보험법 시행규칙 부칙 제263호 (2019. 10. 15.)`.
@@ -257,6 +262,7 @@ decisionTable:
   - Statutes: a block of the statute note, labelled with the official citation, as in `[^1]: [[고용보험법 제40조#^v20260918-p1-i1|고용보험법 제40조제1항제1호]]`
   - 단서, 본문, 전단 and 후단: link the block, and name the part in the label, only when the block has it
   - Items of a 별표 or 서식: link the block, and name the item in the label, as in `고용보험법 시행령 별표 2 제1호나목`
+  - 항 and 호 of a 행정규칙 article: link the block, and name them in the label, as in `실업인정 및 재취업지원규정 제12조제2항제1호`
   - 법령해석례 and 고용24 guides: a quotation block of the raw note, labelled with the name of the source, as in `[^2]: [[법령해석례 26-0321 20261019T2045#^q1|법제처 법령해석례 26-0321]]`
   - A footnote to a whole raw note rests only on its frontmatter and the basic information of its response, such as 시행일자 and 공포번호.
 - Quote statutory text verbatim inside “ ” (U+201C and U+201D), followed directly by its footnote.
