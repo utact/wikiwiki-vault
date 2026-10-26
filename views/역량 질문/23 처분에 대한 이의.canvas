@@ -318,11 +318,22 @@
 			"subpath": "#^v20100125-p1"
 		},
 		{
+			"id": "6589b618a6a6654c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제92조.md",
+			"x": 1680,
+			"y": 5040,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20070511-p1"
+		},
+		{
 			"id": "c5a41c4a637cc65b",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제125조.md",
 			"x": 1680,
-			"y": 5040,
+			"y": 5320,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -333,7 +344,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제104조.md",
 			"x": 1680,
-			"y": 5320,
+			"y": 5600,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -344,22 +355,11 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제87조.md",
 			"x": 1680,
-			"y": 5600,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20120802-p2"
-		},
-		{
-			"id": "6589b618a6a6654c",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제92조.md",
-			"x": 1680,
 			"y": 5880,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20070511-p1"
+			"subpath": "#^v20120802-p2"
 		},
 		{
 			"id": "a125a27e55ad209b",
@@ -948,6 +948,15 @@
 			"fromNode": "8ac579a0924ac9c0",
 			"fromSide": "right",
 			"toNode": "b2def99256b6f14f",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "f7f71b9c3b335ede",
+			"fromNode": "8ac579a0924ac9c0",
+			"fromSide": "right",
+			"toNode": "6589b618a6a6654c",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"

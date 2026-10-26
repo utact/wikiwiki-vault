@@ -184,7 +184,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/10년간 부정행위로 지급 제한을 받은 횟수.md",
 			"x": 1680,
-			"y": 1400,
+			"y": 1680,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -204,7 +204,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/10년간 사업주와 공모한 부정행위로 지급 제한을 받은 횟수.md",
 			"x": 1680,
-			"y": 1680,
+			"y": 1960,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -234,7 +234,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/사업주와 공모.md",
 			"x": 1680,
-			"y": 2240,
+			"y": 2520,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -314,7 +314,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/소급하여 10년간 부정행위로 구직급여를 받지 못한 횟수.md",
 			"x": 1680,
-			"y": 2800,
+			"y": 3080,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -344,7 +344,17 @@
 			"type": "file",
 			"file": "wiki/Criterion/2020-08-28 이후 구직급여 부정수급.md",
 			"x": 1680,
-			"y": 1120,
+			"y": 1400,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "060d4dabbf457e19",
+			"type": "file",
+			"file": "wiki/Criterion/2026-07-01 이후 구직급여 부정수급.md",
+			"x": 1680,
+			"y": 840,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -354,7 +364,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/부정하게 지급받은 구직급여액.md",
 			"x": 1680,
-			"y": 840,
+			"y": 1120,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -374,7 +384,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/구직급여의 지급 제한이 완화되는 부정행위 해당 여부.md",
 			"x": 1680,
-			"y": 3360,
+			"y": 3640,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -394,7 +404,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/지급 제한이 완화되는 부정행위의 위반 횟수.md",
 			"x": 1680,
-			"y": 3640,
+			"y": 3920,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -404,7 +414,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/지급 제한이 완화되는 경우 해당 여부.md",
 			"x": 1680,
-			"y": 2520,
+			"y": 2800,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -434,7 +444,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/새로운 수급자격에 따른 급여 여부.md",
 			"x": 1680,
-			"y": 3080,
+			"y": 3360,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -484,7 +494,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/사업주와 공모하지 않음.md",
 			"x": 1680,
-			"y": 1960,
+			"y": 2240,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -781,7 +791,7 @@
 			"subpath": "#^v20260701-p3-i1"
 		},
 		{
-			"id": "5bfadf6e7fb7d7a6",
+			"id": "ed1786a07a027a6c",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
@@ -789,10 +799,10 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20260701-p2"
+			"subpath": "#^v20260701-p3-i2"
 		},
 		{
-			"id": "ed1786a07a027a6c",
+			"id": "5bfadf6e7fb7d7a6",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
@@ -800,25 +810,14 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20260701-p3-i2"
-		},
-		{
-			"id": "2ff92936b4f49444",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
-			"x": 2800,
-			"y": 6440,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20260701-p1"
+			"subpath": "#^v20260701-p2"
 		},
 		{
 			"id": "95b191b3de262c21",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
-			"y": 6720,
+			"y": 6440,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -829,33 +828,44 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
-			"y": 7000,
+			"y": 6720,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20260701-p3"
 		},
 		{
-			"id": "23361c5ad5f4710d",
+			"id": "2ff92936b4f49444",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제62조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
-			"y": 7280,
+			"y": 7000,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20200828-p2"
+			"subpath": "#^v20260701-p1"
 		},
 		{
 			"id": "8bb3f780e0acd880",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
-			"y": 7560,
+			"y": 7280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20260701-p4"
+		},
+		{
+			"id": "23361c5ad5f4710d",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제62조.md",
+			"x": 2800,
+			"y": 7560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200828-p2"
 		},
 		{
 			"id": "832611fce80be9df",
@@ -869,22 +879,11 @@
 			"subpath": "#^v20200828-p3"
 		},
 		{
-			"id": "e255cbc7f91a8312",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제16557호.md",
-			"x": 2800,
-			"y": 8120,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20191001-a1"
-		},
-		{
 			"id": "2ec2c3e47909c2f7",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제80조의2.md",
 			"x": 2800,
-			"y": 8400,
+			"y": 8120,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -895,7 +894,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제80조의2.md",
 			"x": 2800,
-			"y": 8680,
+			"y": 8400,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -906,7 +905,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제80조의2.md",
 			"x": 2800,
-			"y": 8960,
+			"y": 8680,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -917,11 +916,22 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제116조.md",
 			"x": 2800,
-			"y": 9240,
+			"y": 8960,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20221231-p2-i2"
+		},
+		{
+			"id": "c00f326c978e1a5e",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제116조.md",
+			"x": 2800,
+			"y": 9240,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20221231-p1"
 		},
 		{
 			"id": "de3db796353c6ea5",
@@ -946,7 +956,7 @@
 			"subpath": "#^v20200526-p2"
 		},
 		{
-			"id": "c00f326c978e1a5e",
+			"id": "daa2bd2efa6a7780",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제116조.md",
 			"x": 2800,
@@ -954,47 +964,36 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20221231-p1"
+			"subpath": "#^v20221231-p2"
+		},
+		{
+			"id": "e255cbc7f91a8312",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제16557호.md",
+			"x": 2800,
+			"y": 10360,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20191001-a1"
 		},
 		{
 			"id": "1a034ac4bab36d98",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 부칙 제292호.md",
 			"x": 2800,
-			"y": 10360,
+			"y": 10640,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20200828-a2"
 		},
 		{
-			"id": "daa2bd2efa6a7780",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제116조.md",
-			"x": 2800,
-			"y": 10640,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20221231-p2"
-		},
-		{
-			"id": "e25de98a6f5d40d7",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제61조.md",
-			"x": 2800,
-			"y": 10920,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20200101-p1"
-		},
-		{
 			"id": "557d08166a7418f0",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제68조.md",
 			"x": 2800,
-			"y": 11200,
+			"y": 10920,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1005,55 +1004,66 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제61조.md",
 			"x": 2800,
-			"y": 11480,
+			"y": 11200,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20200828-p1"
 		},
 		{
-			"id": "fe49f13c8abcf6c9",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 부칙 제292호.md",
-			"x": 2800,
-			"y": 11760,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20200828-a1"
-		},
-		{
 			"id": "f254c354c292d292",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제116조.md",
 			"x": 2800,
-			"y": 12040,
+			"y": 11480,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20221231-p1-i2"
 		},
 		{
-			"id": "4cbcc268adad4108",
+			"id": "e25de98a6f5d40d7",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제80조의2.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제61조.md",
 			"x": 2800,
-			"y": 12320,
+			"y": 11760,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20200828-lead"
+			"subpath": "#^v20200101-p1"
+		},
+		{
+			"id": "fe49f13c8abcf6c9",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 부칙 제292호.md",
+			"x": 2800,
+			"y": 12040,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200828-a1"
 		},
 		{
 			"id": "04f0c46ec352b42b",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제105조.md",
 			"x": 2800,
-			"y": 12600,
+			"y": 12320,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20260701-p4-i1"
+		},
+		{
+			"id": "4cbcc268adad4108",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제80조의2.md",
+			"x": 2800,
+			"y": 12600,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200828-lead"
 		},
 		{
 			"id": "af39494df70ebdb0",
@@ -1133,22 +1143,11 @@
 			"subpath": "#^v20200828-p2"
 		},
 		{
-			"id": "6dc4762d5c19c3c9",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제16557호.md",
-			"x": 2800,
-			"y": 14840,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20191001-a4"
-		},
-		{
 			"id": "1b437d718e44ba7a",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제157조.md",
 			"x": 2800,
-			"y": 15120,
+			"y": 14840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1159,7 +1158,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제159조.md",
 			"x": 2800,
-			"y": 15400,
+			"y": 15120,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1170,7 +1169,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제160조.md",
 			"x": 2800,
-			"y": 15680,
+			"y": 15400,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1181,7 +1180,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제160조.md",
 			"x": 2800,
-			"y": 15960,
+			"y": 15680,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1192,7 +1191,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제160조.md",
 			"x": 2800,
-			"y": 16240,
+			"y": 15960,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1203,7 +1202,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/민법 제161조.md",
 			"x": 2800,
-			"y": 16520,
+			"y": 16240,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1214,7 +1213,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
 			"x": 2800,
-			"y": 16800,
+			"y": 16520,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1225,7 +1224,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
 			"x": 2800,
-			"y": 17080,
+			"y": 16800,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1236,7 +1235,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
 			"x": 2800,
-			"y": 17360,
+			"y": 17080,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1247,11 +1246,22 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
 			"x": 2800,
-			"y": 17640,
+			"y": 17360,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20210323-p2-i2"
+		},
+		{
+			"id": "6dc4762d5c19c3c9",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제16557호.md",
+			"x": 2800,
+			"y": 17640,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20191001-a4"
 		},
 		{
 			"id": "8970f0259e95b411",
@@ -1460,6 +1470,14 @@
 			"label": "appliesWhen"
 		},
 		{
+			"id": "dfc7d62e61ec1d03",
+			"fromNode": "8a10666ef2c124d7",
+			"fromSide": "right",
+			"toNode": "060d4dabbf457e19",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
 			"id": "01efd2631c80a715",
 			"fromNode": "8a10666ef2c124d7",
 			"fromSide": "right",
@@ -1544,6 +1562,14 @@
 			"fromNode": "eb8c0c275d99c8a6",
 			"fromSide": "right",
 			"toNode": "a5c9d2db83e95a9d",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "c8593e15062cedf8",
+			"fromNode": "eb8c0c275d99c8a6",
+			"fromSide": "right",
+			"toNode": "060d4dabbf457e19",
 			"toSide": "left",
 			"label": "appliesWhen"
 		},
@@ -1726,6 +1752,14 @@
 		{
 			"id": "8b042e3387ebfa6d",
 			"fromNode": "a5c9d2db83e95a9d",
+			"fromSide": "right",
+			"toNode": "40c58cd3492c627b",
+			"toSide": "left",
+			"label": "hasConcept"
+		},
+		{
+			"id": "f44f6cdd8645ea90",
+			"fromNode": "060d4dabbf457e19",
 			"fromSide": "right",
 			"toNode": "40c58cd3492c627b",
 			"toSide": "left",
@@ -3139,6 +3173,33 @@
 			"fromNode": "a5c9d2db83e95a9d",
 			"fromSide": "right",
 			"toNode": "23361c5ad5f4710d",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ef03026f40067cd5",
+			"fromNode": "060d4dabbf457e19",
+			"fromSide": "right",
+			"toNode": "2ff92936b4f49444",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "8d24f76199e70da4",
+			"fromNode": "060d4dabbf457e19",
+			"fromSide": "right",
+			"toNode": "5bfadf6e7fb7d7a6",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "6860ff506ed71f1b",
+			"fromNode": "060d4dabbf457e19",
+			"fromSide": "right",
+			"toNode": "cdf042d03f98c7c4",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
