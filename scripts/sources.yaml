@@ -28,6 +28,10 @@ interpretations:
   - id: "341169"
   - id: "334739"
   - id: "331135"
+  - id: "325539"
+  - id: "343645"
+  - id: "338875"
+  - id: "330985"
 shapes:
   - name: CPSV-AP 3.2.0
     file: cpsv-ap-3.2.0-shacl.ttl
