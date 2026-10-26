@@ -278,7 +278,9 @@ decisionTable:
   - The operands of a calculation must appear in a cited block, as a number or as a ratio such as 100분의 60 for `60 / 100`.
   - Mark a calculation on example inputs with 예시 in its footnote, as in `` [^3]: [[최저기초일액 산정]] 예시 `8 * 10320` ``. Its operands may then appear in the sentence instead.
   - Numbers in the labels of wikilinks, as in `[[기초일액|11만3500원]]`, count as part of the sentence, except the 공포일자 or 시행일자 of the statute note the link names, as in `[[고용보험법 시행령 부칙 제35934호|부칙 제35934호(2025. 12. 23.)]]`.
+  - The 시행일 of the version of a cited statute block counts as part of the block, as 2020-08-28 for `[[고용보험법 제62조#^v20200828-p2]]`, because a 부칙 sometimes states it only as a time after 공포, such as 공포 후 1년이 경과한 날.
 - Numbers and dates in `definition`, `unaryTests`, decision table cells and `literalExpression` must appear in the blocks of `source` or `isDerivedFrom`.
+  - The 시행일 of the version of such a block counts, as in a footnoted sentence.
   - A number in a test or cell carries the unit of its concept's `unitCode` or `currency`, such as 일 for `DAY` and 원 for `KRW`, and a part of a duration its own unit, such as 개월 for `M`.
   - An operand of `*` or `/` carries no unit, because it states a ratio, as 60 and 100 in `기초일액 * 60 / 100`.
   - 0 and 1 in FEEL are exempt, because they often encode structure, as `duration("P1M")` for 다음 달.
@@ -297,6 +299,7 @@ decisionTable:
   - Use `validFrom` and `validThrough` only for calendar validity.
   - Model a transitional provision (경과조치) as a `Criterion` on the date it depends on, such as 이직일, and link it with `appliesWhen`.
   - A note with `appliesWhen` may cite a version that is not in force on the reference date, when the version's period meets the dates in which all its criteria hold.
+  - A criterion on a date may cite such a version when the version's period meets the dates its own test admits, as 2023-07-01 이후 수급자격 인정 신청 cites the 2023-07-01 version of 고용보험법 제40조.
   - Criteria that test no date leave such a citation unchecked, so lint reports it.
 - State a provision with its 단서 and exceptions, or name the ones a note leaves out.
   - Leave out a case that a rule, constraint or criterion does not cover through a criterion in `appliesWhen`, as 기초일액 산정 does for 고용보험법 제45조제1항 단서.
@@ -444,7 +447,7 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
   - Footnote links to statute blocks without the citation label, or with a part that the block lacks
   - Calculation operands outside the cited blocks, or outside the sentence too when the footnote marks an example
   - Numbers and dates of frontmatter values outside the blocks of `source` and `isDerivedFrom`, or in another unit
-  - Facts that cite a version not in force on the reference date, without an `appliesWhen` date condition or outside the dates of its criteria
+  - Facts that cite a version not in force on the reference date, without a date condition in `appliesWhen` or in the test of the criterion itself, or outside the dates of those conditions
   - Cited blocks whose hash differs from the one in the verification ledger
   - `verified` or `reviewed` notes without a matching ledger entry, or whose entry lacks a cited block
   - `reviewed` notes without `reviewedBy` and `lastReviewed`

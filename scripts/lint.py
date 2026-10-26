@@ -265,6 +265,19 @@ class Linter:
                 self.problem(note, f"footnote cites [[{name}]] without a block")
         return found
 
+    @staticmethod
+    def version_dates(sources):
+        """The 시행일 of the version of each cited statute block, which its block ID names, as 2020-08-28 for ^v20200828-p2.
+
+        A 부칙 may set it as a time after 공포, such as 공포 후 1년이 경과한 날, and then only the versions of the provisions it starts state the date.
+        """
+        found = []
+        for _, _, target, block in sources:
+            match = re.match(r"v(\d{4})(\d{2})(\d{2})-", block or "")
+            if target.statute and match:
+                found.append(("date", "-".join(match.groups()), None))
+        return found
+
     def raw_facts(self, note):
         """What a footnote to a whole raw note can rest on: its frontmatter and the basic information of its response, such as 시행일자 and 공포번호.
 
@@ -390,6 +403,7 @@ class Linter:
         pool = []
         for text, table, _, _ in sources:
             pool += L.number_tokens(L.number_text(text, wrapped=table))
+        pool += self.version_dates(sources)
         numbers = {v for k, v, _ in pool if k == "number"}
         ratios = {v for k, v, _ in pool if k == "ratio"}
         dates = {v for k, v, _ in pool if k == "date"}
@@ -458,12 +472,16 @@ class Linter:
         """Date intervals in which all the criteria a note applies when can hold, or None when none of them tests a date.
 
         A note applies when every criterion holds, so the intervals of the criteria intersect.
+        A criterion on a date holds only in the dates its own test admits, so its own test counts too.
         """
         values = note.meta.get("appliesWhen") or []
-        periods = None
-        for value in values if isinstance(values, list) else [values]:
+        values = values if isinstance(values, list) else [values]
+        criteria = [note] if note.type == "Criterion" else []
+        for value in values:
             match = LINK.fullmatch(str(value).strip())
-            target = self.notes.get(match.group(2).strip()) if match else None
+            criteria.append(self.notes.get(match.group(2).strip()) if match else None)
+        periods = None
+        for target in criteria:
             if target is None or target.type != "Criterion" or target.meta.get("unaryTests") is None:
                 continue
             concept = (target.meta.get("hasConcept") or [None])[0]
@@ -555,7 +573,7 @@ class Linter:
                     quoted_sources += self.cited(note, notes[ref][0])
             if not any(L.canonical(quote.group(1)) in L.canonical(text) for text, _, _, _ in quoted_sources):
                 self.problem(note, f"quote does not match the cited block: “{quote.group(1)[:40]}”")
-        pool = []
+        pool = self.version_dates(sources)
         for text, table, _, _ in sources:
             pool += L.number_tokens(L.number_text(text, wrapped=table))
         numbers = {v for k, v, _ in pool if k == "number"}

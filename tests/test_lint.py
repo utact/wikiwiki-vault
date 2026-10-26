@@ -350,3 +350,40 @@ def test_native_numeral_determiners(tmp_path, sentence, flagged):
     found = run(tmp_path, (CAP, original, original + "\n\n" + sentence[:-1] + ".[^1]"))
     numerals = [p for p in found if "Arabic numerals" in p]
     assert numerals == [] if flagged is None else any(flagged in p for p in numerals), numerals
+
+
+@pytest.mark.parametrize("stated, flagged", [("2021년 7월 1일", False), ("2021년 7월 2일", True)])
+def test_version_date_of_a_cited_block(tmp_path, stated, flagged):
+    """The 시행일 of the version of a cited block counts as part of the block, as its block ID names it."""
+    body = f"이 문언은 {stated}부터 시행되었다.[^1]"
+    found = run(tmp_path, ("wiki/InformationConcept/시험 개념.md", None, NOTE.format(body=body)))
+    dates = [p for p in found if "시험 개념" in p and "date 2021-07-0" in p]
+    assert bool(dates) is flagged, dates
+
+
+CRITERION = """---
+type: Criterion
+identifier: test-separation
+definition: 이직일이 시험 조건에 맞는 경우
+hasConcept:
+- '[[이직일]]'
+isDerivedFrom:
+- '[[고용보험법 제45조#^v20280101-p2]]'
+unaryTests: 'TEST date("2028-01-01")'
+source:
+- '[[고용보험법 제45조#^v20280101-p2]]'
+status: draft
+---
+
+2028년 1월 1일부터 시행되는 버전도 통상임금을 기초일액으로 하는 경우를 정한다.[^1]
+
+[^1]: [[고용보험법 제45조#^v20280101-p2|고용보험법 제45조제2항]]
+"""
+
+
+@pytest.mark.parametrize("test, problem", [(">=", None), ("<", "outside the dates")])
+def test_criterion_on_a_date_may_cite_versions_in_its_dates(tmp_path, test, problem):
+    """A criterion on a date holds only in the dates its own test admits, so it may cite a version in force then."""
+    found = run(tmp_path, ("wiki/Criterion/시험 조건.md", None, CRITERION.replace("TEST", test)))
+    versions = [p for p in found if "시험 조건" in p and "version" in p]
+    assert versions == [] if problem is None else any(problem in p for p in versions), versions
