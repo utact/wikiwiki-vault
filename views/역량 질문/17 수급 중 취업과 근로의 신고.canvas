@@ -261,26 +261,26 @@
 			"subpath": "#^v20190716-p2"
 		},
 		{
-			"id": "a6788a44e6c90852",
+			"id": "aef52678c619829a",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제47조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제88조.md",
 			"x": 2240,
 			"y": 280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20190716-p1"
+			"subpath": "#^v20210701-p3"
 		},
 		{
-			"id": "aef52678c619829a",
+			"id": "a6788a44e6c90852",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제88조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제47조.md",
 			"x": 2240,
 			"y": 560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20210701-p3"
+			"subpath": "#^v20190716-p1"
 		},
 		{
 			"id": "2451a1f6ad61beb6",
@@ -1424,6 +1424,15 @@
 			"fromNode": "ce2db801c9e3a529",
 			"fromSide": "right",
 			"toNode": "b0359f2ddfc031ac",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "44381559ad10cf64",
+			"fromNode": "ce2db801c9e3a529",
+			"fromSide": "right",
+			"toNode": "a6788a44e6c90852",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
