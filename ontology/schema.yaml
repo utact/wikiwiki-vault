@@ -68,6 +68,9 @@ enums:
       remarks:
         description: 별표의 비고
         meaning: employment:subdivision-remarks
+      preamble:
+        description: 고시의 개정문
+        meaning: employment:subdivision-preamble
       form:
         description: 별지 서식
         meaning: employment:subdivision-form

@@ -545,6 +545,14 @@ def notice_text(service, attachments):
     return "\n".join(x for x in (text, pdf_text(pdf) if pdf else "") if x)
 
 
+def notice_preamble(service):
+    """개정문 of a 고시, which names the provisions it rests on, as 「고용보험법」 제2조제5호 단서 in 고시 제2022-116호.
+
+    Some 고시 keep it only in their PDF, and the response has none.
+    """
+    return "\n".join(flatten((service.get("개정문") or {}).get("개정문내용")))
+
+
 def choose_versions(rows):
     """One version per 시행일자: the later 공포일자, then the later 공포번호."""
     chosen = {}

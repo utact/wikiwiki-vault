@@ -250,7 +250,7 @@ class를 정의하는 표준은 class가 처음 나오는 순서로, property만
 
 | 이름 | 표준 | 필수 | 값 |
 | --- | --- | --- | --- |
-| `typeSubdivision` | `eli:type_subdivision` | 예 | 하위 단위의 종류: `chapter`(장), `section`(절), `article`(조), `paragraph`(항), `point`(호), `subpoint`(목), `lead`(각 호 외의 부분), `annex`(별표), `remarks`(별표의 비고), `form`(별지 서식), `addendum`(부칙) |
+| `typeSubdivision` | `eli:type_subdivision` | 예 | 하위 단위의 종류: `chapter`(장), `section`(절), `article`(조), `paragraph`(항), `point`(호), `subpoint`(목), `lead`(각 호 외의 부분), `annex`(별표), `remarks`(별표의 비고), `preamble`(고시의 개정문), `form`(별지 서식), `addendum`(부칙) |
 | `number` | `eli:number` | 아니요 | 제40조, 제1항, 별표 1 같은 하위 단위 번호 |
 
 ### Concept

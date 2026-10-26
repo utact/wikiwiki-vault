@@ -213,3 +213,10 @@ def test_same_name_ignores_spaces():
 
 def test_a_name_with_digits_is_not_a_number():
     assert L.number_tokens("고용24 안내는 90일 안에 청구한다고 적는다.", notes=False) == [("number", 90, "일")]
+
+
+def test_notice_preamble_keeps_the_lines_of_its_개정문():
+    service = {"개정문": {"개정문내용": [["⊙고용노동부고시 제2022-116호", "  「고용보험법」 제2조제5호 단서에 따라 고시합니다."]]}}
+    assert L.notice_preamble(service) == "⊙고용노동부고시 제2022-116호\n  「고용보험법」 제2조제5호 단서에 따라 고시합니다."
+    assert L.notice_preamble({"개정문": ""}) == ""
+    assert L.notice_preamble({}) == ""

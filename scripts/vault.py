@@ -42,7 +42,7 @@ StringLoader.yaml_implicit_resolvers = {
 
 BLOCK = re.compile(r"\^(v(\d{8})-([a-z0-9-]+)|q\d+)\s*$", re.M)
 STATUTE_TYPES = ("LegalResource", "LegalResourceSubdivision")
-BLOCK_TYPES = {"p": "paragraph", "i": "point", "m": "subpoint", "a": "article", "lead": "lead", "remarks": "remarks"}
+BLOCK_TYPES = {"p": "paragraph", "i": "point", "m": "subpoint", "a": "article", "lead": "lead", "remarks": "remarks", "preamble": "preamble"}
 
 
 def read_note(path):
@@ -56,7 +56,7 @@ def read_note(path):
 
 def block_label(suffix):
     """Official citation of a block suffix, such as p1-i5-m1 for 제1항제5호가목."""
-    words = {"lead": "각 호 외의 부분", "remarks": "비고"}
+    words = {"lead": "각 호 외의 부분", "remarks": "비고", "preamble": "개정문"}
     if suffix in words:
         return " " + words[suffix]
     label = ""

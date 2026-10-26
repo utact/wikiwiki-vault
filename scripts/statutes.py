@@ -1115,8 +1115,12 @@ def render_notice(source, as_of):
             body += [f"## {iso(effective)} 시행 ({label})", "", f"{iso(info[effective]['발령일자'])} 발령 {issued}, 원문은 {link(note.stem)}이다.", ""]
             continue
         text = L.notice_text(response["AdmRulService"], L.note_attachments(note, response))
-        body += [f"## {iso(effective)} 시행 ({label})", "", f"{info[effective]['행정규칙명']}, {issued}", "",
-                 "```text", text.rstrip("\n"), "```", "", f"^v{effective}-t", ""]
+        preamble = L.notice_preamble(response["AdmRulService"])
+        body += [f"## {iso(effective)} 시행 ({label})", "", f"{info[effective]['행정규칙명']}, {issued}", ""]
+        if preamble:
+            body += ["```text", preamble.rstrip("\n"), "```", "", f"^v{effective}-preamble", ""]
+            blocks[f"v{effective}-preamble"] = L.sha256(L.version_text(preamble))
+        body += ["```text", text.rstrip("\n"), "```", "", f"^v{effective}-t", ""]
         blocks[f"v{effective}-t"] = L.sha256(L.version_text(text))
     name = info[current]["행정규칙명"]
     meta = {
@@ -1133,6 +1137,8 @@ def render_notice(source, as_of):
         text = f"{name}의 법령 노트다. 시행일 버전마다 원문 노트를 잇는다."
     else:
         text = f"{name}의 법령 노트다. 같은 행정규칙ID의 고시를 시행일 버전으로 두고, 본문은 원문의 조문내용과 고시 이름의 PDF 첨부파일에서 스크립트로 옮겼다."
+        if any(b.endswith("-preamble") for b in blocks):
+            text += " 개정문은 원문의 개정문에서 옮겼다."
     return WIKI / "LegalResource" / f"{name}.md", identifier, meta, "\n".join([text, "", *body]).rstrip() + "\n", blocks
 
 

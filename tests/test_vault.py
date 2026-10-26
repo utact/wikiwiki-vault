@@ -90,3 +90,8 @@ def test_public_organisations_count_as_organizations():
     organisations = set(graph.subjects(vault.RDF.type, vault.M8G.PublicOrganisation))
     assert organisations
     assert all((o, vault.RDF.type, vault.ORG.Organization) in graph for o in organisations)
+
+
+def test_a_preamble_block_is_cited_as_the_개정문():
+    assert vault.block_label("preamble") == " 개정문"
+    assert vault.BLOCK_TYPES["preamble"] == "preamble"

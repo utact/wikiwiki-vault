@@ -137,6 +137,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - Law: `law-<법령ID>`, and for a series of 고시 under one 행정규칙ID: `admrul-<행정규칙ID>`
   - Units: the law's identifier followed by `-art-40`, `-art-10-2`, `-ch-4`, `-ch-5-2`, `-ch-4-sec-2`, `-part-1-ch-6` for a 장 of a 편, `-annex-1-2`, `-form-6` or `-sup-<공포일자>-<공포번호>`
 - Write a series of 고시 such as the 적용 최저임금 고시 as one `LegalResource` named after the current 고시, with each year's 고시 as a version and its text as the block `^v20260101-t`.
+  - When the response carries the 개정문 of a 고시, give it the block `^v20221229-preamble`, because it names the provisions the 고시 rests on, as 고용보험법 제2조제5호 단서 for 고시 제2022-116호.
 - Write a 행정규칙 that 법제처 gives as a list of articles, such as a 훈령 or 예규, as a `LegalResource` that links its versions, with notes for the articles that wiki notes cite and the 장 that hold them.
   - Units: `admrul-<행정규칙ID>-art-12` and `admrul-<행정규칙ID>-ch-2`, named as in `실업인정 및 재취업지원규정 제12조`
   - 법제처 gives each article as one string, so each version of a unit is one block, `^v20260901-t`. A citation names its 항 and 호 in the label.
@@ -164,6 +165,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
   - 가지 호 such as 제3호의2: `^v20260918-i3-2`
   - 목: `^v20260918-p1-i5-m1`, where 가 is 1 and 나 is 2
   - 비고 of a 별표: `^v20260918-remarks`
+  - 개정문 of a 고시: `^v20221229-preamble`
   - Articles of a 부칙 and their parts: `^v20260317-a3`, `^v20260317-a3-p1`, where `a3` holds only the heading when the article has 항
   - 별지 서식: only the whole text, `^v20260918-t`, with its parts cited by quotation
 - The text of a block includes the text of its children, such as the 호 of a 항, for quotes, numbers and hashes.
@@ -317,6 +319,7 @@ Scripts check quotes, numbers and hashes against texts derived from the canonica
   - 별표 and 별지 서식: 별표내용
   - 부칙: 부칙내용
   - 고시: 조문내용, then the text extracted from the PDF attachment named after the 고시, because some years keep the text only there
+  - 개정문 of a 고시: 개정문내용
   - 고용24 guide: the text of the body area, section by section as its table of contents lists them
 - Keep amendment tags such as `<개정 2019.1.15>`.
 - Read the text in cell order before any comparison.
