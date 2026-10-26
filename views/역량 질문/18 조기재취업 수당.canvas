@@ -34,7 +34,27 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/이직일 당시 65세 이상인 사람 여부.md",
 			"x": 1680,
-			"y": 2800,
+			"y": 3640,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
+			"id": "935fd1011a13592c",
+			"type": "file",
+			"file": "wiki/Criterion/12개월 이상 계속하여 사업을 영위함.md",
+			"x": 1680,
+			"y": 560,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "d7bc5dffd627c42e",
+			"type": "file",
+			"file": "wiki/InformationConcept/12개월 이상 계속 사업 영위 여부.md",
+			"x": 2240,
+			"y": 0,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -44,7 +64,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/자영업 준비활동 신고로 실업의 인정을 받음.md",
 			"x": 1680,
-			"y": 1680,
+			"y": 2520,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -54,7 +74,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/자영업 준비활동 신고에 따른 실업의 인정 여부.md",
 			"x": 2240,
-			"y": 3080,
+			"y": 3920,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -64,7 +84,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/이직 당시 건설일용근로자 여부.md",
 			"x": 2800,
-			"y": 1120,
+			"y": 1400,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -184,7 +204,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/재취업한 날 이전 2년 안의 조기재취업 수당 수급 여부.md",
 			"x": 1680,
-			"y": 2240,
+			"y": 3080,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -194,7 +214,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/조기재취업의 구분.md",
 			"x": 2800,
-			"y": 840,
+			"y": 0,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -214,7 +234,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/계속하여 고용된 경우에 해당.md",
 			"x": 2240,
-			"y": 840,
+			"y": 1120,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -234,7 +254,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/계속하여 사업을 영위한 경우에 해당.md",
 			"x": 2240,
-			"y": 3360,
+			"y": 1680,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -244,7 +264,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/조기재취업 수당 지급기준의 각 호에 해당.md",
 			"x": 1680,
-			"y": 560,
+			"y": 840,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -254,7 +274,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/2025-07-01 전 조기재취업 수당 청구.md",
 			"x": 2240,
-			"y": 3640,
+			"y": 4200,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -264,7 +284,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/조기재취업 수당청구서 제출일.md",
 			"x": 2800,
-			"y": 1400,
+			"y": 840,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -304,7 +324,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/조기재취업 수당 지급 제외 사유.md",
 			"x": 2240,
-			"y": 1120,
+			"y": 1400,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -364,7 +384,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/수급자격 인정신청일.md",
 			"x": 2800,
-			"y": 0,
+			"y": 560,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -380,11 +400,21 @@
 			"color": "#1c7ed6"
 		},
 		{
+			"id": "18910af672c29053",
+			"type": "file",
+			"file": "wiki/Criterion/2014-01-01 이후 2025-07-01 전 수급자격 인정 신청.md",
+			"x": 2240,
+			"y": 4480,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
 			"id": "5a2700bbc4f1d234",
 			"type": "file",
 			"file": "wiki/Criterion/2024-01-01 이후 2025-07-01 전 수급자격 인정 신청.md",
 			"x": 2240,
-			"y": 2800,
+			"y": 2520,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -400,11 +430,31 @@
 			"color": "#1c7ed6"
 		},
 		{
+			"id": "1a883ae1f55bd3db",
+			"type": "file",
+			"file": "wiki/Criterion/12개월 이상 계속하여 고용됨.md",
+			"x": 1680,
+			"y": 1120,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
+			"id": "2916f6c61b52a6fe",
+			"type": "file",
+			"file": "wiki/InformationConcept/12개월 이상 계속 고용 여부.md",
+			"x": 2240,
+			"y": 280,
+			"width": 400,
+			"height": 240,
+			"color": "#37b24d"
+		},
+		{
 			"id": "bbec83cc0ca9b049",
 			"type": "file",
 			"file": "wiki/InformationConcept/외국인 근로자 여부.md",
 			"x": 1680,
-			"y": 2520,
+			"y": 3360,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -414,7 +464,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/실업의 신고일부터 14일이 되는 날.md",
 			"x": 2240,
-			"y": 0,
+			"y": 1960,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -424,7 +474,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/소득감소로 인한 이직 인정 여부.md",
 			"x": 2800,
-			"y": 560,
+			"y": 1120,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -450,11 +500,21 @@
 			"color": "#1c7ed6"
 		},
 		{
+			"id": "80717083d6990512",
+			"type": "file",
+			"file": "wiki/Criterion/2014-01-01 시행 조기재취업 수당 지급기준에서 제외되는 경우에 해당하지 않음.md",
+			"x": 1680,
+			"y": 1400,
+			"width": 400,
+			"height": 240,
+			"color": "#1c7ed6"
+		},
+		{
 			"id": "3ae32e0d377dfb3a",
 			"type": "file",
 			"file": "wiki/Criterion/2024-01-01 시행 조기재취업 수당 지급기준에서 제외되는 경우에 해당하지 않음.md",
 			"x": 1680,
-			"y": 1960,
+			"y": 2800,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -464,7 +524,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/소득감소로 인한 이직으로 인정되지 않음.md",
 			"x": 2240,
-			"y": 1400,
+			"y": 2800,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -484,7 +544,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/이직 당시 건설일용근로자가 아님.md",
 			"x": 2240,
-			"y": 1680,
+			"y": 3080,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -504,7 +564,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/소정급여일수.md",
 			"x": 2240,
-			"y": 2520,
+			"y": 3640,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -514,7 +574,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/실업의 신고일부터 14일이 지난 후 재취업.md",
 			"x": 1680,
-			"y": 840,
+			"y": 1680,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -524,7 +584,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/대기기간이 지난 후 재취업.md",
 			"x": 1680,
-			"y": 1120,
+			"y": 1960,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -544,7 +604,7 @@
 			"type": "file",
 			"file": "wiki/Criterion/소정급여일수를 2분의 1 이상 남기고 재취업.md",
 			"x": 1680,
-			"y": 1400,
+			"y": 2240,
 			"width": 400,
 			"height": 240,
 			"color": "#1c7ed6"
@@ -554,7 +614,7 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/실업의 신고일.md",
 			"x": 2240,
-			"y": 1960,
+			"y": 3360,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
@@ -564,28 +624,17 @@
 			"type": "file",
 			"file": "wiki/InformationConcept/미지급일수.md",
 			"x": 2240,
-			"y": 280,
+			"y": 840,
 			"width": 400,
 			"height": 240,
 			"color": "#37b24d"
-		},
-		{
-			"id": "20b8ef3f80844045",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제19210호.md",
-			"x": 3920,
-			"y": 0,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20221231-a5"
 		},
 		{
 			"id": "10ac8c4ffff004ec",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제86조.md",
 			"x": 3920,
-			"y": 280,
+			"y": 0,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -596,7 +645,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제37조.md",
 			"x": 3920,
-			"y": 560,
+			"y": 280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -607,51 +656,18 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제3조.md",
 			"x": 3920,
-			"y": 840,
+			"y": 560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20100705-t"
 		},
 		{
-			"id": "4f4e0b1cec9674f7",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제40조.md",
-			"x": 3920,
-			"y": 1120,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20251001-p1-i5-m1"
-		},
-		{
-			"id": "252b72f4e13b2b0a",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제42조.md",
-			"x": 3920,
-			"y": 1400,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20230701-p2"
-		},
-		{
-			"id": "0840c197878e2706",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
-			"x": 3920,
-			"y": 1680,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20200828-p1"
-		},
-		{
 			"id": "c5450a20f57e8ed5",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
 			"x": 3920,
-			"y": 1960,
+			"y": 840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -662,7 +678,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
 			"x": 3920,
-			"y": 2240,
+			"y": 1120,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -673,7 +689,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
 			"x": 3920,
-			"y": 2520,
+			"y": 1400,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -684,7 +700,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
 			"x": 3920,
-			"y": 2800,
+			"y": 1680,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -695,7 +711,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제46조.md",
 			"x": 3920,
-			"y": 3080,
+			"y": 1960,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -706,7 +722,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제61조.md",
 			"x": 3920,
-			"y": 3360,
+			"y": 2240,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -717,7 +733,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제62조.md",
 			"x": 3920,
-			"y": 3640,
+			"y": 2520,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -728,73 +744,18 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
 			"x": 3920,
-			"y": 3920,
+			"y": 2800,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20200526-p5"
 		},
 		{
-			"id": "809b6de6edb7eae9",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/민법 제159조.md",
-			"x": 3920,
-			"y": 4200,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v19600101-t"
-		},
-		{
-			"id": "cbe82facfa9dd931",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/민법 제161조.md",
-			"x": 3920,
-			"y": 4480,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20090809-t"
-		},
-		{
-			"id": "c710c266de76462a",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
-			"x": 3920,
-			"y": 4760,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20210323-p2"
-		},
-		{
-			"id": "a5580c75d80ebba1",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
-			"x": 3920,
-			"y": 5040,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20210323-p2-i1"
-		},
-		{
-			"id": "78794929fb375cab",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
-			"x": 3920,
-			"y": 5320,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20210323-p2-i2"
-		},
-		{
 			"id": "e479085690d8cfc1",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
 			"x": 3920,
-			"y": 5600,
+			"y": 3080,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -805,7 +766,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
 			"x": 3920,
-			"y": 5880,
+			"y": 3360,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -816,29 +777,18 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
 			"x": 3920,
-			"y": 6160,
+			"y": 3640,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20250701-p2"
 		},
 		{
-			"id": "7c92b3eb6d5b9b36",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제85조.md",
-			"x": 3920,
-			"y": 6440,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20140101-p1"
-		},
-		{
 			"id": "6fa84fb89f7f671e",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험지급사무규정 제6조.md",
 			"x": 3920,
-			"y": 6720,
+			"y": 3920,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -849,29 +799,40 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/국고금 관리법 제47조.md",
 			"x": 3920,
-			"y": 7000,
+			"y": 4200,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20111005-p1"
 		},
 		{
-			"id": "1a5aa7ecf585f6bf",
+			"id": "7c92b3eb6d5b9b36",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제85조.md",
 			"x": 3920,
-			"y": 7280,
+			"y": 4480,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20200526-p3"
+			"subpath": "#^v20140101-p1"
+		},
+		{
+			"id": "20b8ef3f80844045",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 부칙 제19210호.md",
+			"x": 3920,
+			"y": 4760,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20221231-a5"
 		},
 		{
 			"id": "9bb970f7b5b49bb3",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 별지 제97호서식.md",
 			"x": 3920,
-			"y": 7560,
+			"y": 5040,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -882,7 +843,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
 			"x": 3920,
-			"y": 7840,
+			"y": 5320,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -893,7 +854,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
 			"x": 3920,
-			"y": 8120,
+			"y": 5600,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -904,7 +865,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
 			"x": 3920,
-			"y": 8400,
+			"y": 5880,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -915,7 +876,7 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
 			"x": 3920,
-			"y": 8680,
+			"y": 6160,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -926,29 +887,51 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
-			"y": 8960,
+			"y": 6440,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20250701-p1-i1-m1"
 		},
 		{
-			"id": "35d0e964ab6690d2",
+			"id": "4f4e0b1cec9674f7",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조의2.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제40조.md",
 			"x": 3920,
-			"y": 9240,
+			"y": 6720,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20230701-p1"
+			"subpath": "#^v20251001-p1-i5-m1"
+		},
+		{
+			"id": "252b72f4e13b2b0a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제42조.md",
+			"x": 3920,
+			"y": 7000,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p2"
+		},
+		{
+			"id": "0840c197878e2706",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조.md",
+			"x": 3920,
+			"y": 7280,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200828-p1"
 		},
 		{
 			"id": "dc82a3af018cd0ab",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 별지 제97호서식.md",
 			"x": 3920,
-			"y": 9520,
+			"y": 7560,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96"
@@ -958,14 +941,91 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
-			"y": 9800,
+			"y": 7840,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20250701-p1-i1-m2"
 		},
 		{
+			"id": "6ca114f60ce53cbe",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제108조.md",
+			"x": 3920,
+			"y": 8120,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-p1"
+		},
+		{
+			"id": "be1ceca1caf839bd",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"x": 3920,
+			"y": 8400,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-p1-i1-m3"
+		},
+		{
+			"id": "1a5aa7ecf585f6bf",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
+			"x": 3920,
+			"y": 8680,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20200526-p3"
+		},
+		{
+			"id": "1dd8579b8e14b1f7",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"x": 3920,
+			"y": 8960,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-p1-i2"
+		},
+		{
+			"id": "35af20f645df53a6",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"x": 3920,
+			"y": 9240,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-p1-i1-m4"
+		},
+		{
+			"id": "61b9f3d809b2208c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제86조.md",
+			"x": 3920,
+			"y": 9520,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20240101-p1"
+		},
+		{
 			"id": "780f3ea7361b1b41",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"x": 3920,
+			"y": 9800,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-p1"
+		},
+		{
+			"id": "52a89da6b8f65b43",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
@@ -973,32 +1033,32 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20250701-p1"
+			"subpath": "#^v20140101-p1-i1"
 		},
 		{
-			"id": "6ca114f60ce53cbe",
+			"id": "1d17f2c46bb59559",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제108조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
 			"y": 10360,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20250701-p1"
+			"subpath": "#^v20250701-p1-i1-m5"
 		},
 		{
-			"id": "458f410880892edc",
+			"id": "35d0e964ab6690d2",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조의2.md",
 			"x": 3920,
 			"y": 10640,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20140101-p1"
+			"subpath": "#^v20230701-p1"
 		},
 		{
-			"id": "52a89da6b8f65b43",
+			"id": "c53b2176d91bfe0d",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
@@ -1006,7 +1066,7 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20140101-p1-i1"
+			"subpath": "#^v20250701-p1-i1"
 		},
 		{
 			"id": "06cfbbc20104695e",
@@ -1020,15 +1080,15 @@
 			"subpath": "#^v20140101-p1-i2"
 		},
 		{
-			"id": "be1ceca1caf839bd",
+			"id": "5f3271f96d9d1025",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
 			"x": 3920,
 			"y": 11480,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20250701-p1-i1-m3"
+			"subpath": "#^v20200526-p1"
 		},
 		{
 			"id": "e87f1a540fbd3ad1",
@@ -1042,73 +1102,73 @@
 			"subpath": "#^v20240101-a3"
 		},
 		{
-			"id": "35af20f645df53a6",
+			"id": "a0eb8df68d1fcce2",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제40조.md",
 			"x": 3920,
 			"y": 12040,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20250701-p1-i1-m4"
+			"subpath": "#^v20251001-p1-i5-m2"
 		},
 		{
-			"id": "7354dd5600506d75",
+			"id": "f9b960e01cafe7d5",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조의2.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
 			"x": 3920,
 			"y": 12320,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20230701-p2"
+			"subpath": "#^v20200526-p2"
 		},
 		{
-			"id": "1b437d718e44ba7a",
+			"id": "d717838225d3da06",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/민법 제157조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제34048호.md",
 			"x": 3920,
 			"y": 12600,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v19600101-t"
+			"subpath": "#^v20240101-a1"
 		},
 		{
-			"id": "ec2b5f8321e0fd69",
+			"id": "1b1cb8f24cb5239d",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35575호.md",
 			"x": 3920,
 			"y": 12880,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20210323-p1"
+			"subpath": "#^v20250701-a3-p2"
 		},
 		{
-			"id": "61b9f3d809b2208c",
+			"id": "4ae61c063d838e66",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제86조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35575호.md",
 			"x": 3920,
 			"y": 13160,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20240101-p1"
+			"subpath": "#^v20250701-a3-p1"
 		},
 		{
-			"id": "0eb532c2b21a000c",
+			"id": "5ab0b43eae538a7d",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
+			"file": "wiki/LegalResource/조기재취업 수당 지급제외 대상에 해당하는 임금액 고시.md",
 			"x": 3920,
 			"y": 13440,
 			"width": 440,
 			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20230701-p2"
+			"color": "#495057",
+			"subpath": "#^v20250101-t"
 		},
 		{
-			"id": "c53b2176d91bfe0d",
+			"id": "94d082d0fd6f9df2",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
@@ -1116,190 +1176,14 @@
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
-			"subpath": "#^v20250701-p1-i1"
-		},
-		{
-			"id": "1d17f2c46bb59559",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
-			"x": 3920,
-			"y": 14000,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20250701-p1-i1-m5"
-		},
-		{
-			"id": "a0eb8df68d1fcce2",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제40조.md",
-			"x": 3920,
-			"y": 14280,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20251001-p1-i5-m2"
-		},
-		{
-			"id": "30bee2146c316749",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
-			"x": 3920,
-			"y": 14560,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20190716-t"
-		},
-		{
-			"id": "4ae61c063d838e66",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35575호.md",
-			"x": 3920,
-			"y": 14840,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20250701-a3-p1"
-		},
-		{
-			"id": "1dd8579b8e14b1f7",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
-			"x": 3920,
-			"y": 15120,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20250701-p1-i2"
-		},
-		{
-			"id": "7f8f5fd492cad7e7",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
-			"x": 3920,
-			"y": 15400,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20230701-p1"
-		},
-		{
-			"id": "5f3271f96d9d1025",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
-			"x": 3920,
-			"y": 15680,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20200526-p1"
-		},
-		{
-			"id": "f9b960e01cafe7d5",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제64조.md",
-			"x": 3920,
-			"y": 15960,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20200526-p2"
-		},
-		{
-			"id": "1b1cb8f24cb5239d",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35575호.md",
-			"x": 3920,
-			"y": 16240,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20250701-a3-p2"
-		},
-		{
-			"id": "94d082d0fd6f9df2",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
-			"x": 3920,
-			"y": 16520,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
 			"subpath": "#^v20250701-p2"
-		},
-		{
-			"id": "0b8b2e6ac79746ac",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
-			"x": 3920,
-			"y": 16800,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20240101-p1-i1"
-		},
-		{
-			"id": "266c5ae9f370c6e7",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35575호.md",
-			"x": 3920,
-			"y": 17080,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20250701-a1"
-		},
-		{
-			"id": "aa0253dff8ca4c43",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
-			"x": 3920,
-			"y": 17360,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20240101-p1-i2"
-		},
-		{
-			"id": "c88cdd8ac50da42c",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
-			"x": 3920,
-			"y": 17640,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20250701-p2-i2"
-		},
-		{
-			"id": "d717838225d3da06",
-			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제34048호.md",
-			"x": 3920,
-			"y": 17920,
-			"width": 440,
-			"height": 240,
-			"color": "#868e96",
-			"subpath": "#^v20240101-a1"
-		},
-		{
-			"id": "5ab0b43eae538a7d",
-			"type": "file",
-			"file": "wiki/LegalResource/조기재취업 수당 지급제외 대상에 해당하는 임금액 고시.md",
-			"x": 3920,
-			"y": 18200,
-			"width": 440,
-			"height": 240,
-			"color": "#495057",
-			"subpath": "#^v20250101-t"
 		},
 		{
 			"id": "e6f7480431fa6b38",
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제86조.md",
 			"x": 3920,
-			"y": 18480,
+			"y": 14000,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1310,18 +1194,183 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
-			"y": 18760,
+			"y": 14280,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20240101-p1"
 		},
 		{
-			"id": "a337115f56bd27f5",
+			"id": "458f410880892edc",
 			"type": "file",
-			"file": "wiki/LegalResourceSubdivision/고용보험법 제42조.md",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
 			"x": 3920,
-			"y": 19040,
+			"y": 14560,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20140101-p1"
+		},
+		{
+			"id": "0b8b2e6ac79746ac",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"x": 3920,
+			"y": 14840,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20240101-p1-i1"
+		},
+		{
+			"id": "7354dd5600506d75",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제43조의2.md",
+			"x": 3920,
+			"y": 15120,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p2"
+		},
+		{
+			"id": "30bee2146c316749",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
+			"x": 3920,
+			"y": 15400,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20190716-t"
+		},
+		{
+			"id": "0eb532c2b21a000c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
+			"x": 3920,
+			"y": 15680,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p2"
+		},
+		{
+			"id": "1b437d718e44ba7a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/민법 제157조.md",
+			"x": 3920,
+			"y": 15960,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v19600101-t"
+		},
+		{
+			"id": "809b6de6edb7eae9",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/민법 제159조.md",
+			"x": 3920,
+			"y": 16240,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v19600101-t"
+		},
+		{
+			"id": "cbe82facfa9dd931",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/민법 제161조.md",
+			"x": 3920,
+			"y": 16520,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20090809-t"
+		},
+		{
+			"id": "ec2b5f8321e0fd69",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
+			"x": 3920,
+			"y": 16800,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210323-p1"
+		},
+		{
+			"id": "c710c266de76462a",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
+			"x": 3920,
+			"y": 17080,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210323-p2"
+		},
+		{
+			"id": "a5580c75d80ebba1",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
+			"x": 3920,
+			"y": 17360,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210323-p2-i1"
+		},
+		{
+			"id": "78794929fb375cab",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/행정기본법 제6조.md",
+			"x": 3920,
+			"y": 17640,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20210323-p2-i2"
+		},
+		{
+			"id": "266c5ae9f370c6e7",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 부칙 제35575호.md",
+			"x": 3920,
+			"y": 17920,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-a1"
+		},
+		{
+			"id": "c88cdd8ac50da42c",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제109조.md",
+			"x": 3920,
+			"y": 18200,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20250701-p2-i2"
+		},
+		{
+			"id": "aa0253dff8ca4c43",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 시행령 제84조.md",
+			"x": 3920,
+			"y": 18480,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20240101-p1-i2"
+		},
+		{
+			"id": "7f8f5fd492cad7e7",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제49조.md",
+			"x": 3920,
+			"y": 18760,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
@@ -1332,11 +1381,22 @@
 			"type": "file",
 			"file": "wiki/LegalResourceSubdivision/고용보험법 시행규칙 제87조.md",
 			"x": 3920,
-			"y": 19320,
+			"y": 19040,
 			"width": 440,
 			"height": 240,
 			"color": "#868e96",
 			"subpath": "#^v20220218-p1-i8"
+		},
+		{
+			"id": "a337115f56bd27f5",
+			"type": "file",
+			"file": "wiki/LegalResourceSubdivision/고용보험법 제42조.md",
+			"x": 3920,
+			"y": 19320,
+			"width": 440,
+			"height": 240,
+			"color": "#868e96",
+			"subpath": "#^v20230701-p1"
 		},
 		{
 			"id": "526bd05eb5790c8a",
@@ -1441,6 +1501,30 @@
 			"label": "hasConcept"
 		},
 		{
+			"id": "6221d9097062a0f1",
+			"fromNode": "935fd1011a13592c",
+			"fromSide": "right",
+			"toNode": "5e462c9924678a54",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "8803f5a0ddfce56c",
+			"fromNode": "935fd1011a13592c",
+			"fromSide": "right",
+			"toNode": "6f16eecba9d96168",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "42fba21eb8caedea",
+			"fromNode": "935fd1011a13592c",
+			"fromSide": "right",
+			"toNode": "d7bc5dffd627c42e",
+			"toSide": "left",
+			"label": "hasConcept"
+		},
+		{
 			"id": "5e537f65527ca3cb",
 			"fromNode": "f778d8d5c0d1ff36",
 			"fromSide": "right",
@@ -1449,10 +1533,10 @@
 			"label": "appliesWhen"
 		},
 		{
-			"id": "d9ed650c23f20636",
+			"id": "283e246c35b49093",
 			"fromNode": "f778d8d5c0d1ff36",
 			"fromSide": "right",
-			"toNode": "5a2700bbc4f1d234",
+			"toNode": "18910af672c29053",
 			"toSide": "left",
 			"label": "appliesWhen"
 		},
@@ -1573,6 +1657,46 @@
 			"fromNode": "6b60695e61f7b2d9",
 			"fromSide": "right",
 			"toNode": "dd7c119448b38f7d",
+			"toSide": "left",
+			"label": "hasRequirement"
+		},
+		{
+			"id": "a0e9b9d11132abee",
+			"fromNode": "6b60695e61f7b2d9",
+			"fromSide": "right",
+			"toNode": "8d380ea304a7f8c0",
+			"toSide": "left",
+			"label": "hasRequirement"
+		},
+		{
+			"id": "a571d0a1161f6e87",
+			"fromNode": "6b60695e61f7b2d9",
+			"fromSide": "right",
+			"toNode": "1a883ae1f55bd3db",
+			"toSide": "left",
+			"label": "hasRequirement"
+		},
+		{
+			"id": "fd43c4eb11ed5964",
+			"fromNode": "6b60695e61f7b2d9",
+			"fromSide": "right",
+			"toNode": "80717083d6990512",
+			"toSide": "left",
+			"label": "hasRequirement"
+		},
+		{
+			"id": "f7559104939a8d90",
+			"fromNode": "6b60695e61f7b2d9",
+			"fromSide": "right",
+			"toNode": "935fd1011a13592c",
+			"toSide": "left",
+			"label": "hasRequirement"
+		},
+		{
+			"id": "cc37e6b34b8bb77b",
+			"fromNode": "6b60695e61f7b2d9",
+			"fromSide": "right",
+			"toNode": "f778d8d5c0d1ff36",
 			"toSide": "left",
 			"label": "hasRequirement"
 		},
@@ -1825,6 +1949,14 @@
 			"label": "hasConcept"
 		},
 		{
+			"id": "c4c5390ee96126ba",
+			"fromNode": "18910af672c29053",
+			"fromSide": "right",
+			"toNode": "0785063b2bcf0a78",
+			"toSide": "left",
+			"label": "hasConcept"
+		},
+		{
 			"id": "4bda4304d559d17e",
 			"fromNode": "5a2700bbc4f1d234",
 			"fromSide": "right",
@@ -1837,6 +1969,30 @@
 			"fromNode": "39a0bc8d1288f970",
 			"fromSide": "right",
 			"toNode": "0785063b2bcf0a78",
+			"toSide": "left",
+			"label": "hasConcept"
+		},
+		{
+			"id": "605bff20549cfb1c",
+			"fromNode": "1a883ae1f55bd3db",
+			"fromSide": "right",
+			"toNode": "f67231b1789bdcc0",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "e597bbfa25105cbc",
+			"fromNode": "1a883ae1f55bd3db",
+			"fromSide": "right",
+			"toNode": "6f16eecba9d96168",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "e1e0648371d5baf6",
+			"fromNode": "1a883ae1f55bd3db",
+			"fromSide": "right",
+			"toNode": "2916f6c61b52a6fe",
 			"toSide": "left",
 			"label": "hasConcept"
 		},
@@ -1859,6 +2015,30 @@
 		{
 			"id": "7ce37c64cf0f8525",
 			"fromNode": "f6410d2f1b19f890",
+			"fromSide": "right",
+			"toNode": "a1754f698f1d8d81",
+			"toSide": "left",
+			"label": "hasConcept"
+		},
+		{
+			"id": "e5baa9886a861718",
+			"fromNode": "80717083d6990512",
+			"fromSide": "right",
+			"toNode": "f67231b1789bdcc0",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "d2a5066ea5b9a2fb",
+			"fromNode": "80717083d6990512",
+			"fromSide": "right",
+			"toNode": "6f16eecba9d96168",
+			"toSide": "left",
+			"label": "appliesWhen"
+		},
+		{
+			"id": "196d33cd82d7654e",
+			"fromNode": "80717083d6990512",
 			"fromSide": "right",
 			"toNode": "a1754f698f1d8d81",
 			"toSide": "left",
@@ -2175,6 +2355,42 @@
 			"fromNode": "4885469e923025e0",
 			"fromSide": "right",
 			"toNode": "c88cdd8ac50da42c",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "1f457c0783f1a45a",
+			"fromNode": "935fd1011a13592c",
+			"fromSide": "right",
+			"toNode": "06cfbbc20104695e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "82c953832958b06c",
+			"fromNode": "935fd1011a13592c",
+			"fromSide": "right",
+			"toNode": "1dd8579b8e14b1f7",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "85395a46f39086ec",
+			"fromNode": "d7bc5dffd627c42e",
+			"fromSide": "right",
+			"toNode": "1dd8579b8e14b1f7",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "0a867ddb806ced70",
+			"fromNode": "f778d8d5c0d1ff36",
+			"fromSide": "right",
+			"toNode": "06cfbbc20104695e",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -3314,6 +3530,42 @@
 			"color": "#868e96"
 		},
 		{
+			"id": "f05aa19a6cb02ebf",
+			"fromNode": "18910af672c29053",
+			"fromSide": "right",
+			"toNode": "e87f1a540fbd3ad1",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "02a78962aa6d56c7",
+			"fromNode": "18910af672c29053",
+			"fromSide": "right",
+			"toNode": "266c5ae9f370c6e7",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ad85ee7d1aabfb51",
+			"fromNode": "18910af672c29053",
+			"fromSide": "right",
+			"toNode": "4ae61c063d838e66",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "2610d625e4fc5f5b",
+			"fromNode": "18910af672c29053",
+			"fromSide": "right",
+			"toNode": "458f410880892edc",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
 			"id": "37cbd71af14a58d3",
 			"fromNode": "5a2700bbc4f1d234",
 			"fromSide": "right",
@@ -3408,6 +3660,33 @@
 			"fromNode": "39a0bc8d1288f970",
 			"fromSide": "right",
 			"toNode": "e87f1a540fbd3ad1",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "27ab2f22aba9014d",
+			"fromNode": "1a883ae1f55bd3db",
+			"fromSide": "right",
+			"toNode": "52a89da6b8f65b43",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "c557bc15c71c5855",
+			"fromNode": "1a883ae1f55bd3db",
+			"fromSide": "right",
+			"toNode": "c53b2176d91bfe0d",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "a90ff8fe6cf52bb1",
+			"fromNode": "2916f6c61b52a6fe",
+			"fromSide": "right",
+			"toNode": "c53b2176d91bfe0d",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
@@ -3561,6 +3840,33 @@
 			"fromNode": "f6410d2f1b19f890",
 			"fromSide": "right",
 			"toNode": "1dd8579b8e14b1f7",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "5651221917b71147",
+			"fromNode": "80717083d6990512",
+			"fromSide": "right",
+			"toNode": "52a89da6b8f65b43",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "ace59989cbd4697b",
+			"fromNode": "80717083d6990512",
+			"fromSide": "right",
+			"toNode": "06cfbbc20104695e",
+			"toSide": "left",
+			"label": "source",
+			"color": "#868e96"
+		},
+		{
+			"id": "a2e71149d1d546e9",
+			"fromNode": "80717083d6990512",
+			"fromSide": "right",
+			"toNode": "c53b2176d91bfe0d",
 			"toSide": "left",
 			"label": "source",
 			"color": "#868e96"
