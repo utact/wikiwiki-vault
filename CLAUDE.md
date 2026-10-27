@@ -24,7 +24,7 @@ The vault has three layers: raw sources that are never edited, the wiki that the
 | `scripts/` | — | Collection, generation and validation scripts |
 | `tests/` | — | Fixture notes and tests for the scripts |
 | `.cache/` | — | Local cache of uncited raw versions, ignored by Git |
-| `docs/` | — | Human-facing documents such as the roadmap |
+| `docs/` | — | Human-facing documents such as the roadmap and the decision record |
 | `index.md` | — | Notes by class |
 | `log.md` | — | Operation log |
 | `TODO.md` | — | Current and next tasks of the human owner and the agent |
@@ -266,6 +266,7 @@ decisionTable:
   - Items of a 별표 or 서식: link the block, and name the item in the label, as in `고용보험법 시행령 별표 2 제1호나목`
   - 항 and 호 of a 행정규칙 article: link the block, and name them in the label, as in `실업인정 및 재취업지원규정 제12조제2항제1호`
   - 법령해석례 and 고용24 guides: a quotation block of the raw note, labelled with the name of the source, as in `[^2]: [[법령해석례 26-0321 20261019T2045#^q1|법제처 법령해석례 26-0321]]`
+  - Decisions of the human owner: a block of `docs/decisions.md`, next to the blocks the reading rests on, as described in Decisions
   - A footnote to a whole raw note rests only on its frontmatter and the basic information of its response, such as 시행일자 and 공포번호.
 - Quote statutory text verbatim inside “ ” (U+201C and U+201D), followed directly by its footnote.
   - Statute text itself uses ASCII double quotes, as in `[이하 "기초일액(基礎日額)"이라 한다]`.
@@ -480,6 +481,21 @@ Lint compares each number with the cited blocks, not the claim it makes. A sente
   - A numbered step names its service by `identifier`, as in "서비스는 `job-application`(구직신청)이다", and its 선행 조건 by step number, as in "선행 조건은 3단계 구직 등록이다".
   - The service of a step must `requires` the service of each step that is its 선행 조건.
   - Every competency question a step lists must have a query and pass.
+
+### Decisions
+
+The human owner decides the readings that no source settles, through the Human tasks in `TODO.md`.
+
+- Record each answer in `docs/decisions.md` before changing a note.
+  - Give each decision a heading `## <date> <task ID>`, with the items 질문, 판단, 보류 and 반영.
+  - Quote the owner's words verbatim inside “ ” in 판단, one line per point, each ending in a block ID such as `^deadline-reading-1`.
+  - Never edit a recorded decision. Record a change as a new decision that names the block it replaces.
+- In each note, replace an answered question with the reading.
+  - Start the sentence with 이 노트는, footnote it with the blocks it reads, and add a footnote to the decision labelled `판단 기록 <task ID>`, as in `[^4]: [[decisions#^deadline-reading-1|판단 기록 deadline-reading]]`.
+  - Keep decisions out of `source`. A decision settles how the cited blocks are read and is not a source of facts, so a sentence that cites only a decision has no source.
+  - Keep a question that the owner leaves open, and list it under 보류.
+- Return each changed note to `draft` and verify it. `scripts/verify.py context` prints the decision record, and the verifier checks that each reading says what the decision says.
+- Log the operation as `review`.
 
 ### Views
 

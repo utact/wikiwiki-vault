@@ -4,7 +4,7 @@ Usage:
     uv run python -X utf8 scripts/verify.py context NOTE...
     uv run python -X utf8 scripts/verify.py record --model MODEL --effort EFFORT --session ID NOTE...
 
-NOTE is a note name. context prints what the verifier reads: each note, the text of every statute block its links cite, the raw notes it links, and the wiki notes that link to or from it.
+NOTE is a note name. context prints what the verifier reads: each note, the text of every statute block its links cite, the raw notes and the decision record it links, and the wiki notes that link to or from it.
 record appends a ledger line for each draft note and sets its status to verified. The line holds the hash of the note without status, reviewedBy and lastReviewed, the ledger hash of every statute block the note links, and the verifier's model, effort and session.
 """
 
@@ -61,7 +61,7 @@ def context(linter, names):
         blocks.update(dict.fromkeys(cited))
         for target in dict.fromkeys(n for n, _ in links(note)):
             other = linter.notes.get(target)
-            if other and other.folder == "raw":
+            if other and other.folder in ("raw", "docs"):
                 raw[target] = other
             elif other and other.folder == "wiki" and not other.statute and target not in names:
                 linked.add(target)
@@ -72,7 +72,7 @@ def context(linter, names):
             text = linter.notes[target].blocks.get(block)
             out += [f"## Cited block {target}#^{block}", ""] + fenced(text[0] if text else "(the note declares no such block)", "text")
     if raw:
-        out += ["# Linked raw notes", ""]
+        out += ["# Linked raw notes and decision record", ""]
         for target, other in raw.items():
             out += [f"## {target}", ""] + fenced(other.text, "markdown")
     if linked:

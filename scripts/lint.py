@@ -25,6 +25,7 @@ import lawlib as L
 import vault as V
 
 STATUTE_TYPES = ("LegalResource", "LegalResourceSubdivision")
+DECISIONS = Path("docs") / "decisions.md"
 LINK = re.compile(r"(!?)\[\[([^\]|#]+)(?:#\^([a-z0-9-]+))?(?:\|([^\]]*))?\]\]")
 ANY_LINK = re.compile(r"(!?)\[\[([^\]|#]+)(#[^\]|]*)?(?:\|([^\]]*))?\]\]")
 FOOTNOTE_DEF = re.compile(r"^\[\^([^\]]+)\]:\s*(.*)$")
@@ -83,7 +84,7 @@ class Note:
         self.path, self.folder, self.stem = path, folder, path.stem
         self.where = path.relative_to(root).as_posix()
         self.text = path.read_text(encoding="utf-8")
-        self.meta, self.body = V.read_note(path)
+        self.meta, self.body = ({}, self.text) if folder == "docs" else V.read_note(path)
         self.type = self.meta.get("type")
         self.statute = self.type in STATUTE_TYPES
         self.blocks = block_texts(self.body)
@@ -158,6 +159,9 @@ class Linter:
                 if note.stem in self.notes:
                     self.problem(note, f"duplicate note name {note.stem}")
                 self.notes[note.stem] = note
+        decisions = self.root / DECISIONS
+        if decisions.exists():
+            self.notes[decisions.stem] = Note(decisions, "docs", self.root)
         self.files = {p.name for folder in ("wiki", "raw") for p in (self.root / folder).rglob("*") if p.is_file()}
         self.terms = sorted((n.stem for n in self.notes.values() if n.folder == "wiki" and not n.statute and re.search(r"\d", n.stem)),
                             key=len, reverse=True)
@@ -219,7 +223,7 @@ class Linter:
                     self.problem(note, f"undeclared block: [[{name}{anchor}]]")
                 elif anchor and block is None and anchor[1:].strip() not in target.headings:
                     self.problem(note, f"link to a heading the note lacks: [[{name}{anchor}]]")
-                if target.stem != note.stem:
+                if target.stem != note.stem and note.folder != "docs":
                     incoming[target.stem] += 1
                     if target.folder == "wiki" and not target.statute:
                         outgoing[note.stem] += 1
@@ -254,7 +258,7 @@ class Linter:
         found = []
         for embed, name, block, _ in links:
             target = self.notes.get(name.strip())
-            if target is None or embed:
+            if target is None or embed or target.folder == "docs":
                 continue
             if block and block in target.blocks:
                 parts = [target.blocks[b] for b in target.blocks if b == block or b.startswith(block + "-")]
@@ -310,7 +314,7 @@ class Linter:
             for links, *_ in self.footnotes(note).values():
                 for embed, name, block, _ in links:
                     target = self.notes.get(name.strip())
-                    if target is not None and target.type != "Rule":
+                    if target is not None and target.type != "Rule" and target.folder != "docs":
                         footnote_links.add((target.stem, block))
             for stem, block in sorted(footnote_links - source_links):
                 self.problem(note, f"footnote source missing from source: [[{stem}{'#^' + block if block else ''}]]")
@@ -797,6 +801,8 @@ class Linter:
     def check_duplicates(self):
         seen, names = {}, {stem.casefold() for stem in self.notes}
         for note in self.notes.values():
+            if note.folder == "docs":
+                continue
             identifier = note.meta.get("identifier")
             if identifier in seen:
                 self.problem(note, f"identifier {identifier} also in {seen[identifier]}")

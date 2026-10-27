@@ -387,3 +387,35 @@ def test_criterion_on_a_date_may_cite_versions_in_its_dates(tmp_path, test, prob
     found = run(tmp_path, ("wiki/Criterion/시험 조건.md", None, CRITERION.replace("TEST", test)))
     versions = [p for p in found if "시험 조건" in p and "version" in p]
     assert versions == [] if problem is None else any(problem in p for p in versions), versions
+
+
+DECISION = """# 판단 기록
+
+## 2026-10-27 deadline-reading
+
+- 판단: “사유가 발생한 날을 퇴직일로 본다.” ^deadline-reading-1
+"""
+DEADLINE_SENTENCE = "다음 달 15일까지 신고해야 한다.[^1]"
+DEADLINE_FOOTNOTE = "[^1]: [[고용보험법 시행령 제7조#^v20210701-p1|고용보험법 시행령 제7조제1항]]"
+
+
+def test_decision_footnote_needs_no_source(tmp_path):
+    """A footnote may add a decision of the owner to a statute block, and the decision stays out of source."""
+    problems = run(tmp_path, ("docs/decisions.md", None, DECISION),
+                   (DEADLINE, DEADLINE_SENTENCE, "다음 달 15일까지 신고해야 한다.[^1][^2]"),
+                   (DEADLINE, DEADLINE_FOOTNOTE, DEADLINE_FOOTNOTE + "\n[^2]: [[decisions#^deadline-reading-1|판단 기록 deadline-reading]]"))
+    assert problems == []
+
+
+def test_decision_alone_is_no_source(tmp_path):
+    problems = run(tmp_path, ("docs/decisions.md", None, DECISION),
+                   (DEADLINE, DEADLINE_SENTENCE, "다음 달 15일까지 신고해야 한다.[^1] 이 노트는 그날을 퇴직일로 본다.[^2]"),
+                   (DEADLINE, DEADLINE_FOOTNOTE, DEADLINE_FOOTNOTE + "\n[^2]: [[decisions#^deadline-reading-1|판단 기록 deadline-reading]]"))
+    assert any("sentence without a source: its footnotes cite no statute block" in p for p in problems)
+
+
+def test_undeclared_decision_block_is_reported(tmp_path):
+    problems = run(tmp_path, ("docs/decisions.md", None, DECISION),
+                   (DEADLINE, DEADLINE_SENTENCE, "다음 달 15일까지 신고해야 한다.[^1][^2]"),
+                   (DEADLINE, DEADLINE_FOOTNOTE, DEADLINE_FOOTNOTE + "\n[^2]: [[decisions#^deadline-reading-2|판단 기록 deadline-reading]]"))
+    assert any("undeclared block: [[decisions#^deadline-reading-2]]" in p for p in problems)

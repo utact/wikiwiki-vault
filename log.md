@@ -1189,3 +1189,14 @@
     - [[대기기간이 지난 후 재취업]]의 첫 문장을 노트의 해석으로 적는 표현
   - [[2019-07-16 이후 실업의 신고]]는 고용보험법 제49조의 종전 버전을 인용하면 없앨 수 있어 Agent 할 일로 남겼다.
   - 고친 노트와 새 노트 8개는 `draft`이고 판단 반영 노트와 함께 검증한다.
+
+## 2026-10-27 09:40 schema
+
+- 대상: 사용자 판단의 기록
+- 추가: `docs/decisions.md`
+- 수정: `CLAUDE.md`, `scripts/lint.py`, `scripts/verify.py`, `tests/test_lint.py`
+- 내용:
+  - 출처로 풀리지 않는 질문에 대한 사용자의 판단을 `docs/decisions.md`에 기록하고, 노트는 해석 문장에 읽은 법령 block과 판단 block을 함께 각주로 단다.
+  - 판단 block은 `source`에 넣지 않는다. 판단만 각주로 단 문장은 출처가 없는 문장으로 lint가 보고한다.
+  - lint는 `docs/decisions.md`의 block을 링크 대상으로 읽고, `verify.py context`는 노트가 링크한 판단 기록을 검증 agent에게 보인다.
+  - 판단을 반영하는 작업은 `review`로 기록한다.
