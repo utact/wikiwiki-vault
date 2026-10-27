@@ -468,6 +468,16 @@ Lint checks the wiki for these problems with `uv run python -X utf8 scripts/lint
 
 Lint compares each number with the cited blocks, not the claim it makes. A sentence that puts two numbers of a block together wrongly passes, and so does `duration("P15D")` for "다음 달 15일까지", whose 15일 is in the block. The verifier agent compares the meaning.
 
+### Coverage
+
+`uv run python -X utf8 scripts/coverage.py` counts the articles in scope that wiki notes cite, by law and 장, and lists the others.
+
+- The scope is `coverage` in `scripts/sources.yaml`: the 장 and articles of each law, and the articles left out with a reason.
+  - It also takes in every article of a lower law that receives a delegation from an article in scope, by the 위임조문 data.
+  - Deleted articles do not count.
+- An article is covered when a note other than a statute note links to it or to one of its blocks.
+- Leave out only an article that governs a matter other than 이직 and 실업급여, such as 출산전후급여 or the organization of 고용보험심사위원회.
+
 ### Competency questions
 
 `docs/competency-questions.md` lists the questions the ontology must answer, with expected answers that cite the provisions they rest on.
