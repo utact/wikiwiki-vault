@@ -59,6 +59,14 @@ admrul:
     id: "22131"
   - query: 고용보험료 산정범위에 속하는 금품
     id: "22253"
+  - query: 직업능력개발수당 고시
+    id: "22214"
+  - query: 광역구직활동비 중 숙박료 고시
+    id: "22207"
+  - query: 이주비 고시
+    id: "22212"
+  - query: 직업능력개발 훈련 거부 등에 따른 구직급여 지급 정지기간 고시
+    id: "22215"
 work24:
   - name: 실업급여(상용직)
     url: https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000254&systCnntId=&systId=SI00000411
