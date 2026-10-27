@@ -386,7 +386,10 @@ Notes written by the LLM move through three statuses in order.
    - Log the reason in `log.md`.
 2. `verified`: checked by a separate agent
    - The verifier did not write the note and works in a fresh context.
-   - Run it as a subagent with model `opus` and effort `xhigh`.
+   - Run it as a subagent with model `opus`.
+     - Use effort `xhigh` for the first verification of a note and after any change to what it states: a reading, a condition, a scope, a number, a date or an expression.
+     - Use effort `high` after a change that states nothing new, such as a typo, a footnote label or a sentence moved within the note.
+     - When unsure, use `xhigh`, because a wrong pass enters the ledger and later notes build on it.
    - Give it the note, the cited blocks and the notes that link to or from the note, which `uv run python -X utf8 scripts/verify.py context <note>...` prints.
    - It compares every factual sentence with the cited blocks, checks schema conformance and looks for contradictions with the linked notes.
    - On any mismatch, the note stays `draft` and the required fixes go to `log.md`.
@@ -401,7 +404,7 @@ Notes written by the LLM move through three statuses in order.
   - Key it by `identifier`.
   - Record the hash of the note without `status`, `reviewedBy` and `lastReviewed`, and the hashes of the cited blocks.
   - Record the generator and its commit, or the verifier's model, effort and session.
-  - For a note the verifier passed, `uv run python -X utf8 scripts/verify.py record --model opus --effort xhigh --session <id> <note>...` writes the line and sets `verified`.
+  - For a note the verifier passed, `uv run python -X utf8 scripts/verify.py record --model opus --effort <effort> --session <id> <note>...` writes the line and sets `verified`.
 - Retired or superseded instances are never deleted.
   - Set `validThrough` and link the successor with `isReplacedBy`.
 
@@ -484,7 +487,7 @@ Lint compares each number with the cited blocks, not the claim it makes. A sente
 
 ### Decisions
 
-The human owner decides the readings that no source settles, through the Human tasks in `TODO.md`.
+The human owner decides what the wiki covers where the sources leave a question open, such as leaving a case out of scope, but not how a statute is read. A reading that no source settles stays a question.
 
 - Record each answer in `docs/decisions.md` before changing a note.
   - Give each decision a heading `## <date> <task ID>`, with the items 질문, 판단, 보류 and 반영.
