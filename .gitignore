@@ -14,3 +14,6 @@ raw/work24/**/*.html
 .cache/
 
 tests/fixtures/vault/.obsidian/
+
+# Local research, service comparisons, and application prototypes.
+docs/evaluation/
