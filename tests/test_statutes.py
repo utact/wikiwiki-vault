@@ -364,6 +364,18 @@ def test_delegation_data_decides_for_articles_of_the_current_version():
     assert not statutes.decides(S.Unit(statutes.laws["시험법"], "art-10"), "시험법")
 
 
+def test_a_delegation_of_a_whole_article_links_the_unit(tmp_path):
+    statutes = family(rule_articles=[article(5, "범위", [("신고한다.", [])])])
+    note = tmp_path / "시험법 시행규칙 20260101-1 20261015T1337.md"
+    note.with_suffix(".json").write_text("{}", encoding="utf-8")
+    statutes.laws["시험법 시행규칙"].notes = {EFFECTIVE: note}
+    statutes.covered = {"시험법": Path("시험법 위임조문 20260101-1 20261015T1337.md")}
+    statutes.delegations = {("시험법 시행규칙", "art-5"): [("시험법", "제14조"), ("시험법", "제10조제2항")]}
+    chosen = [S.Unit(statutes.laws["시험법"], "art-14"), S.Unit(statutes.laws["시험법"], "art-10"), S.Unit(statutes.laws["시험법 시행규칙"], "art-5")]
+    meta, _ = S.render_unit(statutes, chosen[-1], chosen)
+    assert meta["basedOn"] == ["[[시험법 제14조]]", "[[시험법 제10조#^v20260101-p2]]"]
+
+
 def moved_article(reference):
     row = article(5, "범위", [("신고한다.", [])])
     row["조문참고자료"] = reference

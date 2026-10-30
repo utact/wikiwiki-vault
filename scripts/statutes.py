@@ -999,7 +999,7 @@ def render_unit(statutes, unit, chosen):
             lines = {s: t for s, t, _ in unit_lines(target, version["effective"])} if version else {}
             if block and block not in lines:
                 statutes.review.append(f"{unit.name}: the 위임조문 data names {upper} {provision}, which the current version does not declare; the link names the unit")
-            based.append(link(target.name, block_id(version, block) if block in lines else None))
+            based.append(link(target.name, block_id(version, block) if block and block in lines else None))
             data_notes.append(statutes.covered[upper].stem)
     if based:
         meta["basedOn"] = list(dict.fromkeys(based))
