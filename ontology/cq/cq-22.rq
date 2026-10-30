@@ -13,6 +13,7 @@ SELECT ?item ?source WHERE {
     ?service cv:hasChannel ?item .
   } UNION {
     employment:unemployment-recognition cv:relatedService ?item .
+    FILTER (?item NOT IN (employment:trainee-unemployment-recognition, employment:mass-unemployment-recognition))
   } UNION {
     employment:unemployment-recognition cv:relatedService/cv:hasChannel ?item .
   }
