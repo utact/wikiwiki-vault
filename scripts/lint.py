@@ -442,7 +442,10 @@ class Linter:
                 units = None if unit == "operand" else UNITS.get(unit or column_unit)
                 if kind == "date" and value not in dates:
                     report(where, kind, value)
-                elif kind == "number" and value not in (0, 1) and units and not any(("number", value, u) in pool for u in units):
+                elif kind == "number" and value not in (0, 1) and units and not any(("number", value, u) in pool for u in units) and not (
+                    # FEEL durations have no weeks, so the days of a duration may state 주 of the block, as P14D for 2주간.
+                    unit == "DAY" and value % 7 == 0 and ("number", value / 7, "주") in pool
+                ):
                     report(where, kind, value, "/".join(sorted(units)))
                 elif kind == "number" and value not in (0, 1) and not units and not (
                     value in numbers or value in ratios or any(value in (a, b) and b and a / b in ratios for a, b in pairs)

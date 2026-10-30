@@ -247,6 +247,15 @@ def test_operands_of_a_calculation_carry_no_unit():
     assert lint.feel_numbers("<= 113500")[0][3] is None
 
 
+def test_days_of_a_duration_may_state_weeks_of_the_block(tmp_path):
+    """FEEL durations have no weeks, so duration("P14D") states 2주간 of a block, and P21D does not."""
+    block = ("wiki/LegalResourceSubdivision/고용보험법 시행령 제7조.md", "다음 달 15일까지(근로자가", "다음 달 15일까지 또는 2주간(근로자가")
+    problems = run(tmp_path, block, (DEADLINE, 'duration("P1M")', 'duration("P14D")'))
+    assert not any("unaryTests has number" in p for p in problems), problems
+    problems = run(tmp_path / "bad", block, (DEADLINE, 'duration("P1M")', 'duration("P21D")'))
+    assert any("unaryTests has number 21일" in p for p in problems), problems
+
+
 def test_decision_table_outputs_may_be_expressions(tmp_path):
     """A DMN output entry is a FEEL expression, so a cell may compute its value from the inputs."""
     problems = run(tmp_path, (TABLE, "    - '120'\n  - - < 50\n    - '[1..3)'", "    - 피보험기간 * 120\n  - - < 50\n    - '[1..3)'"))

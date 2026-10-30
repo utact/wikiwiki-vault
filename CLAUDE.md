@@ -285,6 +285,7 @@ decisionTable:
 - Numbers and dates in `definition`, `unaryTests`, decision table cells and `literalExpression` must appear in the blocks of `source` or `isDerivedFrom`.
   - The 시행일 of the version of such a block counts, as in a footnoted sentence.
   - A number in a test or cell carries the unit of its concept's `unitCode` or `currency`, such as 일 for `DAY` and 원 for `KRW`, and a part of a duration its own unit, such as 개월 for `M`.
+  - FEEL durations have no weeks, so a part in days also matches a number of 주 that is a seventh of it, as `duration("P14D")` for 2주간.
   - An operand of `*` or `/` carries no unit, because it states a ratio, as 60 and 100 in `기초일액 * 60 / 100`.
   - 0 and 1 in FEEL are exempt, because they often encode structure, as `duration("P1M")` for 다음 달.
 - Rank sources in this order.
